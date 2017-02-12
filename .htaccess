@@ -1,3 +1,0 @@
-RewriteEngine on
-#RewriteRule ^ws/([^/\.]+)(.+)?$ /ws.php?_action=$1&_path=$2 [L,QSA]
-RewriteRule ^api/([^/\.]+)/?(.+)?$ /api.php?_action=$1&_path=$2 [L,QSA]
