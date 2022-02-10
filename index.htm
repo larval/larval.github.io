@@ -1,33 +1,141 @@
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
 <head>
- <title>Larval.com</title>
- <meta name="theme-color" content="#111" />
- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
- <style>
-HTML, BODY {
-	height: 100%;
-	background-color: #333;
-	margin: 0;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	pointer-events: none;
-}
-IMG {
-	position: fixed;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	max-width: 100%;
-	max-height: 100%;
-	margin: auto;
-	overflow: auto;
-}
- </style>
+ <title>Larval - Live market volatility</title>
+ <meta charset="UTF-8" /> 
+ <meta name="description" content="live stock market volatility in its larval stage" />
+ <meta name="keywords" content="live,stock,market,volatility,vega,implied,iv" />
+ <meta name="url" content="https://www.larval.com" />
+ <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, width=device-width" />
+ <meta name="theme-color" content="#303630" />
+ <link rel="icon" type="image/png" sizes="256x256" href="icon-256x256.png">
+ <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
+ <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
+ <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
+ <link rel="stylesheet" type="text/css" href="larval.css" />
+ <script src="larval.js"></script>
 </head>
-<body><img src="./res/larval.png" draggable="false" /></body>
-</html>
+<body onload="L.onload()">
+ <div id="l_fixed" onclick="L.fastSplash()">
+  <div id="l_fixed_bg1"></div>
+  <div id="l_fixed_bg2"></div>
+  <div id="l_fixed_bg3"></div>
+  <div id="l_menu">
+   <div id="l_afterhours_left">after<br />hours</div>
+   <div id="l_afterhours_right">after<br />hours</div>
+   <svg id="l_logo" version="1.0" xmlns="http://www.w3.org/2000/svg" width="550.000000pt" height="242.000000pt" viewBox="0 0 550.000000 242.000000" preserveAspectRatio="xMidYMid meet">
+    <g transform="translate(0.000000,242.000000) scale(0.100000,-0.100000)" fill="none" stroke="none">
+     <path class="l_logo_worm_out" fill="#E1FDE4" stroke="#E1FDE4" d="M1500 1909 c-92 -55 -144 -130 -144 -210 -1 -61 7 -74 64 -105 27 -14 57 -18 127 -18 51 0 96 3 99 7 3 3 -4 22 -16 42 -31 51 -60 166 -60 242 0 72 -10 78 -70 42z">
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0.5" dur="0.5s" begin="3.5s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_worm_in" fill="#E1FDE4" stroke="#E1FDE4" d="M1815 2163 c-11 -3 -33 -15 -50 -26 -82 -56 -109 -127 -103 -265 8 -156 32 -206 146 -304 27 -23 42 -28 88 -28 45 0 59 4 79 24 13 13 44 32 69 41 25 10 46 20 46 23 0 3 -14 27 -30 54 -17 27 -42 84 -56 126 -23 69 -26 87 -21 177 3 55 9 112 12 127 6 21 2 29 -14 37 -24 13 -136 23 -166 14z">
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0.5" dur="0.5s" begin="3.6s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_worm_out" fill="#E1FDE4" stroke="#E1FDE4" d="M2242 2289 c-104 -52 -159 -146 -169 -290 -10 -144 35 -255 156 -381 l74 -78 54 0 c48 0 60 4 96 35 22 19 44 35 49 35 15 0 8 20 -30 79 -59 90 -77 157 -77 281 0 120 23 212 75 293 16 26 30 50 30 52 0 3 -44 5 -98 5 -90 0 -104 -3 -160 -31z">
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0.5" dur="0.5s" begin="3.7s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_worm_in" fill="#E1FDE4" stroke="#E1FDE4" d="M2717 2356 c-136 -50 -218 -176 -233 -356 -14 -163 50 -290 196 -390 31 -21 62 -45 69 -54 9 -11 30 -16 68 -16 57 0 50 -4 160 85 l24 20 -25 46 c-104 186 -94 421 25 578 22 29 39 54 37 56 -2 1 -19 11 -38 21 -47 24 -227 31 -283 10z">
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0.5" dur="0.5s" begin="3.8s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_worm_out" fill="#E1FDE4" stroke="#E1FDE4" d="M3205 2308 c-149 -54 -233 -223 -204 -412 16 -105 59 -185 146 -277 l76 -79 55 0 c47 0 60 4 92 33 21 17 48 39 60 47 l22 16 -21 34 c-96 157 -76 406 45 540 l35 38 -30 21 c-53 38 -98 51 -173 50 -40 0 -86 -5 -103 -11z">
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0.5" dur="0.5s" begin="3.9s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_worm_in" fill="#E1FDE4" stroke="#E1FDE4" d="M3630 2207 c-46 -15 -109 -79 -140 -142 -21 -43 -24 -65 -25 -155 0 -95 3 -110 28 -161 28 -59 77 -111 160 -173 39 -30 55 -36 97 -36 28 0 50 4 50 8 0 20 43 52 70 52 17 0 30 5 30 10 0 6 -4 10 -8 10 -14 0 -74 108 -93 170 -38 124 -15 238 64 307 21 18 37 36 37 40 -1 12 -71 59 -109 71 -41 15 -114 14 -161 -1z">
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0.5" dur="0.5s" begin="4s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_worm" fill="#E1FDE4" stroke="#E1FDE4" d="M3949 2047 c-70 -47 -90 -104 -73 -209 8 -48 20 -48 39 -1 32 76 86 113 165 113 39 0 50 3 50 16 0 27 -41 75 -76 90 -46 19 -66 18 -105 -9z">
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0.5" dur="0.5s" begin="4.1s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_worm l_logo_worm_blink" fill="#E1FDE4" stroke="#E1FDE4" d="M4022 1837 c-25 -27 -42 -76 -42 -124 0 -91 49 -83 109 17 21 34 27 83 15 114 -9 24 -57 20 -82 -7z">
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0.5" dur="0.5s" begin="4.2s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4" d="M 632 1938 c 0 -33 0 -1439 0 -1466 c 8 -8 48 -12 113 -12 c 65 0 105 4 113 12 c 0 22 0 1440 0 1466 c -8 8 -48 12 -113 12 c -65 0 -105 -4 -113 -12 z">
+      <animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="stroke-width" values="40;0" dur="0.5s" begin="1s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="1s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4" d="M1310 1452 c-277 -73 -434 -382 -335 -662 34 -96 113 -193 205 -252 99 -63 147 -71 458 -76 214 -3 286 -1 297 8 0 18 0 540 0 623 -22 87 -61 155 -127 223 -128 134 -313 184 -498 136z m250 -252 c49 -25 95 -72 123 -124 19 -36 22 -61 25 -203 l4 -163 -163 0 c-186 0 -217 9 -284 75 -107 107 -100 280 16 378 78 68 190 82 279 37z">
+      <animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="stroke-width" values="40;0" dur="0.5s" begin="1.5s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="1.5s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_letter" fill="#E1FDE4" stroke="#E1FDE4" d="M1369 1097 c-105 -71 -105 -193 0 -264 126 -85 293 82 208 208 -52 78 -140 102 -208 56z">
+      <animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="stroke-width" values="20;0" dur="0.5s" begin="4.2s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="4.2s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4" d="M2390 1452 c-187 -49 -335 -218 -360 -412 -14 -112 0 -553 2 -568 16 -16 210 -16 226 0 9 9 12 86 12 283 0 262 1 271 24 321 29 63 95 120 160 139 30 9 91 14 155 15 l106 0 188 -375 c178 -357 188 -375 215 -375 26 0 37 21 267 479 205 411 237 481 226 495 -11 13 -35 16 -120 16 l-106 0 -134 -267 -133 -268 -134 268 -134 267 -198 -1 c-152 0 -212 0 -262 -17z">
+      <animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="stroke-width" values="20;0" dur="0.5s" begin="2s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="2s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4" d="M3920 1452 c-277 -73 -434 -382 -335 -662 34 -96 113 -193 205 -252 99 -63 147 -71 458 -76 214 -3 286 -1 297 8 0 18 0 540 0 623 -22 87 -61 155 -127 223 -128 134 -313 184 -498 136z m250 -252 c49 -25 95 -72 123 -124 19 -36 22 -61 25 -203 l4 -163 -163 0 c-186 0 -217 9 -284 75 -107 107 -100 280 16 378 78 68 190 82 279 37z">
+      <animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="stroke-width" values="20;0" dur="0.5s" begin="2.5s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="2.5s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_letter" fill="#E1FDE4" stroke="#E1FDE4" d="M3979 1097 c-50 -33 -79 -82 -79 -132 0 -79 76 -155 155 -155 50 0 99 29 132 79 85 126 -82 293 -208 208z">
+      <animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="stroke-width" values="20;0" dur="0.5s" begin="4.2s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="4.2s" repeatCount="1" fill="freeze" />
+     </path>
+     <path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4" d="M 4642 1938 c 0 -25 0 -1448 0 -1466 c 16 -16 210 -16 226 0 c 0 19 0 1443 0 1466 c -8 8 -48 12 -113 12 c -65 0 -105 -4 -113 -12 z">
+      <animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze" />
+      <animate attributeName="stroke-width" values="20;0" dur="0.5s" begin="3s" repeatCount="1" fill="freeze" />
+      <animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="3s" repeatCount="1" fill="freeze" />
+     </path>
+    </g>
+   </svg>
+   <div id="l_logo_tag">stock market volatility in its <span id="l_logo_tag_type"><span>l</span><span>a</span><span>r</span><span>v</span><span>a</span><span>l</span></span> stage</div>
+  </div>
+  <div id="l_progress">
+   <div id="l_progress_display">
+    <div id="l_progress_cap_left"></div>
+    <div id="l_progress_cap_right"></div>
+   </div>
+  </div>
+ </div>
+ <div id="l_marquee_container">
+  <div id="l_marquee">
+   <div id="l_marquee_content">
+    <div class="l_marquee_item">
+     <span class='l_marquee_blink'>&#8226;</span> Larval is a simple utility that looks for volatility in the stock market as it happens. <span class='l_marquee_blink'>&#8226;</span> It works by monitoring the market in ~5 minute intervals and alerts you if the price change meets your criteria. <span class='l_marquee_blink'>&#9650;</span> The countdown slider above indicates the time remaining until the next polling update. <span class='l_marquee_blink'>&#9660;</span> The settings button below allows you to control the criteria that alerts you after each polling update.
+    </div>
+   </div>
+   <div id="l_marquee_content_clone"></div>
+  </div>
+ </div>
+ <div id="l_settings_button" onclick="L.settingsButtonToggle();">&#9650; settings &#9650;</div>
+ <div id="l_control">
+  <table id="l_control_table">
+   <tr><th colspan="2">~5 minute % change threshold to alert (<i>0.0% to disable</i>)</th></tr>
+   <tr><td><input type="range" min="0" max="99" value="50" class="l_range" id="l_range_up" oninput="L.updateRangeDisplay('l_range_up_display', this.value)" onchange="L.settingsSave(true)" /></td><td style="width:1%">&gt;<span id="l_range_up_display">0.0</span>%</td></tr>
+   <tr><td><input type="range" min="0" max="99" value="50" class="l_range" id="l_range_down" oninput="L.updateRangeDisplay('l_range_down_display', -this.value)" onchange="L.settingsSave(true)" /></td><td style="width:1%">&lt;<span id="l_range_down_display">0.0</span>%</td></tr>
+   <tr><td colspan="2"><input type="checkbox" class="l_checkbox" id="l_audible" name="l_audible" onchange="L.settingsSave(true)" /> <label for="l_audible">Audible notifications</label> <input type="checkbox" class="l_checkbox" id="l_options_only" name="l_options_only" onchange="L.settingsSave(true)" /> <label for="l_options_only">Only notify if stock has options</label></td></tr>
+   <tr><td colspan="2"><input type="checkbox" checked="checked" class="l_checkbox" id="l_notify_halts" name="l_notify_halts" onchange="L.settingsSave(true)" /> <label for="l_notify_halts">Notifications when stocks are halted</label> <input type="checkbox" class="l_checkbox" id="l_include_crypto" name="l_include_crypto" onchange="L.settingsSave(true)" value="1" /> <label for="l_include_crypto">Include crypto</label></td></tr>
+  </table>
+ </div>
+ <div id="l_content">
+  <table id="l_content_table">
+   <tr><th id="l_awaiting_data">Larval is awaiting market data or is undergoing temporary maintenance. This page will automatically update as soon as market data becomes available.</th></tr>
+  </table>
+ </div>
+ <div id="l_footer">
+  <a href="//larval.com">larval.com</a> &#8226; <a href="//stage.larval.com">stage.larval.com</a> &#8226; <a href="#" onclick="L.forceNextStagePoll()" title="Force update now">last update: <span id="l_last_update">0000-00-00T00:00:00-00:00</span></a>
+ </div>
+</body></html>
