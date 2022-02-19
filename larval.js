@@ -58,7 +58,8 @@ var L = {
 		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.setNextStagePoll(!L._stageData||!L._stageData['stocks'] ? L._setNextStagePollShort : L.getSynchronizedNext());
-		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData['top'] && L._stageData['top'].length > 1)
+		const topType = L.E('l_include_crypto').checked ? 'top_all' : 'top';
+		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData[topType] && L._stageData[topType].length > 1)
 			L.marqueeUpdate(L._marqueeLoopSecondsLong);
 		else
 			L.marqueeInitiate(L._marqueeLoopSecondsShort);
@@ -197,7 +198,7 @@ var L = {
 		lb.style.animation = `l_marquee ${seconds}s linear infinite`;
 	},
 	marqueeUpdate: seconds => {
-		let topType = L.E('l_include_crypto').checked ? 'top_all' : 'top';
+		const topType = L.E('l_include_crypto').checked ? 'top_all' : 'top';
 		if(!L._stageData || !L._stageData[topType] || L._stageData[topType].length < 2)
 			return;
 		let html='';
