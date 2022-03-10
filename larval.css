@@ -709,7 +709,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	}
 	#l_footer a {
 		padding-left: 5px;
-		padding-right:5px;
+		padding-right: 5px;
 	}
 	#l_last_update {
 		font-size: 10px;
