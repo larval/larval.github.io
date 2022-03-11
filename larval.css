@@ -371,7 +371,7 @@ body:before {
 	font-weight: bold;
 	text-align: center;
 }
-#l_control_table tr:nth-child(4) {
+#l_control_table tr:nth-child(5) {
 	border-top: 1px solid #333;
 	white-space: nowrap;
 }
@@ -390,7 +390,7 @@ body:before {
 	border-left: 1px solid #333;
 	border-right: 1px solid #333;
 }
-#l_control_table tr:nth-child(4) td, #l_control_table tr:nth-child(5) td {
+#l_control_table tr:nth-child(5) td, #l_control_table tr:nth-child(6) td {
 	padding: 5px !important;
 }
 #l_content_table {
@@ -488,7 +488,22 @@ body:before {
 	background: #FDA4A4;
 	cursor: pointer;
 }
-#l_range_up_display, #l_range_down_display {
+#l_range_volume::-webkit-slider-thumb {
+	appearance: none;
+	width: 25px;
+	height: 25px;
+	border-radius: 50%;
+	background: #A6FDA4;
+	cursor: pointer;
+}
+#l_range_volume::-moz-range-thumb {
+	width: 25px;
+	height: 25px;
+	border-radius: 50%;
+	background: #A6FDA4;
+	cursor: pointer;
+}
+#l_range_up_display, #l_range_down_display, #l_range_volume_display {
 	padding-left: 5px;
 }
 input[type="checkbox"] {

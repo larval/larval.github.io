@@ -49,6 +49,7 @@ var L = {
 		setTimeout(L.onloadAnimationComplete, 5500);
 		L.E('l_range_up').oninput();
 		L.E('l_range_down').oninput();
+		L.E('l_range_volume').oninput();
 		L.getStageData(false);
 	},
 	onloadAnimationComplete: () => {
@@ -181,7 +182,7 @@ var L = {
 		}
 	},
 	updateRangeDisplay: (id, value) => {
-		if(L.E(id)) L.E(id).innerHTML = (value / 10).toFixed(1);
+		if(L.E(id)) L.E(id).innerHTML = (id=='l_range_volume_display' ? value : (value / 10).toFixed(1));
 	},
 	marqueeInitiate: (seconds, html) => {
 		const lb=L.E('l_marquee'), lbc=L.E('l_marquee_content'), lbcc=L.E('l_marquee_content_clone');
@@ -284,7 +285,7 @@ var L = {
 	updateLiveTable: doNotify => {
 		if(!L._stageData)
 			return;
-		const rangeUp=parseFloat(L.E('l_range_up_display').innerHTML), rangeDown=parseFloat(L.E('l_range_down_display').innerHTML), optionsOnly=L.E('l_options_only').checked, includeCrypto=L.E('l_include_crypto').checked;
+		const rangeUp=parseFloat(L.E('l_range_up_display').innerHTML), rangeDown=parseFloat(L.E('l_range_down_display').innerHTML), rangeVolume=parseInt(L.E('l_range_volume_display').innerHTML)*1000, optionsOnly=L.E('l_options_only').checked, includeCrypto=L.E('l_include_crypto').checked;
 		L.E('l_afterhours_left').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		let notifySymbols=[], notifyAny=false, rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
@@ -315,7 +316,7 @@ var L = {
 		}
 		for(let i in L._stageData['stocks']) {
 			const row=L._stageData['stocks'][i], notifyExcept=!!L._notifyExceptions[row[0]];
-			const notify=( !notifyExcept && ((rangeUp&&row[2]>=rangeUp)||(rangeDown&&rangeDown>=row[2])) && (!optionsOnly||row[6]) );
+			const notify=( !notifyExcept && ((rangeUp&&row[2]>=rangeUp)||(rangeDown&&rangeDown>=row[2])) && row[5]>=rangeVolume && (!optionsOnly||row[6]) );
 			if(!includeCrypto && row[6]=='crypto')
 				continue;
 			if(notify) {
