@@ -303,8 +303,8 @@ var L = {
                  ${L.H(row[0])}
                 </td>
 				<td>${L.H(row[1])}</td>
-				<td>HALTED</td>
-				<td colspan="4">${L.H(row[2])}</td>
+				<td colspan="4">HALT: ${L.H(row[2])}</td>
+				<td>${row[3]?L.H(row[3]):'<div class="l_none">&#8226;</div>'}</td>
 				</tr>`;
 			if(notify) {
 				notifyAny = true;
