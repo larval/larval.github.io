@@ -429,6 +429,12 @@ body:before {
 	text-align: center;
 	position: relative;
 }
+.l_notify_halt td:nth-child(3) {
+	text-align: left !important;
+}
+.l_notify_halt td:nth-child(4) {
+	text-align: center !important;
+}
 #l_awaiting_data {
 	font-variant: normal !important;
 	font-family: Larval,Futura,Trebuchet MS,Arial,sans-serif;
