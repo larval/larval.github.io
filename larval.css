@@ -365,7 +365,7 @@ body:before {
 	transition: 0.5s;
 }
 #l_control {
-	max-height: 0px;
+	height: 0px;
 	width: 45%; 
 	transition: 1s;
 	overflow: hidden;
