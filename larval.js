@@ -4,6 +4,7 @@ var L = {
 	_stageData: null,
 	_notifyExceptions: {},
 	_splashComplete: false,
+	_forceContentTableShrink: false,
 	_setNextStagePollTimeout: null,
 	_setNextStagePollLong: 300,
 	_setNextStagePollShort: 30,
@@ -289,7 +290,7 @@ var L = {
 		L.E('l_afterhours_left').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		let notifySymbols=[], notifyAny=false, rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
-		let html='<tr><th style="width:1%">symbol</th><th>company</th><th style="width:1%">~5min%</th><th style="width:1%">total%</th><th style="width:1%">price</th><th style="width:1%">volume</th><th style="width:1%">options</th></tr>';
+		let html=`<tr><th style="width:1%">symbol</th><th>${L._forceContentTableShrink?'<div class="l_none">&#8226;</div>':'company'}</th><th style="width:1%">~5min%</th><th style="width:1%">total%</th><th style="width:1%">price</th><th style="width:1%">volume</th><th style="width:1%">options</th></tr>`;
 		if(doNotify)
 			L.notifyClear();
 		for(let i in L._stageData['halts']) {
@@ -302,7 +303,7 @@ var L = {
 				 <div class="l_notify_disable" title="Disable ${L.H(row[0])} notifications for this session" onclick="L.notifyException('${L.H(row[0])}', true)">x</div>
                  ${L.H(row[0])}
                 </td>
-				<td>${L.H(row[1])}</td>
+				<td>${L._forceContentTableShrink?'<div class="l_none">&#8226;</div>':L.H(row[1])}</td>
 				<td colspan="4">HALT: ${L.H(row[2])}</td>
 				<td>${row[3]?L.H(row[3]):'<div class="l_none">&#8226;</div>'}</td>
 				</tr>`;
@@ -341,7 +342,7 @@ var L = {
 				notifyEarnings = '';
 			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow('${L.H(row[0])}', event)">
 				<td>${notifyControl}${L.H(row[0])}</td>
-				<td>${L.H(row[1])}</td>
+				<td>${L._forceContentTableShrink?'<div class="l_none">&#8226;</div>':L.H(row[1])}</td>
 				<td>${L.htmlPercent(row[2])}</td>
 				<td>${L.htmlPercent(row[3])}</td>
 				<td>$${L.D(row[4],2)}</td>
@@ -360,7 +361,11 @@ var L = {
 		if(!L.E('l_awaiting_data') && !L.E('l_content_table').classList.contains('l_content_tr_fade_in'))
 			L.E('l_content_table').classList.add('l_content_tr_fade_in');
 		L.E('l_content_table').innerHTML = html;
-		if(notifyAny && doNotify)
+		if(!L._forceContentTableShrink && L.E('l_content_table').offsetWidth > document.body.offsetWidth) {
+			L._forceContentTableShrink = true;
+			L.updateLiveTable(doNotify);
+		}
+		else if(notifyAny && doNotify)
 			L.notify(notifySymbols.length > 0 ? ('Volatile stock(s): '+notifySymbols.join(', ')) : null);
 	}
 }

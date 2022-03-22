@@ -6,17 +6,17 @@
 	src: url(larval.woff2) format('woff2');
 }
 @keyframes l_body {
-  0% { background: #222; }
-  50% { background: #333; }
-  100% { background: #222; }
+	0% { background: #222; }
+	50% { background: #333; }
+	100% { background: #222; }
 }
 @keyframes l_background {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
 }
 @keyframes l_fixed_bg {
-  0% { transform: translateX(-25%); }
-  100% { transform: translateX(25%); }
+	0% { transform: translateX(-25%); }
+	100% { transform: translateX(25%); }
 }
 @keyframes l_fixed {
     from { height: 100%; }
@@ -103,6 +103,7 @@ html, body {
 	width: 100%;
 	font-family: Larval,Futura,Trebuchet MS,Arial,sans-serif;
 	font-size: 16px;
+    max-width: 100%;
 }
 body {
 	animation: l_body 120s linear infinite;
@@ -130,6 +131,10 @@ body:before {
 	right: 15vw;
 	animation-delay: -30s;
 	animation-direction: reverse;
+}
+#l_overflow {
+	max-width: 100%;
+	overflow-x: hidden;
 }
 #l_fixed_bg1, #l_fixed_bg2, #l_fixed_bg3 {
 	position: absolute;
@@ -218,10 +223,10 @@ body:before {
 	user-select: none;
 }
 #l_logo_tag::after {
-  display: none;
-  clear: both;
-  height: 0;
-  width: 0;
+	display: none;
+	clear: both;
+	height: 0;
+	width: 0;
 }
 #l_logo_tag_type {
 	color: #A6FDA4;
@@ -241,10 +246,10 @@ body:before {
 #l_logo_tag_type span:nth-child(5) { animation-delay: 2.6s; }
 #l_logo_tag_type span:nth-child(6) { animation-delay: 3s; }
 .l_logo_letter {
-  stroke-dasharray: 20;
-  stroke-dashoffset: 20;
-  animation: l_logo_dash 60s linear alternate infinite;
-  filter: drop-shadow( 75px -75px 0px rgba(0, 0, 0, 1));
+	stroke-dasharray: 20;
+	stroke-dashoffset: 20;
+	animation: l_logo_dash 60s linear alternate infinite;
+	filter: drop-shadow( 75px -75px 0px rgba(0, 0, 0, 1));
 }
 .l_logo_worm, .l_logo_worm_in, .l_logo_worm_out {
 	stroke-dasharray: 20;
@@ -734,6 +739,9 @@ input[type=checkbox]:checked:disabled + label:before {
 	}
 	#l_last_update {
 		font-size: 10px;
+	}
+	.l_notify_earnings, .l_notify_disable, .l_notify_enable {
+		display: none;
 	}
 }
 @media only screen and (max-height: 500px) {
