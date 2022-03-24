@@ -115,6 +115,7 @@ var L = {
 					xhr.onerror();
 				else {
 					L._stageData = json;
+					L._forceContentTableShrink = false;
 					L.E('l_last_update').innerHTML = L.H(L._stageData['ts']);
 					if(updateView)
 						L.updateLiveTable(true);
