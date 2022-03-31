@@ -2,6 +2,7 @@ var L = {
 
 	/* INTERNALS */
 	_stageData: null,
+	_stageDataSortByColumn: 0,
 	_notifyExceptions: {},
 	_splashComplete: false,
 	_forceContentTableShrink: false,
@@ -115,6 +116,7 @@ var L = {
 					xhr.onerror();
 				else {
 					L._stageData = json;
+					L.sortStageData(false);
 					L._forceContentTableShrink = false;
 					L.E('l_last_update').innerHTML = L.H(L._stageData['ts']);
 					if(updateView)
@@ -284,14 +286,58 @@ var L = {
 			sym = symbol.substr(1) + '-USD';
 		window.open(`https://finance.yahoo.com/quote/${L.H(sym)}`, `larval_${symbol}`).focus();
 	},
+	setSortStageData: column => {
+		if(L._stageDataSortByColumn == -column) {
+			if(L._stageData.stocksImmutable)
+				L._stageData.stocks = structuredClone(L._stageData.stocksImmutable);
+			L._stageDataSortByColumn = 0;
+		}
+		else if(L._stageDataSortByColumn == column)
+			L._stageDataSortByColumn = -column;
+		else
+			L._stageDataSortByColumn = column;
+		L.sortStageData(true);
+	},
+	sortStageData: updateView => {
+		if(L._stageData && L._stageDataSortByColumn) {
+			if(!L._stageData.stocksImmutable)
+				L._stageData.stocksImmutable = structuredClone(L._stageData.stocks);
+			L._stageData.stocks = L._stageData.stocks.sort((a, b) => {
+				const column = Math.abs(L._stageDataSortByColumn) - 1;
+				if(a[column] === null || a[column] === false)
+					return 1;
+				else if(b[column] === null || b[column] === false)
+					return -1;
+				else if(typeof a[column] == 'string')
+					return L._stageDataSortByColumn < 0 ? b[column].toUpperCase().localeCompare(a[column].toUpperCase()) : a[column].toUpperCase().localeCompare(b[column].toUpperCase());
+				else if(typeof a[column] == 'number')
+					return L._stageDataSortByColumn < 0 ? a[column]-b[column] : b[column]-a[column];
+			});
+		}
+		if(updateView)
+			L.updateLiveTable(false);
+	},
 	updateLiveTable: doNotify => {
 		if(!L._stageData)
 			return;
+		const columns=['symbol', L._forceContentTableShrink?'<div class="l_none">&#8226;</div>':'company', '~5min%','total%','price','volume','options'];
 		const rangeUp=parseFloat(L.E('l_range_up_display').innerHTML), rangeDown=parseFloat(L.E('l_range_down_display').innerHTML), rangeVolume=parseInt(L.E('l_range_volume_display').innerHTML)*1000, optionsOnly=L.E('l_options_only').checked, includeCrypto=L.E('l_include_crypto').checked;
 		L.E('l_afterhours_left').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		let notifySymbols=[], notifyAny=false, rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
-		let html=`<tr><th style="width:1%">symbol</th><th>${L._forceContentTableShrink?'<div class="l_none">&#8226;</div>':'company'}</th><th style="width:1%">~5min%</th><th style="width:1%">total%</th><th style="width:1%">price</th><th style="width:1%">volume</th><th style="width:1%">options</th></tr>`;
+
+		let html='<tr>';
+		for(let c=1,className=''; c <= columns.length; c++) {
+			if(L._stageDataSortByColumn == c)
+				className = 'l_content_table_header_selected';
+			else if(L._stageDataSortByColumn == -c)
+				className = 'l_content_table_header_selected_reverse';
+			else
+				className = 'l_content_table_header';
+			html += `<th onclick="L.setSortStageData(${c})" id="l_content_table_header_${c}" class="${className}">${columns[c-1]}</th>`;
+		}
+		html += '</tr>';
+
 		if(doNotify)
 			L.notifyClear();
 		for(let i in L._stageData['halts']) {
