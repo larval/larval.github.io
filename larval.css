@@ -416,6 +416,8 @@ body:before {
 }
 #l_content_table tr th:hover {
 	text-decoration: underline;
+	text-underline-offset: 2px;
+	text-decoration-thickness: 2px;
 	cursor: pointer;
 }
 #l_content_table tr td {
@@ -663,6 +665,8 @@ input[type=checkbox]:checked:disabled + label:before {
 	.l_marquee_link:hover {
 		display: inline-block;
 		text-decoration: underline;
+		text-underline-offset: 2px;
+		text-decoration-thickness: 2px;
 		cursor: pointer;
 	}
 	#l_settings_button:hover {
