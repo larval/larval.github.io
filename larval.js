@@ -165,7 +165,7 @@ var L = {
 		for(let inputs=L.T('input'), i=0; i < inputs.length; i++) {
 			let input=inputs[i];
 			if(input.type == 'checkbox')
-				localStorage.setItem(input.id, input.checked? 'true' : 'false');
+				localStorage.setItem(input.id, input.checked ? 'true' : 'false');
 			else if(input.type == 'range')
 				localStorage.setItem(input.id, input.value);
 		}
@@ -173,6 +173,9 @@ var L = {
 			L.updateLiveTable(false);
 	},
 	settingsLoad: () => {
+		const now=new Date();
+		if(localStorage.length == 0 && (now.getDay() == 0 || now.getDay() == 6))
+			L.E('l_include_crypto').checked = true;
 		for(let i=0; i < localStorage.length; i++) {
 			let input=L.E(localStorage.key(i));
 			if(!input || !input['type'])
