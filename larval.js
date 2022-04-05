@@ -157,8 +157,8 @@ var L = {
 			return('<div class="l_none">&#8226;</div>');
 	},
 	settingsButtonToggle: () => {
-		const grow=L.E('l_control').style.height!='240px';
-		L.E('l_control').style.height = (grow?'240px':'0px');
+		const controlHeight=(L.E('l_control').scrollHeight > 200 ? L.E('l_control_table').scrollHeight : 240)+'px', grow=L.E('l_control').style.height!=controlHeight;
+		L.E('l_control').style.height = (grow?controlHeight:'0px');
 		L.E('l_settings_button').innerHTML = (grow?'&#9660; settings &#9660;':'&#9650; settings &#9650;');
 	},
 	settingsSave: updateView => {

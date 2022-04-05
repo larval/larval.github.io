@@ -396,8 +396,11 @@ body:before {
 	border-left: 1px solid #333;
 	border-right: 1px solid #333;
 }
-#l_control_table tr:nth-child(5) td, #l_control_table tr:nth-child(6) td {
+#l_control_table tr:nth-child(5) td {
 	padding: 5px !important;
+}
+#l_control_table tr:nth-child(6) td {
+	padding: 5px 5px 8px 5px !important;
 }
 #l_content_table {
 	width: 100%;
