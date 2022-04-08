@@ -48,6 +48,7 @@ var L = {
 		document.addEventListener('click', L.notifySetup);
 		document.addEventListener('touchstart', L.notifySetup);
 		document.addEventListener('scroll', L.onscroll);
+		window.addEventListener('resize', L.onresize);
 		setTimeout(L.onloadAnimationComplete, 5500);
 		L.E('l_range_up').oninput();
 		L.E('l_range_down').oninput();
@@ -69,6 +70,7 @@ var L = {
 		setInterval(() => { L.marqueeUpdate(L._marqueeLoopSecondsLong) }, L._marqueeLoopSecondsLong * 1000);
 		L.updateLiveTable(true);
 	},
+	onresize: () => { L.settingsButtonToggle(true); },
 	onscroll: () => {
 		const w=window, d=document, e=d.documentElement, g=L.T('body')[0],
 			x=w.innerWidth||e.clientWidth||g.clientWidth, y=w.innerHeight||e.clientHeight||g.clientHeight,
@@ -156,8 +158,8 @@ var L = {
 		else
 			return('<div class="l_none">&#8226;</div>');
 	},
-	settingsButtonToggle: () => {
-		const controlHeight=(L.E('l_control').scrollHeight > 200 ? L.E('l_control_table').scrollHeight : 240)+'px', grow=L.E('l_control').style.height!=controlHeight;
+	settingsButtonToggle: forceClosed => {
+		const controlHeight=(L.E('l_control').scrollHeight > 200 ? L.E('l_control_table').scrollHeight : 250)+'px', grow=(!forceClosed && L.E('l_control').style.height!=controlHeight);
 		L.E('l_control').style.height = (grow?controlHeight:'0px');
 		L.E('l_settings_button').innerHTML = (grow?'&#9660; settings &#9660;':'&#9650; settings &#9650;');
 	},
