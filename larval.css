@@ -446,7 +446,10 @@ body:before {
 	text-align: left;
 	position: relative;
 }
-#l_content_table tr td:nth-child(2) { text-align: left; }
+#l_content_table tr td:nth-child(2) {
+	text-align: left;
+	word-break: break-all;
+}
 #l_content_table tr td:nth-child(7) {
 	text-align: center;
 	position: relative;
