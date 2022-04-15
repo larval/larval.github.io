@@ -393,27 +393,13 @@ var L = {
 			else
 				notifyEarnings = '';
 
-let priceColumn = '';
-if(row[8])
-	priceColumn += `<span class="l_hover_active">$${L.D(row[8],2)}</span><span class="l_hover_inactive">`;
-priceColumn += row[4] ? ('$'+L.D(row[4],2)) : '<div class="l_none">&#8226;</div>';
-if(row[8])
-	priceColumn += '</span>';
-
-let volumeColumn = '';
-if(row[9])
-	volumeColumn += `<span class="l_hover_active">+${L.F(row[9],1)}</span><span class="l_hover_inactive">`;
-volumeColumn += row[5] ? L.F(row[5],1) : '<div class="l_none">&#8226;</div>';
-if(row[9])
-	volumeColumn += '</span>';
-
 			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow('${L.H(row[0])}', event)">
 				<td>${notifyControl}${L.H(row[0])}</td>
 				<td>${L._forceContentTableShrink?'<div class="l_none">&#8226;</div>':L.H(row[1])}</td>
 				<td>${L.htmlPercent(row[2])}</td>
 				<td>${L.htmlPercent(row[3])}</td>
-				<td>${priceColumn}</td>
-				<td>${volumeColumn}</td>
+				<td>$${L.D(row[4],2)}</td>
+				<td>${row[5]?L.F(row[5],1):'<div class="l_none">&#8226;</div>'}</td>
 				<td>${notifyEarnings}${row[6]?L.H(row[6]):'<div class="l_none">&#8226;</div>'}</td>
 				</tr>`;
 			if(notify)

@@ -433,6 +433,16 @@ body:before {
 	border-top: 1px solid #ccc;
 	text-align: right;
 }
+#l_content_table tr td .l_hover_active {
+	font-style: italic;
+	color: #825900;
+}
+#l_content_table tr td .l_hover_inactive, #l_content_table tr:hover td .l_hover_active {
+	display: block;
+}
+#l_content_table tr td .l_hover_active, #l_content_table tr:hover td .l_hover_inactive {
+	display: none;
+}
 .l_content_table_header, .l_content_table_header_selected, .l_content_table_header_selected_reverse {
 	width: 1%;
 	user-select: none;
