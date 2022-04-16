@@ -30,10 +30,10 @@
 	}
 }
 @keyframes l_tag {
-    0% {opacity: 0;}
-    10% {opacity: 1;}
-    90% {opacity: 1;}
-    100% {opacity: 0;}
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
 }
 @keyframes l_logo_dash {
 	from { stroke-dashoffset: 5000; }
@@ -86,6 +86,16 @@
 @keyframes l_notify_halt {
 	from { background-color: transparent; }
 	to { background-color: #ffde96; }
+}
+@keyframes l_hover_active {
+	from {
+		right: -20px;
+		opacity: 0;
+	}
+	to {
+		right: 0px;
+		opacity: 1;
+	}
 }
 @keyframes l_afterhours {
 	from { color: #A6FDA4; }
@@ -433,15 +443,21 @@ body:before {
 	border-top: 1px solid #ccc;
 	text-align: right;
 }
+#l_content_table tr td .l_hover_container {
+	position: relative;
+}
 #l_content_table tr td .l_hover_active {
 	font-style: italic;
+	text-decoration: underline;
 	color: #825900;
-}
-#l_content_table tr td .l_hover_inactive, #l_content_table tr:hover td .l_hover_active {
-	display: block;
-}
-#l_content_table tr td .l_hover_active, #l_content_table tr:hover td .l_hover_inactive {
 	display: none;
+	position: absolute;
+	top: 0;
+	right: -20px;
+	opacity: 0;
+}
+#l_content_table tr td .l_hover_inactive {
+	visibility: visible;
 }
 .l_content_table_header, .l_content_table_header_selected, .l_content_table_header_selected_reverse {
 	width: 1%;
@@ -460,16 +476,16 @@ body:before {
 	text-align: left;
 	word-break: break-all;
 }
+#l_content_table tr td:nth-child(5) { overflow: hidden; }
+#l_content_table tr td:nth-child(6) { overflow: hidden; }
 #l_content_table tr td:nth-child(7) {
 	text-align: center;
 	position: relative;
 }
-.l_notify_halt td:nth-child(3) {
-	text-align: left !important;
-}
-.l_notify_halt td:nth-child(4) {
-	text-align: center !important;
-}
+.l_notify_halt td:nth-child(3) { text-align: left !important; }
+.l_notify_halt td:nth-child(4) { text-align: center !important; }
+
+
 #l_awaiting_data {
 	font-variant: normal !important;
 	font-family: Larval,Futura,Trebuchet MS,Arial,sans-serif;
@@ -695,6 +711,13 @@ input[type=checkbox]:checked:disabled + label:before {
 		cursor: pointer;
 		text-decoration: underline;
 	}
+	#l_content_table tr:hover td .l_hover_inactive {
+		visibility: hidden;
+	}
+	#l_content_table tr:hover td .l_hover_active {
+		display: block;
+		animation: l_hover_active 0.5s ease 0s 1 normal forwards; 
+	}
 	.l_notify_enable:hover, .l_notify_disable:hover {
 		left: -35px;
 		width: 30px;
@@ -708,7 +731,7 @@ input[type=checkbox]:checked:disabled + label:before {
 }
 @media only screen and (max-width: 1300px) {
 	.l_notify_earnings span {
-		display:none;
+		display: none;
 	}
 }
 @media only screen and (max-width: 1500px) {
