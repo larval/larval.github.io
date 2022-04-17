@@ -86,18 +86,18 @@ var L = {
 	fastSplash: () => {
 		if(L._splashComplete || !L._stageData)
 			return;
-		let reanimate={
+		const reanimate={
 			'l_logo': 'l_logo 0.5s ease 1 normal 0.5s forwards',
 			'l_fixed': 'l_fixed 0.5s ease 1 normal forwards',
 			'l_marquee_container': 'l_marquee_container 0.5s ease forwards'
 		}
-		for(var id in reanimate) {
+		for(let id in reanimate) {
 			L.E(id).style.animation = 'none';
 			void L.E(id).offsetHeight;
 			L.E(id).style.animation = reanimate[id];
 		}
 		L.E('l_logo_tag').style.display = 'none';
-		L.E('l_progress').style.display = 'block'
+		L.E('l_progress').style.display = 'block';
 		L.onloadAnimationComplete();
 	},
 	getSynchronizedNext: () => {
