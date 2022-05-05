@@ -283,13 +283,22 @@ var L = {
 		try { if(navigator.wakeLock) navigator.wakeLock.request('screen'); }
 		catch (e) { }
 	},
-	openStockWindow: (symbol, e) => {
+	openStockWindow: (symbolOrIndex, e) => {
 		if(e && e.target.nodeName != 'TD')
 			return;
-		let sym = symbol;
+		let symbol = '';
+		if(typeof symbolOrIndex == 'number') {
+			symbol = L._stageData['stocks'][symbolOrIndex][0];
+			if(L._stageData['stocks'][symbolOrIndex][11]) {
+				window.open(L._stageData['stocks'][symbolOrIndex][11], `larval_news_${symbol}`).focus();
+				return;
+			}
+		}
+		else if(typeof symbolOrIndex == 'string')
+			symbol = symbolOrIndex;
 		if(symbol[0] == '*')
-			sym = symbol.substr(1) + '-USD';
-		window.open(`https://finance.yahoo.com/quote/${L.H(sym)}`, `larval_${symbol}`).focus();
+			symbol = symbol.substr(1) + '-USD';
+		window.open(`https://finance.yahoo.com/quote/${L.H(symbol)}`, `larval_${symbol}`).focus();
 	},
 	setSortStageData: column => {
 		if(L._stageDataSortByColumn == -column) {
@@ -330,7 +339,6 @@ var L = {
 		L.E('l_afterhours_left').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		let notifySymbols=[], notifyAny=false, rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
-
 		let html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			if(L._stageDataSortByColumn == c)
@@ -342,7 +350,6 @@ var L = {
 			html += `<th onclick="L.setSortStageData(${c})" id="l_content_table_header_${c}" class="${className}">${columns[c-1]}</th>`;
 		}
 		html += '</tr>';
-
 		if(doNotify)
 			L.notifyClear();
 		for(let i in L._stageData['halts']) {
@@ -388,10 +395,13 @@ var L = {
 			}
 			if(row[6]=='crypto')
 				rowClass += ' l_crypto';
-			if(row[7])
-				notifyEarnings = `<div class="l_notify_earnings" title="Earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;earnings</span></div>`;
-			else
-				notifyEarnings = '';
+			let notifyPopout = '';
+			if(row[7] && row[10])
+				notifyPopout = `<div class="l_notify_popout" title="News and earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;+&nbsp;news</span></div>`;
+			else if(row[7])
+				notifyPopout = `<div class="l_notify_popout" title="Earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;earnings</span></div>`;
+			else if(row[10])
+				notifyPopout = `<div class="l_notify_popout" title="Company news">&#128240;&nbsp;<span>recent </span>news</div>`;
 			let priceColumn = '<div class="l_hover_container">';
 			if(row[8])
 				priceColumn += `<span class="l_hover_active">${row[8]<0?'-':'+'}$${L.D(Math.abs(row[8]),2)}</span><span class="l_hover_inactive">`;
@@ -406,14 +416,21 @@ var L = {
 			if(row[9])
 				volumeColumn += '</span>';
 			volumeColumn += '</div>';
-			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow('${L.H(row[0])}', event)">
+			let companyColumn = '<div class="l_hover_container">';
+			if(row[10] && !L._forceContentTableShrink)
+				companyColumn += `<span class="l_hover_active_left">${L.H(row[10])}</span><span class="l_hover_inactive">`;
+			companyColumn += L._forceContentTableShrink ? '<div class="l_none">&#8226;</div>' : L.H(row[1]);
+			if(row[10] && !L._forceContentTableShrink)
+				companyColumn += '</span>';
+			companyColumn += '</div>';
+			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${i}, event)">
 				<td>${notifyControl}${L.H(row[0])}</td>
-				<td>${L._forceContentTableShrink?'<div class="l_none">&#8226;</div>':L.H(row[1])}</td>
+				<td>${companyColumn}</td>
 				<td>${L.htmlPercent(row[2])}</td>
 				<td>${L.htmlPercent(row[3])}</td>
 				<td>${priceColumn}</td>
 				<td>${volumeColumn}</td>
-				<td>${notifyEarnings}${row[6]?L.H(row[6]):'<div class="l_none">&#8226;</div>'}</td>
+				<td>${notifyPopout}${row[6]?L.H(row[6]):'<div class="l_none">&#8226;</div>'}</td>
 				</tr>`;
 			if(notify)
 				htmlPriority += htmlRow;

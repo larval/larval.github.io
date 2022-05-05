@@ -97,6 +97,16 @@
 		opacity: 1;
 	}
 }
+@keyframes l_hover_active_left {
+	from {
+		left: 20px;
+		opacity: 0;
+	}
+	to {
+		left: 0px;
+		opacity: 1;
+	}
+}
 @keyframes l_afterhours {
 	from { color: #A6FDA4; }
 	to { color: #659e64; }
@@ -444,6 +454,7 @@ body:before {
 	text-align: right;
 }
 #l_content_table tr td .l_hover_container {
+	pointer-events: none;
 	position: relative;
 }
 #l_content_table tr td .l_hover_active {
@@ -455,6 +466,21 @@ body:before {
 	top: 0;
 	right: -20px;
 	opacity: 0;
+}
+#l_content_table tr td .l_hover_active_left {
+	font-style: italic;
+	text-decoration: underline;
+	color: #825900;
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 20px;
+	opacity: 0;
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	word-break: keep-all;
 }
 #l_content_table tr td .l_hover_inactive {
 	visibility: visible;
@@ -475,6 +501,7 @@ body:before {
 #l_content_table tr td:nth-child(2) {
 	text-align: left;
 	word-break: break-all;
+	overflow: hidden;
 }
 #l_content_table tr td:nth-child(5) { overflow: hidden; }
 #l_content_table tr td:nth-child(6) { overflow: hidden; }
@@ -493,6 +520,9 @@ body:before {
 	text-align: center;
 	font-size: 25px;
 	padding: 60px 30px 60px 30px !important;
+	color: #E1FDE4 !important;
+	text-decoration: none !important;
+	cursor: default !important;
 	user-select: none;
 }
 .l_range {
@@ -579,7 +609,7 @@ input[type="checkbox"] {
 }
 .l_halt { color: #825900; }
 .l_crypto { color: #825900; }
-.l_notify_earnings {
+.l_notify_popout {
 	position: absolute;
 	top: 2px;
 	right: -30px;
@@ -718,19 +748,23 @@ input[type=checkbox]:checked:disabled + label:before {
 		display: block;
 		animation: l_hover_active 0.5s ease 0s 1 normal forwards; 
 	}
+	#l_content_table tr:hover td .l_hover_active_left {
+		display: block;
+		animation: l_hover_active_left 0.5s ease 0s 1 normal forwards; 
+	}
 	.l_notify_enable:hover, .l_notify_disable:hover {
 		left: -35px;
 		width: 30px;
 	}
 }
 @media only screen and (min-width: 1000px) {
-	#l_content_table tr:hover td .l_notify_earnings {
+	#l_content_table tr:hover td .l_notify_popout {
 		right: -215px;
 		width: 200px;
 	}
 }
 @media only screen and (max-width: 1300px) {
-	.l_notify_earnings span {
+	.l_notify_popout span {
 		display: none;
 	}
 }
@@ -795,7 +829,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_last_update {
 		font-size: 10px;
 	}
-	.l_notify_earnings, .l_notify_disable, .l_notify_enable {
+	.l_notify_popout, .l_notify_disable, .l_notify_enable {
 		display: none;
 	}
 }
