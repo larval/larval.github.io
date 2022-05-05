@@ -319,6 +319,7 @@ body:before {
 	text-shadow: 2px 2px 0 #000;
 	transition: 0.5s;
 	animation: l_marquee_container 1s ease 6s forwards; 
+	border: 1px solid #444;
 }
 #l_marquee_container a {
 	color: #A6FDA4;
@@ -395,6 +396,7 @@ body:before {
 	border-collapse: collapse;
 	font-weight: bold;
 	text-align: center;
+	border: 1px solid #444;
 }
 #l_control_table tr:nth-child(5) {
 	border-top: 1px solid #333;
@@ -426,6 +428,7 @@ body:before {
 	width: 100%;
 	border-collapse: collapse;
 	font-weight: bold;
+	border: 1px solid #444;
 }
 #l_content_table tbody tr:nth-child(odd){
 	background-color: rgba(0, 0, 0, 0.05);

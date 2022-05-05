@@ -399,9 +399,9 @@ var L = {
 			if(row[7] && row[10])
 				notifyPopout = `<div class="l_notify_popout" title="News and earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;+&nbsp;news</span></div>`;
 			else if(row[7])
-				notifyPopout = `<div class="l_notify_popout" title="Earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;earnings</span></div>`;
+				notifyPopout = `<div class="l_notify_popout" title="Earnings on ${L.H(row[7])}">&#128198;&nbsp;${L.H(row[7])}<span>&nbsp;earnings</span></div>`;
 			else if(row[10])
-				notifyPopout = `<div class="l_notify_popout" title="Company news">&#128240;&nbsp;<span>recent </span>news</div>`;
+				notifyPopout = `<div class="l_notify_popout" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`;
 			let priceColumn = '<div class="l_hover_container">';
 			if(row[8])
 				priceColumn += `<span class="l_hover_active">${row[8]<0?'-':'+'}$${L.D(Math.abs(row[8]),2)}</span><span class="l_hover_inactive">`;
