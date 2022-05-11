@@ -555,7 +555,7 @@ const L = {
                 </td>
 				<td>${L._forceContentTableShrink?L._emptyCellHtml:L.H(row[1])}</td>
 				<td colspan="4">HALT: ${L.H(row[2])}</td>
-				<td>${row[3]?L.H(row[3]):L._emptyCellHtml}</td>
+				<td class="${row[3]?'l_options':''}">${row[3]?L.H(row[3]):L._emptyCellHtml}</td>
 				</tr>`;
 			if(notify) {
 				notifyAny = true;
