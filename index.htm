@@ -122,11 +122,12 @@
   <div id="l_marquee">
    <div id="l_marquee_content">
     <div class="l_marquee_item">
-     <span class='l_marquee_blink'>&#8226;</span> Larval is a utility that looks for volatility in the stock market as it happens. <span class='l_marquee_blink'>&#8226;</span> It works by monitoring the market in ~5 minute intervals and alerts you if the price change meets your criteria. <span class='l_marquee_blink'>&#8226;</span> For more information go to <a href="//larval.medium.com/larval-a-journey-into-experimental-stock-option-trading-strategies-873108d95fb0" style="text-decoration:none" target="_blank">larval.medium.com</a>. <span class='l_marquee_blink'>&#9650;</span> The countdown slider above indicates the time remaining until the next polling update. <span class='l_marquee_blink'>&#9660;</span> The settings button below allows you to control the criteria that alerts you after each polling update.
+     <span class='l_marquee_blink'>&#8226;</span> Larval is a utility that looks for volatility in the stock market as it happens. <span class='l_marquee_blink'>&#8226;</span> It works by monitoring the market in ~5 minute intervals and alerts you if the price change meets your criteria. <span class='l_marquee_blink'>&#8226;</span> For a list of keyboard shortcuts type <a href="javascript:L.generateHotKeyHelp()" style="text-decoration:none">&quot;?&quot;</a>. <span class='l_marquee_blink'>&#8226;</span> For more information go to <a href="//larval.medium.com/larval-a-journey-into-experimental-stock-option-trading-strategies-873108d95fb0" style="text-decoration:none" target="_blank">larval.medium.com</a>. <span class='l_marquee_blink'>&#9650;</span> The countdown slider above indicates the time remaining until the next polling update. <span class='l_marquee_blink'>&#9660;</span> The settings button below allows you to control the criteria that alerts you after each polling update.
     </div>
    </div>
    <div id="l_marquee_content_clone"></div>
   </div>
+  <div id="l_marquee_flash"></div>
  </div>
  <div id="l_settings_button" onclick="L.settingsButtonToggle(false);">&#9650; settings &#9650;</div>
  <div id="l_control">
@@ -140,7 +141,7 @@
   </table>
  </div>
  <div id="l_content">
-  <table id="l_content_table">
+  <table id="l_content_table" onmousemove="L.onmousemoveContentTable()">
    <tr><th id="l_awaiting_data">Larval is awaiting market data, please wait. This page will automatically update as soon as market data becomes available.</th></tr>
   </table>
  </div>

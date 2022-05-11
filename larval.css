@@ -324,7 +324,7 @@ body:before {
 #l_marquee_container a {
 	color: #A6FDA4;
 }
-#l_marquee {
+#l_marquee, #l_marquee_flash {
 	z-index: 0;
 	display: inline-block;
 	width: 100%;
@@ -333,6 +333,11 @@ body:before {
 	white-space: nowrap;
 	user-select: none;
 }
+#l_marquee_flash {
+	display: none;
+	margin: auto 0 0 auto;
+	text-align: center;
+}
 .l_marquee_blink {
 	color: #ff0;
 	animation: l_fade_in 1s linear infinite; 
@@ -340,8 +345,8 @@ body:before {
 	padding-left: 10px;
 	padding-right: 10px;
 }
-.l_marquee_highlight {
-	color: #A6FDA4;
+.l_marquee_highlight, .l_marquee_highlight_padded { color: #A6FDA4; }
+.l_marquee_highlight_padded {
 	padding-left: 10px;
 	padding-right: 10px;
 }
@@ -433,6 +438,9 @@ body:before {
 #l_content_table tbody tr:nth-child(odd){
 	background-color: rgba(0, 0, 0, 0.05);
 }
+#l_content_table .l_tr_keyrow {
+	pointer-events: none;
+}
 #l_content_table tr th {
 	background-color: #333 !important;
 	text-shadow: 2px 2px 0 #000;
@@ -514,8 +522,6 @@ body:before {
 }
 .l_notify_halt td:nth-child(3) { text-align: left !important; }
 .l_notify_halt td:nth-child(4) { text-align: center !important; }
-
-
 #l_awaiting_data {
 	font-variant: normal !important;
 	font-family: Larval,Futura,Trebuchet MS,Arial,sans-serif;
@@ -737,21 +743,21 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_settings_button:hover {
 		background: linear-gradient(180deg, #8fde8c 75%, #333 90%);
 	}
-	#l_content_table tr:hover:not(:first-child) {
+	#l_content_table tr:hover:not(:first-child), #l_content_table .l_tr_keyrow_selected:not(:first-child) {
 		outline: none;
 		border-color: #666;
 		box-shadow: 0 0 10px #666;
 		cursor: pointer;
 		text-decoration: underline;
 	}
-	#l_content_table tr:hover td .l_hover_inactive {
+	#l_content_table tr:hover td .l_hover_inactive, #l_content_table .l_tr_keyrow_selected td .l_hover_inactive {
 		visibility: hidden;
 	}
-	#l_content_table tr:hover td .l_hover_active {
+	#l_content_table tr:hover td .l_hover_active, #l_content_table .l_tr_keyrow_selected td .l_hover_active {
 		display: block;
 		animation: l_hover_active 0.5s ease 0s 1 normal forwards; 
 	}
-	#l_content_table tr:hover td .l_hover_active_left {
+	#l_content_table tr:hover td .l_hover_active_left,#l_content_table .l_tr_keyrow_selected td .l_hover_active_left {
 		display: block;
 		animation: l_hover_active_left 0.5s ease 0s 1 normal forwards; 
 	}
@@ -761,7 +767,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	}
 }
 @media only screen and (min-width: 1000px) {
-	#l_content_table tr:hover td .l_notify_popout {
+	#l_content_table tr:hover td .l_notify_popout, #l_content_table .l_tr_keyrow_selected td .l_notify_popout {
 		right: -215px;
 		width: 200px;
 	}
