@@ -3,6 +3,8 @@ const L = {
 	/* INTERNALS */
 	_stageData: null,
 	_stageDataSortByColumn: 0,
+	_stageDataHistoryIndex: -1,
+	_stageDataHistory: [],
 	_notifyExceptions: {},
 	_splashComplete: false,
 	_forceContentTableShrink: false,
@@ -75,6 +77,7 @@ const L = {
 		p.innerHTML = string;
 		return(p.textContent || p.innerText || '');
 	},
+	P: (count, total) => { return(Math.round(count / total * 100)); },
 	T: tag => document.getElementsByTagName(tag),
 	U: string => { return((string?string[0]:'').toUpperCase() + string.substring(1)); },
 
@@ -125,7 +128,7 @@ const L = {
 	},
 	onkeydown: e => {
 		L.fastSplash();
-		if(!L._stageData || (e && (e.ctrlKey || e.altKey || L._keysIgnore.indexOf(e.code) >= 0)))
+		if(!L._splashComplete || !L._stageData || (e && (e.ctrlKey || e.altKey || L._keysIgnore.indexOf(e.code) >= 0)))
 			return;
 		const rows=L.E('l_content_table').getElementsByTagName('tr');
 		let lastKeyRow=L._keyRow;
@@ -144,13 +147,44 @@ const L = {
 			e.preventDefault();
 			switch(e.code) {
 				case 'Slash':     L.marqueeHotKeyHelp(); break;
-				case 'Escape':    L._keyRow = 0; break;
+				case 'Tab':       L.settingsButtonToggle(); break;
 				case 'Home':      L._keyRow = 1; break;
 				case 'End':       L._keyRow = rows.length - 1; break;
 				case 'ArrowUp':   L._keyRow--; break;
 				case 'ArrowDown': L._keyRow++; break;
 				case 'PageUp':    L._keyRow-=L._contentTableRowCountThatAreInView; break;
 				case 'PageDown':  L._keyRow+=L._contentTableRowCountThatAreInView; break;
+				case 'Escape':
+					L._keyRow = 0;
+					if(L._stageDataHistoryIndex >= 0)
+						L.gotoStageDataHistory(L._stageDataHistoryIndex=-1);
+					break;
+				case 'ArrowLeft':
+					if(L._stageDataHistory.length < 2) {
+						L.getHistoryData();
+						break;
+					}
+					if(L._stageDataHistoryIndex < 0)
+						L._stageDataHistoryIndex = L._stageDataHistory.length - 2;
+					else if(L._stageDataHistoryIndex > 0)
+						L._stageDataHistoryIndex--;
+					else {
+						L.marqueeFlash('You are at the beginning of your history, use <span class="l_marquee_highlight">&#8658;</span> to move forward or <span class="l_marquee_highlight">escape</span> to exit.', true);
+						break;
+					}
+					L.gotoStageDataHistory(L._stageDataHistoryIndex);
+					break;
+				case 'ArrowRight':
+					if(L._stageDataHistory.length < 2 || L._stageDataHistoryIndex < 0) {
+						L.marqueeFlash('You are already viewing live data, use the <span class="l_marquee_highlight">&#8656;</span> key to rewind.');
+						break;
+					}
+					else if( L._stageDataHistoryIndex + 2 >= L._stageDataHistory.length)
+						L._stageDataHistoryIndex = -1;
+					else
+						L._stageDataHistoryIndex++;
+					L.gotoStageDataHistory(L._stageDataHistoryIndex);
+					break;
 				case 'Space':
 					let toggleAlertException=L.E('l_content_table').getElementsByTagName('tr')[L._keyRow];
 					if(toggleAlertException && (toggleAlertException=toggleAlertException.querySelector('.l_notify_enable,.l_notify_disable')) && toggleAlertException.onclick)
@@ -227,23 +261,63 @@ const L = {
 		xhr.open('GET', url);
 		xhr.onload = e => {
 			try {
-				let json = JSON.parse(xhr.responseText);
-				if(!json || !json['ts'] || (L._stageData && L._stageData['ts'] == json['ts']))
+				const json = JSON.parse(xhr.responseText);
+				if(!json || !json['ts'] || (L._stageData && L._stageData['ts'] == json['ts'])) {
 					xhr.onerror();
+					return;
+				}
+				else if(L._stageDataHistoryIndex >= 0)
+					L._stageDataHistory.push(json);
 				else {
 					L._stageData = json;
+					L._stageDataHistory.push(L._stageData);
 					L.sortStageData(false);
 					L._forceContentTableShrink = false;
-					L.E('l_last_update').innerHTML = L.H(L._stageData['ts']);
 					if(updateView)
 						L.updateLiveTable(true);
-					L.setNextStagePoll(L.getSynchronizedNext());
 				}
+				L.E('l_last_update').innerHTML = L.epochToDate(json['ts']);
+				L.setNextStagePoll(L.getSynchronizedNext());
 			}
 			catch(e) { xhr.onerror(); }
 		}
 		xhr.onerror = () => { L.setNextStagePoll(L._setNextStagePollShort); }
 		xhr.send();
+	},
+	getHistoryData: () => {
+		if(L._stageDataHistory.length > 1)
+			return;
+		L.marqueeFlash('Attempting to gather recent history from the server...');
+		let xhr=new XMLHttpRequest(), url='//stage.larval.com/history.json?ts='+new Date().getTime();
+		xhr.open('GET', url);
+		xhr.onload = e => {
+			try {
+				const history = JSON.parse(xhr.responseText);
+				if(L._stageDataHistory.length > 1 || !history || history.length < 1)
+					xhr.onerror();
+				else {
+					const localLastHistory=L._stageDataHistory[0], remoteLastHistory=history[history.length - 1];
+					if(localLastHistory['ts'] != remoteLastHistory['ts'])
+						history.push(L._stageDataHistory[0]);
+					L._stageDataHistory = history;
+					L._stageDataHistoryIndex = L._stageDataHistory.length - 2;
+					L.gotoStageDataHistory(L._stageDataHistoryIndex);
+				}
+			}
+			catch(e) { xhr.onerror(); }
+		}
+		xhr.onerror = () => { L.marqueeFlash('Sorry, no history is available to rewind to at this time.'); }
+		xhr.send();
+	},
+	gotoStageDataHistory: index => {
+		const historyTotal=L._stageDataHistory.length-1, historyIndex=index<0?historyTotal:index;
+		L._stageData = L._stageDataHistory[index >= 0 ? index : historyTotal];
+		L.sortStageData(true);
+		const minutesAgo=Math.round((L.epochNow()-L._stageData['ts'])/60,0);
+		if(historyIndex == historyTotal)
+			L.marqueeFlash('All caught up, exiting history mode...', true);
+		else
+			L.marqueeFlash(`Rewound to ${L.epochToDate(L._stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span> [${L.P(historyTotal-historyIndex,historyTotal)}%]`, true);
 	},
 	setNextStagePoll: seconds => {
 		if(L._splashComplete) {
@@ -264,6 +338,10 @@ const L = {
 		L.getStageData(true);
 	},
 	forceNextStagePoll: () => { L.setNextStagePollComplete(); },
+	epochNow: () => { return(Math.floor(Date.now() / 1000)); },
+	epochToDate: epoch => {
+		return(new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}));
+	},
 	htmlPercent: number => {
 		if(number > 0)
 			return(L.D(Math.abs(number),2) + '%<span class="l_up">&#9650;</span>');
@@ -326,7 +404,7 @@ const L = {
 		const fullWidth=lb.scrollWidth, viewWidth=lb.offsetWidth;
 		lbcc.innerHTML = lbc.innerHTML;
 		document.documentElement.style.setProperty('--marquee-start', '-'+viewWidth+'px');
-		document.documentElement.style.setProperty('--marquee-end', '-'+(fullWidth/*-viewWidth*/)+'px');
+		document.documentElement.style.setProperty('--marquee-end', '-'+fullWidth+'px');
 		lb.style.animation = 'none';
 		void lb.offsetWidth;
 		lb.style.animation = `l_marquee ${seconds}s linear infinite`;
@@ -346,9 +424,11 @@ const L = {
 		}
 		L.marqueeInitiate(seconds, html);
 	},
-	marqueeFlash: message => {
+	marqueeFlash: (message, priority) => {
 		if(L.marqueeFlashTimeout)
 			clearTimeout(L.marqueeFlashTimeout);
+		if(L._stageDataHistoryIndex >= 0 && (!message || !priority))
+			return;
 		L.E('l_marquee_flash').innerHTML = message ? message : '';
 		L.E('l_marquee').style.display = message ? 'none' : 'inline-block';
 		L.E('l_marquee_flash').style.display = message ? 'inline-block' : 'none';
@@ -356,6 +436,10 @@ const L = {
 			window.scrollTo({top: 0, behavior: 'smooth'});
 			L.marqueeIntervalReset();
 			L.marqueeFlashTimeout = setTimeout(L.marqueeFlash, 5000);
+			const el=L.E('l_marquee_flash');
+			el.style.animation = 'none';
+			void el.offsetHeight;
+			el.style.animation = `l_content_fade_in 1s ease forwards`;
 		}
 		else
 			L.marqueeUpdate(L._marqueeLoopSecondsLong);
@@ -366,7 +450,7 @@ const L = {
 		L._marqueeInterval = setInterval(() => { L.marqueeUpdate(L._marqueeLoopSecondsLong) }, L._marqueeLoopSecondsLong * 1000);
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html='<span class="l_marquee_blink">&#8226;</span> The following hotkeys are available to quickly navigate to a variety of third party websites. <span class="l_marquee_blink">&#8226;</span> Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: ';
+		let key, match, html='<span class="l_marquee_blink">&#8226;</span> The following hotkeys are available to quickly navigate your history and third party websites. <span class="l_marquee_blink">&#8226;</span> Use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. <span class="l_marquee_blink">&#8226;</span> Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: ';
 		for(let key in L._keyMap) {
 			if((match=L._keyMap[key][0].match(/([a-z]+)\.[a-z]+\//i)))
 				html += `<div class="l_marquee_link" onclick="L.setURLFormat('${key}',false)"><span class='l_marquee_highlight_padded'>${key}</span>${L.H(match[1])}</div> `
@@ -374,7 +458,7 @@ const L = {
 		html += '<span class="l_marquee_blink">&#8226;</span> Hold down the <span class="l_marquee_highlight">shift</span> key to make your selection permanent. <span class="l_marquee_blink">&#8226;</span> The keys <span class="l_marquee_highlight">1-7</span> can be used to sort by each column.';
 		window.scrollTo({top: 0, behavior: 'smooth'});
 		L.marqueeIntervalReset();
-		L.marqueeInitiate(90, html);
+		L.marqueeInitiate(L._marqueeLoopSecondsLong, html);
 	},
 	notify: (message) => {
 		L.notifyClear();

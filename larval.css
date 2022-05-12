@@ -337,6 +337,7 @@ body:before {
 	display: none;
 	margin: auto 0 0 auto;
 	text-align: center;
+	animation: l_content_fade_in 1s ease forwards;
 }
 .l_marquee_blink {
 	color: #ff0;
