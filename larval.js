@@ -21,6 +21,7 @@ const L = {
 	_contentTableRowCountThatAreInView: 10,
 	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
 	_title:	document.title,
+	_swipeStartPosition: null,
 	_keysIgnore: ['ShiftRight','ShiftLeft'],
 	_keyRow: 0,
 	_keyMapIndexDefault: 'Y',
@@ -91,6 +92,8 @@ const L = {
 		document.addEventListener('scroll', L.onscroll);
 		window.addEventListener('resize', L.onresize);
 		window.addEventListener('keydown', L.onkeydown);
+		window.addEventListener('touchstart', L.ontouchstart);
+		window.addEventListener('touchend', L.ontouchend);
 		setTimeout(L.onloadAnimationComplete, 5500);
 		L.E('l_range_up').oninput();
 		L.E('l_range_down').oninput();
@@ -126,6 +129,19 @@ const L = {
 		lf.style.maxHeight =  scrolledDown ? '100px' : '';
 		lar.style.height = lal.style.height = scrolledDown ? '72px' : '';
 	},
+	ontouchstart: e => { L._swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY]; },
+	ontouchend: e => {
+		if(!L._swipeStartPosition)
+			return;
+		const swipeMovement = [L._swipeStartPosition[0]-e.changedTouches[0].clientX, L._swipeStartPosition[1]-e.changedTouches[0].clientY],
+			width = window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth,
+			height = window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight,
+			movementPercent = [Math.abs(swipeMovement[0])/width*100, Math.abs(swipeMovement[1])/height*100],
+			movementWeighting = (movementPercent[0]+1) / (movementPercent[1]+1);
+		if(movementPercent[0] > 25 && movementWeighting >= 1)
+			L.gotoStageDataHistory(swipeMovement[0]);
+		L._swipeStartPosition = null;
+	},
 	onkeydown: e => {
 		L.fastSplash();
 		if(!L._splashComplete || !L._stageData || (e && (e.ctrlKey || e.altKey || L._keysIgnore.indexOf(e.code) >= 0)))
@@ -146,45 +162,17 @@ const L = {
 		else if(e) {
 			e.preventDefault();
 			switch(e.code) {
-				case 'Slash':     L.marqueeHotKeyHelp(); break;
-				case 'Tab':       L.settingsButtonToggle(); break;
-				case 'Home':      L._keyRow = 1; break;
-				case 'End':       L._keyRow = rows.length - 1; break;
-				case 'ArrowUp':   L._keyRow--; break;
-				case 'ArrowDown': L._keyRow++; break;
-				case 'PageUp':    L._keyRow-=L._contentTableRowCountThatAreInView; break;
-				case 'PageDown':  L._keyRow+=L._contentTableRowCountThatAreInView; break;
-				case 'Escape':
-					L._keyRow = 0;
-					if(L._stageDataHistoryIndex >= 0)
-						L.gotoStageDataHistory(L._stageDataHistoryIndex=-1);
-					break;
-				case 'ArrowLeft':
-					if(L._stageDataHistory.length < 2) {
-						L.getHistoryData();
-						break;
-					}
-					if(L._stageDataHistoryIndex < 0)
-						L._stageDataHistoryIndex = L._stageDataHistory.length - 2;
-					else if(L._stageDataHistoryIndex > 0)
-						L._stageDataHistoryIndex--;
-					else {
-						L.marqueeFlash('You are at the beginning of your history, use <span class="l_marquee_highlight">&#8658;</span> to move forward or <span class="l_marquee_highlight">escape</span> to exit.', true);
-						break;
-					}
-					L.gotoStageDataHistory(L._stageDataHistoryIndex);
-					break;
-				case 'ArrowRight':
-					if(L._stageDataHistory.length < 2 || L._stageDataHistoryIndex < 0) {
-						L.marqueeFlash('You are already viewing live data, use the <span class="l_marquee_highlight">&#8656;</span> key to rewind.');
-						break;
-					}
-					else if( L._stageDataHistoryIndex + 2 >= L._stageDataHistory.length)
-						L._stageDataHistoryIndex = -1;
-					else
-						L._stageDataHistoryIndex++;
-					L.gotoStageDataHistory(L._stageDataHistoryIndex);
-					break;
+				case 'Slash':      L.marqueeHotKeyHelp(); break;
+				case 'Tab':        L.settingsButtonToggle(); break;
+				case 'Home':       L._keyRow = 1; break;
+				case 'End':        L._keyRow = rows.length - 1; break;
+				case 'PageUp':     L._keyRow-=L._contentTableRowCountThatAreInView; break;
+				case 'PageDown':   L._keyRow+=L._contentTableRowCountThatAreInView; break;
+				case 'ArrowUp':    L._keyRow--; break;
+				case 'ArrowDown':  L._keyRow++; break;
+				case 'ArrowLeft':  L.gotoStageDataHistory(-1); break;
+				case 'ArrowRight': L.gotoStageDataHistory(1); break;
+				case 'Escape':     L.gotoStageDataHistory(0); break;
 				case 'Space':
 					let toggleAlertException=L.E('l_content_table').getElementsByTagName('tr')[L._keyRow];
 					if(toggleAlertException && (toggleAlertException=toggleAlertException.querySelector('.l_notify_enable,.l_notify_disable')) && toggleAlertException.onclick)
@@ -301,7 +289,7 @@ const L = {
 						history.push(L._stageDataHistory[0]);
 					L._stageDataHistory = history;
 					L._stageDataHistoryIndex = L._stageDataHistory.length - 2;
-					L.gotoStageDataHistory(L._stageDataHistoryIndex);
+					L.setStageDataHistory(L._stageDataHistoryIndex);
 				}
 			}
 			catch(e) { xhr.onerror(); }
@@ -309,7 +297,7 @@ const L = {
 		xhr.onerror = () => { L.marqueeFlash('Sorry, no history is available to rewind to at this time.'); }
 		xhr.send();
 	},
-	gotoStageDataHistory: index => {
+	setStageDataHistory: index => {
 		const historyTotal=L._stageDataHistory.length-1, historyIndex=index<0?historyTotal:index;
 		L._stageData = L._stageDataHistory[index >= 0 ? index : historyTotal];
 		L.sortStageData(true);
@@ -317,7 +305,35 @@ const L = {
 		if(historyIndex == historyTotal)
 			L.marqueeFlash('All caught up, exiting history mode...', true);
 		else
-			L.marqueeFlash(`Rewound to ${L.epochToDate(L._stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span> [${L.P(historyTotal-historyIndex,historyTotal)}%]`, true);
+			L.marqueeFlash(`<div onclick="L.gotoStageDataHistory(0)">Rewound to ${L.epochToDate(L._stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span> [${L.P(historyTotal-historyIndex,historyTotal)}%]</div>`, true);
+	},
+	gotoStageDataHistory: direction => {
+		const lastIndex=L._stageDataHistoryIndex;
+		if(!direction) {
+			L._keyRow = 0;
+			if(L._stageDataHistoryIndex >= 0)
+				L._stageDataHistoryIndex = -1;
+		}
+		else if(direction > 0) {
+			if(L._stageDataHistory.length < 2 || L._stageDataHistoryIndex < 0)
+				L.marqueeFlash('You are already viewing live data, use the <span class="l_marquee_highlight">&#8656;</span> key to rewind.');
+			else if( L._stageDataHistoryIndex + 2 >= L._stageDataHistory.length)
+				L._stageDataHistoryIndex = -1;
+			else
+				L._stageDataHistoryIndex++;
+		}
+		else if(direction < 0) {
+			if(L._stageDataHistory.length < 2)
+				L.getHistoryData();
+			if(L._stageDataHistoryIndex < 0)
+				L._stageDataHistoryIndex = L._stageDataHistory.length - 2;
+			else if(L._stageDataHistoryIndex > 0)
+				L._stageDataHistoryIndex--;
+			else
+				L.marqueeFlash('<div onclick="L.gotoStageDataHistory(0)">End of history, use <span class="l_marquee_highlight">&#8658;</span> to move forward or <span class="l_marquee_highlight">escape</span> to exit.</div>', true);
+		}
+		if(lastIndex !== L._stageDataHistoryIndex)
+			L.setStageDataHistory(L._stageDataHistoryIndex);
 	},
 	setNextStagePoll: seconds => {
 		if(L._splashComplete) {
