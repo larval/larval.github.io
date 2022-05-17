@@ -273,29 +273,35 @@ const L = {
 		xhr.send();
 	},
 	getHistoryData: () => {
-		if(L._stageDataHistory.length > 1)
-			return;
 		L.marqueeFlash('Attempting to gather recent history from the server...');
 		let xhr=new XMLHttpRequest(), url='//stage.larval.com/history.json?ts='+new Date().getTime();
 		xhr.open('GET', url);
 		xhr.onload = e => {
 			try {
-				const history = JSON.parse(xhr.responseText);
-				if(L._stageDataHistory.length > 1 || !history || history.length < 1)
+				let history = JSON.parse(xhr.responseText);
+				if(!history || history.length < 2)
 					xhr.onerror();
 				else {
-					const localLastHistory=L._stageDataHistory[0], remoteLastHistory=history[history.length - 1];
-					if(localLastHistory['ts'] != remoteLastHistory['ts'])
-						history.push(L._stageDataHistory[0]);
-					L._stageDataHistory = history;
-					L._stageDataHistoryIndex = L._stageDataHistory.length - 2;
-					L.setStageDataHistory(L._stageDataHistoryIndex);
+					let h = history.length;
+					while(--h > 0) {
+						if(history[h]['ts'] == L._stageDataHistory[0]['ts'])
+							break;
+					}
+					if(h > 0) {
+						history.length = h;
+						L._stageDataHistory = history.concat(L._stageDataHistory);
+						L._stageDataHistoryIndex = h - 1;
+						L.setStageDataHistory(L._stageDataHistoryIndex);
+					}
+					else
+						xhr.onerror();
 				}
 			}
 			catch(e) { xhr.onerror(); }
 		}
-		xhr.onerror = () => { L.marqueeFlash('Sorry, no history is available to rewind to at this time.'); }
+		xhr.onerror = () => { L.marqueeFlash('Sorry, no additional history is available to rewind to at this time.'); }
 		xhr.send();
+		L.getHistoryData = null;
 	},
 	setStageDataHistory: index => {
 		const historyTotal=L._stageDataHistory.length-1, historyIndex=index<0?historyTotal:index;
@@ -323,9 +329,9 @@ const L = {
 				L._stageDataHistoryIndex++;
 		}
 		else if(direction < 0) {
-			if(L._stageDataHistory.length < 2)
+			if(L.getHistoryData && L._stageDataHistoryIndex == (L._stageDataHistory.length < 2 ? -1 : 0))
 				L.getHistoryData();
-			if(L._stageDataHistoryIndex < 0)
+			else if(L._stageDataHistoryIndex < 0)
 				L._stageDataHistoryIndex = L._stageDataHistory.length - 2;
 			else if(L._stageDataHistoryIndex > 0)
 				L._stageDataHistoryIndex--;
