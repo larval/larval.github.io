@@ -250,7 +250,7 @@ const L = {
 		xhr.onload = e => {
 			try {
 				const json = JSON.parse(xhr.responseText);
-				if(!json || !json['ts'] || (L._stageData && L._stageData['ts'] == json['ts'])) {
+				if(!json || !json['ts'] || (L._stageDataHistory.length > 0 && L._stageDataHistory[L._stageDataHistory.length-1]['ts'] == json['ts'])) {
 					xhr.onerror();
 					return;
 				}
@@ -311,7 +311,7 @@ const L = {
 		if(historyIndex == historyTotal)
 			L.marqueeFlash('All caught up, exiting history mode...', true);
 		else
-			L.marqueeFlash(`<div onclick="L.gotoStageDataHistory(0)">Rewound to ${L.epochToDate(L._stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span> [${L.P(historyTotal-historyIndex,historyTotal)}%]</div>`, true);
+			L.marqueeFlash(`<div onclick="L.gotoStageDataHistory(0)">Rewound to ${L.epochToDate(L._stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span>${L.getHistoryData?'':' ['+L.P(historyTotal-historyIndex,historyTotal)+'%]'}</div>`, true);
 	},
 	gotoStageDataHistory: direction => {
 		const lastIndex=L._stageDataHistoryIndex;
