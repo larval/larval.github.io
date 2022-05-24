@@ -51,7 +51,7 @@ const L = {
 		V: ['https://www.tradingview.com/chart/?symbol=@', null, 'https://www.tradingview.com/chart/?symbol=@USD'],
 		W: ['https://www.twitter.com/search?q=%24@', null, 'https://www.twitter.com/search?q=%24@.X'],
 		X: ['https://www.foxbusiness.com/quote?stockTicker=@'],
-		Y: ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@/options', 'https://finance.yahoo.com/quote/@-USD'],
+		Y: ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@/options', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F'],
 		Z: ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain']
 	},
 
@@ -412,6 +412,8 @@ const L = {
 				L._keyMap[key][1] = L._keyMap[key][0];
 			if(!L._keyMap[key][2])
 				L._keyMap[key][2] = L._keyMap[L._keyMapIndexDefault][2];
+			if(!L._keyMap[key][3])
+				L._keyMap[key][3] = L._keyMap[L._keyMapIndexDefault][3];
 		}
 	},
 	updateRangeDisplay: (id, value) => {
@@ -560,6 +562,10 @@ const L = {
 			symbol = symbolOrIndex;
 		if(symbol[0] == '*') {
 			urlType = 2;
+			symbol = symbol.substr(1);
+		}
+		else if(symbol[0] == '^') {
+			urlType = 3;
 			symbol = symbol.substr(1);
 		}
 		L.gotoURL(symbol, urlType, `larval_${symbol}`);
