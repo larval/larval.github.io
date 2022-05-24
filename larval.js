@@ -696,8 +696,8 @@ const L = {
 				else
 					notifyControl = '';
 			}
-			if(row[6]=='crypto')
-				rowClass += ' l_crypto';
+			if(['crypto','futures'].indexOf(row[6]) >= 0)
+				rowClass += ` l_${row[6]}`;
 			let notifyPopout = '';
 			if(row[7] && row[10])
 				notifyPopout = `<div class="l_notify_popout" title="News and earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;+&nbsp;news</span></div>`;
