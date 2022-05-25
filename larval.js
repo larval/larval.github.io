@@ -682,6 +682,8 @@ const L = {
 			const notify=( !notifyExcept && ((rangeUp&&row[2]>=rangeUp)||(rangeDown&&rangeDown>=row[2])) && row[5]>=rangeVolume && (!optionsOnly||row[6]) );
 			if(!includeCrypto && row[6]=='crypto')
 				continue;
+			if(row[0][0] == '^' && L._stageData['afterhours'] && includeCrypto)
+				continue;
 			if(notify) {
 				notifyAny = true;
 				rowClass = `l_notify_${row[2]<0?'down':'up'}`;
