@@ -656,15 +656,15 @@ const L = {
 		if(doNotify)
 			L.notifyClear();
 		for(let i in L._stageData['halts']) {
-			const row=L._stageData['halts'][i], notify=L.E('l_notify_halts').checked, notifyExcept=!!L._notifyExceptions[row[0]];;
+			const row=L._stageData['halts'][i], notify=L.E('l_notify_halts').checked, notifyExcept=!!L._notifyExceptions[row[0]];
 			if(notifyExcept)
 				continue;
 			rowClass = (notify ? 'l_notify_halt' : 'l_halt');
 			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow('${L.H(row[0])}', event)">
 				<td>
 				 <div class="l_notify_disable" title="Disable ${L.H(row[0])} notifications for this session" onclick="L.notifyException('${L.H(row[0])}', true)">x</div>
-                 ${L.H(row[0])}
-                </td>
+				 ${L.H(row[0])}
+				</td>
 				<td>${L._forceContentTableShrink?L._emptyCellHtml:L.H(row[1])}</td>
 				<td colspan="4">HALT: ${L.H(row[2])}</td>
 				<td class="${row[3]?'l_options':''}">${row[3]?L.H(row[3]):L._emptyCellHtml}</td>
@@ -676,6 +676,16 @@ const L = {
 			}
 			else
 				htmlNormal += htmlRow;
+		}
+		for(let i in L._stageData['futures_notify']) {
+			const row=L._stageData['futures_notify'][i];
+			htmlNormal += `<tr class="l_notify_futures" onclick="L.openStockWindow('${L.H(row[0])}', event)">
+				<td>${L.H(row[0])}</td>
+				<td>${L._forceContentTableShrink?L._emptyCellHtml:L.H(row[1])}</td>
+				<td>${L.htmlPercent(row[2])}</td>
+				<td>${L.htmlPercent(row[3])}</td>
+				<td colspan="3">NOTICE: Sizable movement</td>
+				</tr>`;
 		}
 		for(let i in L._stageData['stocks']) {
 			const row=L._stageData['stocks'][i], notifyExcept=!!L._notifyExceptions[row[0]];

@@ -521,8 +521,9 @@ body:before {
 	text-align: center;
 	position: relative;
 }
-.l_notify_halt td:nth-child(3) { text-align: left !important; }
-.l_notify_halt td:nth-child(4) { text-align: center !important; }
+.l_halt td:nth-child(3), .l_notify_halt td:nth-child(3) { text-align: left !important; }
+.l_halt td:nth-child(4), .l_notify_halt td:nth-child(4) { text-align: center !important; }
+.l_notify_futures td:nth-child(5) { text-align: left !important; }
 #l_awaiting_data {
 	font-variant: normal !important;
 	font-family: Larval,Futura,Trebuchet MS,Arial,sans-serif;
@@ -617,7 +618,7 @@ input[type="checkbox"] {
 	padding-left: 5px;	
 	color: #f00;
 }
-.l_halt, .l_crypto, .l_futures { color: #825900; }
+.l_halt, .l_crypto, .l_futures, .l_notify_futures { color: #825900; }
 .l_notify_popout {
 	position: absolute;
 	top: 2px;
