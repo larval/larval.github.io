@@ -677,80 +677,75 @@ const L = {
 			else
 				htmlNormal += htmlRow;
 		}
-		for(let i in L._stageData['futures_notify']) {
-			const row=L._stageData['futures_notify'][i];
-			htmlNormal += `<tr class="l_notify_futures" onclick="L.openStockWindow('${L.H(row[0])}', event)">
-				<td>${L.H(row[0])}</td>
-				<td>${L._forceContentTableShrink?L._emptyCellHtml:L.H(row[1])}</td>
-				<td>${L.htmlPercent(row[2])}</td>
-				<td>${L.htmlPercent(row[3])}</td>
-				<td colspan="3">NOTICE: Sizable movement</td>
-				</tr>`;
-		}
-		for(let i in L._stageData['stocks']) {
-			const row=L._stageData['stocks'][i], notifyExcept=!!L._notifyExceptions[row[0]];
-			const notify=( !notifyExcept && ((rangeUp&&row[2]>=rangeUp)||(rangeDown&&rangeDown>=row[2])) && row[5]>=rangeVolume && (!optionsOnly||row[6]) );
-			if(!includeCrypto && row[6]=='crypto')
-				continue;
-			if(row[0][0] == '^' && L._stageData['afterhours'] && includeCrypto)
-				continue;
-			if(notify) {
-				notifyAny = true;
-				rowClass = `l_notify_${row[2]<0?'down':'up'}`;
-				notifyControl = `<div class="l_notify_disable" title="Disable ${L.H(row[0])} notifications for this session" onclick="L.notifyException('${L.H(row[0])}', true)">x</div>`;
-				if(notifySymbols.indexOf(row[0]) < 0)
-					notifySymbols.push(row[0]);
-			}
-			else {
-				rowClass = '';
-				if(notifyExcept)
-					notifyControl = `<div class="l_notify_enable" title="Re-enable ${L.H(row[0])} notifications" onclick="L.notifyException('${L.H(row[0])}', false)">&#10003;</div>`;
+		for(let stocksOrSpikes of ['spikes', 'stocks']) {
+			for(let i in L._stageData[stocksOrSpikes]) {
+				const row=L._stageData[stocksOrSpikes][i], notifyExcept=!!L._notifyExceptions[row[0]];
+				const notify=( !notifyExcept && ((rangeUp&&row[2]>=rangeUp)||(rangeDown&&rangeDown>=row[2])) && row[5]>=rangeVolume && (!optionsOnly||row[6]) );
+				if(!includeCrypto && row[6]=='crypto')
+					continue;
+				if(row[0][0] == '^' && L._stageData['afterhours'] && includeCrypto)
+					continue;
+				if(notify) {
+					notifyAny = true;
+					rowClass = `l_notify_${row[2]<0?'down':'up'}`;
+					notifyControl = `<div class="l_notify_disable" title="Disable ${L.H(row[0])} notifications for this session" onclick="L.notifyException('${L.H(row[0])}', true)">x</div>`;
+					if(notifySymbols.indexOf(row[0]) < 0)
+						notifySymbols.push(row[0]);
+				}
+				else {
+					rowClass = '';
+					if(notifyExcept)
+						notifyControl = `<div class="l_notify_enable" title="Re-enable ${L.H(row[0])} notifications" onclick="L.notifyException('${L.H(row[0])}', false)">&#10003;</div>`;
+					else
+						notifyControl = '';
+				}
+				if(['crypto','futures'].indexOf(row[6]) >= 0)
+					rowClass += ` l_${row[6]}`;
+				let notifyPopout = '';
+				if(row[7] && row[10])
+					notifyPopout = `<div class="l_notify_popout" title="News and earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;+&nbsp;news</span></div>`;
+				else if(row[7])
+					notifyPopout = `<div class="l_notify_popout" title="Earnings on ${L.H(row[7])}">&#128198;&nbsp;${L.H(row[7])}<span>&nbsp;earnings</span></div>`;
+				else if(row[10])
+					notifyPopout = `<div class="l_notify_popout" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`;
+				let priceColumn = '<div class="l_hover_container">';
+				if(row[8])
+					priceColumn += `<span class="l_hover_active">${row[8]<0?'-':'+'}$${L.D(Math.abs(row[8]),2)}</span><span class="l_hover_inactive">`;
+				priceColumn += row[4] ? ('$'+L.D(row[4],2)) : L._emptyCellHtml;
+				if(row[8])
+					priceColumn += '</span>';
+				priceColumn += '</div>';
+				let volumeColumn = '<div class="l_hover_container">';
+				if(row[9])
+					volumeColumn += `<span class="l_hover_active">+${L.F(row[9],1)}</span><span class="l_hover_inactive">`;
+				volumeColumn += row[5] ? L.F(row[5],1) : L._emptyCellHtml;
+				if(row[9])
+					volumeColumn += '</span>';
+				volumeColumn += '</div>';
+				let companyColumn = '<div class="l_hover_container">';
+				if(row[10] && !L._forceContentTableShrink)
+					companyColumn += `<span class="l_hover_active_left">${L.H(row[10])}</span><span class="l_hover_inactive">`;
+				companyColumn += L._forceContentTableShrink ? L._emptyCellHtml : L.H(row[1]);
+				if(row[10] && !L._forceContentTableShrink)
+					companyColumn += '</span>';
+				companyColumn += '</div>';
+				if(stocksOrSpikes == 'spikes')
+					volumeColumn = 'SPIKE';
+				let oswType = (stocksOrSpikes=='spikes' ? `'${L.H(row[0])}'` : i);
+				htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${oswType}, event)">
+					<td>${notifyControl}${L.H(row[0])}</td>
+					<td class="l_company_name">${companyColumn}</td>
+					<td>${L.htmlPercent(row[2])}</td>
+					<td>${L.htmlPercent(row[3])}</td>
+					<td>${priceColumn}</td>
+					<td>${volumeColumn}</td>
+					<td class="${row[6]?'l_options':''}">${notifyPopout}${row[6]?L.H(row[6]):L._emptyCellHtml}</td>
+					</tr>`;
+				if(notify)
+					htmlPriority += htmlRow;
 				else
-					notifyControl = '';
+					htmlNormal += htmlRow;
 			}
-			if(['crypto','futures'].indexOf(row[6]) >= 0)
-				rowClass += ` l_${row[6]}`;
-			let notifyPopout = '';
-			if(row[7] && row[10])
-				notifyPopout = `<div class="l_notify_popout" title="News and earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;+&nbsp;news</span></div>`;
-			else if(row[7])
-				notifyPopout = `<div class="l_notify_popout" title="Earnings on ${L.H(row[7])}">&#128198;&nbsp;${L.H(row[7])}<span>&nbsp;earnings</span></div>`;
-			else if(row[10])
-				notifyPopout = `<div class="l_notify_popout" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`;
-			let priceColumn = '<div class="l_hover_container">';
-			if(row[8])
-				priceColumn += `<span class="l_hover_active">${row[8]<0?'-':'+'}$${L.D(Math.abs(row[8]),2)}</span><span class="l_hover_inactive">`;
-			priceColumn += row[4] ? ('$'+L.D(row[4],2)) : L._emptyCellHtml;
-			if(row[8])
-				priceColumn += '</span>';
-			priceColumn += '</div>';
-			let volumeColumn = '<div class="l_hover_container">';
-			if(row[9])
-				volumeColumn += `<span class="l_hover_active">+${L.F(row[9],1)}</span><span class="l_hover_inactive">`;
-			volumeColumn += row[5] ? L.F(row[5],1) : L._emptyCellHtml;
-			if(row[9])
-				volumeColumn += '</span>';
-			volumeColumn += '</div>';
-			let companyColumn = '<div class="l_hover_container">';
-			if(row[10] && !L._forceContentTableShrink)
-				companyColumn += `<span class="l_hover_active_left">${L.H(row[10])}</span><span class="l_hover_inactive">`;
-			companyColumn += L._forceContentTableShrink ? L._emptyCellHtml : L.H(row[1]);
-			if(row[10] && !L._forceContentTableShrink)
-				companyColumn += '</span>';
-			companyColumn += '</div>';
-			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${i}, event)">
-				<td>${notifyControl}${L.H(row[0])}</td>
-				<td class="l_company_name">${companyColumn}</td>
-				<td>${L.htmlPercent(row[2])}</td>
-				<td>${L.htmlPercent(row[3])}</td>
-				<td>${priceColumn}</td>
-				<td>${volumeColumn}</td>
-				<td class="${row[6]?'l_options':''}">${notifyPopout}${row[6]?L.H(row[6]):L._emptyCellHtml}</td>
-				</tr>`;
-			if(notify)
-				htmlPriority += htmlRow;
-			else
-				htmlNormal += htmlRow;
 		}
 		if(!htmlPriority && !htmlNormal)
 			html += '<tr><td colspan="7">No results found.</td></tr>';
