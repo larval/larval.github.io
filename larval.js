@@ -258,6 +258,11 @@ const L = {
 					L._stageDataHistory.push(json);
 				else {
 					L._stageData = json;
+					if(L._stageDataHistory.length == 0 && localStorage.length == 0 && L._stageData['afterhours']) {
+						const now=new Date();
+						if(now.getDay() != 0 && now.getDay() != 6)
+							L.E('l_include_futures').checked = true;
+					}
 					L._stageDataHistory.push(L._stageData);
 					L.sortStageData(false);
 					L._forceContentTableShrink = false;
@@ -638,7 +643,7 @@ const L = {
 		if(!L._stageData)
 			return;
 		const columns=['symbol', L._forceContentTableShrink?L._emptyCellHtml:'company', '~5min%','total%','price','volume','options'];
-		const rangeUp=parseFloat(L.E('l_range_up_display').innerHTML), rangeDown=parseFloat(L.E('l_range_down_display').innerHTML), rangeVolume=parseInt(L.E('l_range_volume_display').innerHTML)*1000, optionsOnly=L.E('l_options_only').checked, includeCrypto=L.E('l_include_crypto').checked;
+		const rangeUp=parseFloat(L.E('l_range_up_display').innerHTML), rangeDown=parseFloat(L.E('l_range_down_display').innerHTML), rangeVolume=parseInt(L.E('l_range_volume_display').innerHTML)*1000, optionsOnly=L.E('l_options_only').checked, includeCrypto=L.E('l_include_crypto').checked, includeFutures=L.E('l_include_futures').checked;
 		L.E('l_afterhours_left').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		let notifySymbols=[], notifyAny=false, rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
@@ -681,9 +686,7 @@ const L = {
 			for(let i in L._stageData[stocksOrSpikes]) {
 				const row=L._stageData[stocksOrSpikes][i], notifyExcept=!!L._notifyExceptions[row[0]];
 				const notify=( !notifyExcept && ((rangeUp&&row[2]>=rangeUp)||(rangeDown&&rangeDown>=row[2])) && row[5]>=rangeVolume && (!optionsOnly||row[6]) );
-				if(!includeCrypto && row[6]=='crypto')
-					continue;
-				if(row[0][0] == '^' && L._stageData['afterhours'] && includeCrypto)
+				if((!includeCrypto && row[6]=='crypto') || (!includeFutures && row[6]=='futures'))
 					continue;
 				if(notify) {
 					notifyAny = true;
