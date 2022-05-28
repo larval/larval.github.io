@@ -685,7 +685,7 @@ const L = {
 		for(let stocksOrSpikes of ['spikes', 'stocks']) {
 			for(let i in L._stageData[stocksOrSpikes]) {
 				const row=L._stageData[stocksOrSpikes][i], notifyExcept=!!L._notifyExceptions[row[0]];
-				const notify=( !notifyExcept && ((rangeUp&&row[2]>=rangeUp)||(rangeDown&&rangeDown>=row[2])) && row[5]>=rangeVolume && (!optionsOnly||row[6]) );
+				const notify=( !notifyExcept && ((rangeUp&&row[2]>=rangeUp)||(rangeDown&&rangeDown>=row[2])) && (!row[5]||row[5]>=rangeVolume) && (!optionsOnly||row[6]) );
 				if((!includeCrypto && row[6]=='crypto') || (!includeFutures && row[6]=='futures'))
 					continue;
 				if(notify) {
