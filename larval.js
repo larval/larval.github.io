@@ -255,7 +255,7 @@ const L = {
 					return;
 				}
 				else if(L._stageDataHistoryIndex >= 0)
-					L._stageDataHistory.push(json);
+					L._stageDataHistory.push(structuredClone(json));
 				else {
 					L._stageData = json;
 					if(L._stageDataHistory.length == 0 && localStorage.length == 0 && L._stageData['afterhours']) {
@@ -263,7 +263,7 @@ const L = {
 						if(now.getDay() != 0 && now.getDay() != 6)
 							L.E('l_include_futures').checked = true;
 					}
-					L._stageDataHistory.push(L._stageData);
+					L._stageDataHistory.push(structuredClone(L._stageData));
 					L.sortStageData(false);
 					L._forceContentTableShrink = false;
 					if(updateView)
@@ -310,7 +310,7 @@ const L = {
 	},
 	setStageDataHistory: index => {
 		const historyTotal=L._stageDataHistory.length-1, historyIndex=index<0?historyTotal:index;
-		L._stageData = L._stageDataHistory[index >= 0 ? index : historyTotal];
+		L._stageData = structuredClone(L._stageDataHistory[index >= 0 ? index : historyTotal]);
 		L.sortStageData(true);
 		const minutesAgo=Math.round((L.epochNow()-L._stageData['ts'])/60,0);
 		if(historyIndex == historyTotal)
