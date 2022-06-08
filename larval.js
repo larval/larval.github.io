@@ -269,6 +269,8 @@ const L = {
 					if(updateView)
 						L.updateLiveTable(true);
 				}
+				if(json['notify'])
+					L.marqueeFlash(json['notify'])
 				L.E('l_last_update').innerHTML = L.epochToDate(json['ts']);
 				L.setNextStagePoll(L.getSynchronizedNext());
 			}
