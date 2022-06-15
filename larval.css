@@ -75,6 +75,10 @@
 	from { filter: blur(4px); }
 	to { filter: blur(0); }
 }
+@keyframes l_content_table_notify {
+	from { background-color: #FFDE96; }
+	to { background-color: transparent; }
+}
 @keyframes l_notify_up {
 	from { background-color: transparent; }
 	to { background-color: #A6FDA4; }
@@ -85,7 +89,7 @@
 }
 @keyframes l_notify_halt {
 	from { background-color: transparent; }
-	to { background-color: #ffde96; }
+	to { background-color: #FFDE96; }
 }
 @keyframes l_hover_active {
 	from {
@@ -515,6 +519,14 @@ body:before {
 	word-break: break-all;
 	overflow: hidden;
 }
+.l_content_table_notify_0 tr td:nth-child(3),
+.l_content_table_notify_1 tr td:nth-child(1),
+.l_content_table_notify_2 tr td:nth-child(2),
+.l_content_table_notify_3 tr td:nth-child(3),
+.l_content_table_notify_4 tr td:nth-child(4),
+.l_content_table_notify_5 tr td:nth-child(5),
+.l_content_table_notify_6 tr td:nth-child(6),
+.l_content_table_notify_7 tr td:nth-child(7) { animation: l_content_table_notify 1s linear forwards; }
 #l_content_table tr td:nth-child(5) { overflow: hidden; }
 #l_content_table tr td:nth-child(6) { overflow: hidden; }
 #l_content_table tr td:nth-child(7) {

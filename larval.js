@@ -756,8 +756,9 @@ const L = {
 			html += '<tr><td colspan="7">No results found.</td></tr>';
 		else
 			html += htmlPriority + htmlNormal;
-		if(!L.E('l_awaiting_data') && !L.E('l_content_table').classList.contains('l_content_tr_fade_in'))
-			L.E('l_content_table').classList.add('l_content_tr_fade_in');
+		L.E('l_content_table').className = L.E('l_awaiting_data') ? '' : 'l_content_tr_fade_in';
+		if(doNotify)
+			L.E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(L._stageDataSortByColumn));
 		L.E('l_content_table').innerHTML = html;
 		L.updateContentTableRowCountThatAreInView();
 		if(!doNotResetKeyRow)
