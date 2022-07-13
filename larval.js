@@ -738,7 +738,7 @@ const L = {
 					volumeColumn = 'SPIKE';
 				let optionsColumn = '<div class="l_hover_container">';
 				if(row[7])
-					optionsColumn += `<span class="l_hover_active">${L.H(row[7])}%iv</span><span class="l_hover_inactive">`;
+					optionsColumn += `<span class="l_hover_active">${L.H(row[7]>0?row[7]:('~'+Math.abs(row[7])))}%iv</span><span class="l_hover_inactive">`;
 				optionsColumn += row[6] ? L.H(row[6]) : L._emptyCellHtml;
 				if(row[7])
 					optionsColumn += '</span>';

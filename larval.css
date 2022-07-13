@@ -532,6 +532,7 @@ body:before {
 #l_content_table tr td:nth-child(7) {
 	text-align: center;
 	position: relative;
+	overflow: hidden; 
 }
 .l_halt td:nth-child(3), .l_notify_halt td:nth-child(3) { text-align: left !important; }
 .l_halt td:nth-child(4), .l_notify_halt td:nth-child(4) { text-align: center !important; }
