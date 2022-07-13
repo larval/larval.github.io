@@ -558,8 +558,8 @@ const L = {
 			return;
 		if(typeof symbolOrIndex == 'number') {
 			symbol = L._stageData['stocks'][symbolOrIndex][0];
-			if(L._stageData['stocks'][symbolOrIndex][11] && e && e.target.className == 'l_company_name') {
-				window.open(L._stageData['stocks'][symbolOrIndex][11], `larval_news_${symbol}`).focus();
+			if(L._stageData['stocks'][symbolOrIndex][12] && e && e.target.className == 'l_company_name') {
+				window.open(L._stageData['stocks'][symbolOrIndex][12], `larval_news_${symbol}`).focus();
 				return;
 			}
 			else if(e && e.target.className == 'l_options')
@@ -707,35 +707,42 @@ const L = {
 				if(['crypto','futures'].indexOf(row[6]) >= 0)
 					rowClass += ` l_${row[6]}`;
 				let notifyPopout = '';
-				if(row[7] && row[10])
-					notifyPopout = `<div class="l_notify_popout" title="News and earnings on ${L.H(row[7])}">&#128197;&nbsp;${L.H(row[7])}<span>&nbsp;+&nbsp;news</span></div>`;
-				else if(row[7])
-					notifyPopout = `<div class="l_notify_popout" title="Earnings on ${L.H(row[7])}">&#128198;&nbsp;${L.H(row[7])}<span>&nbsp;earnings</span></div>`;
-				else if(row[10])
+				if(row[8] && row[11])
+					notifyPopout = `<div class="l_notify_popout" title="News and earnings on ${L.H(row[8])}">&#128197;&nbsp;${L.H(row[8])}<span>&nbsp;+&nbsp;news</span></div>`;
+				else if(row[8])
+					notifyPopout = `<div class="l_notify_popout" title="Earnings on ${L.H(row[8])}">&#128198;&nbsp;${L.H(row[8])}<span>&nbsp;earnings</span></div>`;
+				else if(row[11])
 					notifyPopout = `<div class="l_notify_popout" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`;
 				let priceColumn = '<div class="l_hover_container">';
-				if(row[8])
-					priceColumn += `<span class="l_hover_active">${row[8]<0?'-':'+'}$${L.D(Math.abs(row[8]),2)}</span><span class="l_hover_inactive">`;
+				if(row[9])
+					priceColumn += `<span class="l_hover_active">${row[9]<0?'-':'+'}$${L.D(Math.abs(row[9]),2)}</span><span class="l_hover_inactive">`;
 				priceColumn += row[4] ? ('$'+L.D(row[4],2)) : L._emptyCellHtml;
-				if(row[8])
+				if(row[9])
 					priceColumn += '</span>';
 				priceColumn += '</div>';
 				let volumeColumn = '<div class="l_hover_container">';
-				if(row[9])
-					volumeColumn += `<span class="l_hover_active">+${L.F(row[9],1)}</span><span class="l_hover_inactive">`;
+				if(row[10])
+					volumeColumn += `<span class="l_hover_active">+${L.F(row[10],1)}</span><span class="l_hover_inactive">`;
 				volumeColumn += row[5] ? L.F(row[5],1) : L._emptyCellHtml;
-				if(row[9])
+				if(row[10])
 					volumeColumn += '</span>';
 				volumeColumn += '</div>';
 				let companyColumn = '<div class="l_hover_container">';
-				if(row[10] && !L._forceContentTableShrink)
-					companyColumn += `<span class="l_hover_active_left">${L.H(row[10])}</span><span class="l_hover_inactive">`;
+				if(row[11] && !L._forceContentTableShrink)
+					companyColumn += `<span class="l_hover_active_left">${L.H(row[11])}</span><span class="l_hover_inactive">`;
 				companyColumn += L._forceContentTableShrink ? L._emptyCellHtml : L.H(row[1]);
-				if(row[10] && !L._forceContentTableShrink)
+				if(row[11] && !L._forceContentTableShrink)
 					companyColumn += '</span>';
 				companyColumn += '</div>';
 				if(stocksOrSpikes == 'spikes')
 					volumeColumn = 'SPIKE';
+				let optionsColumn = '<div class="l_hover_container">';
+				if(row[7])
+					optionsColumn += `<span class="l_hover_active">${L.H(row[7])}%iv</span><span class="l_hover_inactive">`;
+				optionsColumn += row[6] ? L.H(row[6]) : L._emptyCellHtml;
+				if(row[7])
+					optionsColumn += '</span>';
+				optionsColumn += '</div>';
 				let oswType = (stocksOrSpikes=='spikes' ? `'${L.H(row[0])}'` : i);
 				htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${oswType}, event)">
 					<td>${notifyControl}${L.H(row[0])}</td>
@@ -744,7 +751,7 @@ const L = {
 					<td>${L.htmlPercent(row[3])}</td>
 					<td>${priceColumn}</td>
 					<td>${volumeColumn}</td>
-					<td class="${row[6]?'l_options':''}">${notifyPopout}${row[6]?L.H(row[6]):L._emptyCellHtml}</td>
+					<td class="${row[6]?'l_options':''}">${notifyPopout}${optionsColumn}</td>
 					</tr>`;
 				if(notify)
 					htmlPriority += htmlRow;
