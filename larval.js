@@ -667,6 +667,13 @@ const L = {
 			if(notifyExcept)
 				continue;
 			rowClass = (notify ? 'l_notify_halt' : 'l_halt');
+			let optionsColumn = '<div class="l_hover_container">';
+			if(row[4])
+				optionsColumn += `<span class="l_hover_active">${L.H(row[4]>0?row[4]:('~'+Math.abs(row[4])))}%iv</span><span class="l_hover_inactive">`;
+			optionsColumn += row[3] ? L.H(row[3]) : L._emptyCellHtml;
+			if(row[4])
+				optionsColumn += '</span>';
+			optionsColumn += '</div>';
 			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow('${L.H(row[0])}', event)">
 				<td>
 				 <div class="l_notify_disable" title="Disable ${L.H(row[0])} notifications for this session" onclick="L.notifyException('${L.H(row[0])}', true)">x</div>
@@ -674,7 +681,7 @@ const L = {
 				</td>
 				<td>${L._forceContentTableShrink?L._emptyCellHtml:L.H(row[1])}</td>
 				<td colspan="4">HALT: ${L.H(row[2])}</td>
-				<td class="${row[3]?'l_options':''}">${row[3]?L.H(row[3]):L._emptyCellHtml}</td>
+				<td class="${row[3]?'l_options':''}">${optionsColumn}</td>
 				</tr>`;
 			if(notify) {
 				notifyAny = true;
