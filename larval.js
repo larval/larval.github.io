@@ -495,25 +495,31 @@ const L = {
 		L.marqueeIntervalReset();
 		L.marqueeInitiate(L._marqueeLoopSecondsLong, html);
 	},
-	notify: (message) => {
+	notify: (notifyRows) => {
 		L.notifyClear();
-		L._notifyTitleInterval = setInterval(() => {
-			if(!document.hidden || !L._notifyTitleInterval)
-				L.notifyClear();
-			else
-				document.title = (document.title==L._title?'*** MARKET VOLATILITY ***':L._title);
-		}, 1000);
 		try {
 			if(Notification && Notification.permission == 'granted') {
 				void new Notification('Larval - Market volatility found!', {
 					icon: 'icon-192x192.png',
-					body: message ? message : 'Larval - Market volatility found!'
+					body: notifyRows.length > 0 ? 'Volatile stock(s): ' + notifyRows.map(a => a[L.SYM]).filter((v,i,s) => { return s.indexOf(v)===i; }).join(', ') : 'Larval - Market volatility found!'
 				});
 			}
 			else 
 				L.requestNotifications();
 		}
 		catch(e) { }
+		notifyRows.push([]);
+		L._notifyTitleInterval = setInterval(() => {
+			if(!document.hidden || !L._notifyTitleInterval)
+				L.notifyClear();
+			else if(!notifyRows[0] || !notifyRows[0][0])
+				document.title = L._title;
+			else if(notifyRows[0].length == 5)
+				document.title = notifyRows[0][L.HSYM] + ' | ' + (notifyRows[0][L.HWHY]?notifyRows[0][L.HWHY]:'HALTED');
+			else
+				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.PCT5]<0?"\u25bc ":"\u25b2 ") + L.D(Math.abs(notifyRows[0][L.PCT5]),2) + '% | ' + (notifyRows[0][L.PCT]<0?"\u25bc ":"\u25b2 ") + L.D(Math.abs(notifyRows[0][L.PCT]),2) + '%';
+			notifyRows.push(notifyRows.shift());
+		}, 1000);
 		if(L.E('l_audible').checked)
 			L.notifyPlayAudio();
 		window.scrollTo({top: 0, behavior: 'smooth'});
@@ -652,7 +658,7 @@ const L = {
 		const rangeUp=parseFloat(L.E('l_range_up_display').innerHTML), rangeDown=parseFloat(L.E('l_range_down_display').innerHTML), rangeVolume=parseInt(L.E('l_range_volume_display').innerHTML)*1000, optionsOnly=L.E('l_options_only').checked, includeCrypto=L.E('l_include_crypto').checked, includeFutures=L.E('l_include_futures').checked;
 		L.E('l_afterhours_left').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
-		let notifySymbols=[], notifyAny=false, rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
+		let notifyRows=[], notifyAny=false, rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
 		let html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			if(L._stageDataSortByColumn == c)
@@ -690,7 +696,7 @@ const L = {
 			if(notify) {
 				notifyAny = true;
 				htmlPriority += htmlRow;
-				notifySymbols.push(row[L.HSYM]);
+				notifyRows.push(row);
 			}
 			else
 				htmlNormal += htmlRow;
@@ -705,8 +711,7 @@ const L = {
 					notifyAny = true;
 					rowClass = `l_notify_${row[L.PCT5]<0?'down':'up'}`;
 					notifyControl = `<div class="l_notify_disable" title="Disable ${L.H(row[L.SYM])} notifications for this session" onclick="L.notifyException('${L.H(row[L.SYM])}', true)">x</div>`;
-					if(notifySymbols.indexOf(row[L.SYM]) < 0)
-						notifySymbols.push(row[L.SYM]);
+					notifyRows.push(row);
 				}
 				else {
 					rowClass = '';
@@ -788,6 +793,6 @@ const L = {
 			L.updateLiveTable(doNotify, doNotResetKeyRow);
 		}
 		else if(notifyAny && doNotify)
-			L.notify(notifySymbols.length > 0 ? ('Volatile stock(s): '+notifySymbols.join(', ')) : null);
+			L.notify(notifyRows.length > 0 ? notifyRows : null);
 	}
 }
