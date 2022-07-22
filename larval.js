@@ -78,13 +78,12 @@ const L = {
 		p.innerHTML = string;
 		return(p.textContent || p.innerText || '');
 	},
-	P: (count, total) => { return(Math.round(count / total * 100)); },
+	P: (count, total) => Math.round(count / total * 100),
 	T: tag => document.getElementsByTagName(tag),
-	U: string => { return((string?string[0]:'').toUpperCase() + string.substring(1)); },
+	U: string => (string?string[0]:'').toUpperCase() + string.substring(1),
 
 	/* ENUMERATIONS */
-	SYM:0, NAM:1, PCT5:2, PCT:3, PRC:4, VOL:5, OPT:6, OIV:7, ERN:8, PRC5:9, VOL5:10, NWS:11, LNK:12,
-	HSYM:0, HNAM:1, HWHY:2, HOPT:3, HOIV:4,
+	SYM:0, NAM:1, PCT5:2, PCT:3, PRC:4, VOL:5, OPT:6, OIV:7, ERN:8, PRC5:9, VOL5:10, NWS:11, LNK:12, HLT:2, 
 
 	/* EVENTS */
 	onload: () => {
@@ -371,10 +370,8 @@ const L = {
 		L.getStageData(true);
 	},
 	forceNextStagePoll: () => { L.setNextStagePollComplete(); },
-	epochNow: () => { return(Math.floor(Date.now() / 1000)); },
-	epochToDate: epoch => {
-		return(new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}));
-	},
+	epochNow: () => Math.floor(Date.now() / 1000),
+	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
 	htmlPercent: number => {
 		if(number > 0)
 			return(L.D(Math.abs(number),2) + '%<span class="l_up">&#9650;</span>');
@@ -514,8 +511,8 @@ const L = {
 				L.notifyClear();
 			else if(!notifyRows[0] || !notifyRows[0][0])
 				document.title = L._title;
-			else if(notifyRows[0].length == 5)
-				document.title = notifyRows[0][L.HSYM] + ' | ' + (notifyRows[0][L.HWHY]?notifyRows[0][L.HWHY]:'HALTED');
+			else if(L.isHaltRow(notifyRows[0]))
+				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.HLT]?notifyRows[0][L.HLT]:'HALTED');
 			else
 				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.PCT5]<0?"\u25bc ":"\u25b2 ") + L.D(Math.abs(notifyRows[0][L.PCT5]),2) + '% | ' + (notifyRows[0][L.PCT]<0?"\u25bc ":"\u25b2 ") + L.D(Math.abs(notifyRows[0][L.PCT]),2) + '%';
 			notifyRows.push(notifyRows.shift());
@@ -563,13 +560,17 @@ const L = {
 		catch (e) { }
 	},
 	openStockWindow: (symbolOrIndex, e) => {
-		let symbol='', urlType=0;
+		let symbol='', urlType=0, stockOrHalt='stocks';
 		if(e && e.target.nodeName != 'TD')
 			return;
 		if(typeof symbolOrIndex == 'number') {
-			symbol = L._stageData['stocks'][symbolOrIndex][0];
-			if(L._stageData['stocks'][symbolOrIndex][L.LNK] && e && e.target.className == 'l_company_name') {
-				window.open(L._stageData['stocks'][symbolOrIndex][L.LNK], `larval_news_${symbol}`).focus();
+			if(symbolOrIndex < 0) {
+				stockOrHalt = 'halts';
+				symbolOrIndex = Math.abs(symbolOrIndex + 1);
+			}
+			symbol = L._stageData[stockOrHalt][symbolOrIndex][L.SYM];
+			if(L._stageData[stockOrHalt][symbolOrIndex][L.LNK] && e && e.target.className == 'l_company_name') {
+				window.open(L._stageData[stockOrHalt][symbolOrIndex][L.LNK], `larval_news_${symbol}`).focus();
 				return;
 			}
 			else if(e && e.target.className == 'l_options')
@@ -651,6 +652,58 @@ const L = {
 		L._contentTableRowCountThatAreInView = total;
 		return(total);
 	},
+	isHaltRow: row => row && !row[L.PRC] && row[L.HLT] && typeof row[L.HLT] == 'string',
+	cell: (row, type) => {
+		if(!row[type])
+			return(L._emptyCellHtml);
+		switch(type) {
+			case L.SYM:
+			case L.OPT:
+			case L.ERN:
+			case L.NWS:
+				return(L.H(row[type]));
+			case L.NAM:
+				return(L._forceContentTableShrink ? L._emptyCellHtml : L.H(row[type]));
+			case L.PCT:
+				return(L.htmlPercent(row[type]));
+			case L.PCT5:
+			case L.HLT:
+				return(L.isHaltRow(row) ? L.H(row[type]?row[type]:'HALTED') : L.htmlPercent(row[type]));
+			case L.VOL:
+				return(L.F(row[type],1));
+			case L.VOL5:
+				return('+' + L.F(row[type],1));
+			case L.PRC:
+				return('$' + L.D(row[type],2));
+			case L.PRC5:
+				return((row[type]<0?'-$':'+$') + L.D(Math.abs(row[type]),2));
+			case L.OIV:
+				return((L.H(row[type] > 0 ? row[type] : ('~' + Math.abs(row[type])))) + '%iv');
+			case L.LNK:
+				return(row[type]);
+			default:
+				return(L._emptyCellHtml);
+		}
+	},
+	cellRollover: (row, primary, secondary, shrinkMode) => {
+		let cell='<div class="l_hover_container">', left=(secondary==L.NWS);
+		if(row[secondary] && !shrinkMode)
+			cell += `<span class="${left?'l_hover_active_left':'l_hover_active'}">${L.cell(row,secondary)}</span><span class="l_hover_inactive">`;
+		cell += L.cell(row,primary);
+		if(row[secondary] && !shrinkMode)
+			cell += '</span>';
+		cell += '</div>';
+		return(cell);
+	},
+	popoutLiveTableRow: row => {
+		if(row[L.ERN] && row[L.NWS])
+			return(`<div class="l_notify_popout" title="News and earnings on ${L.cell(row,L.ERN)}">&#128197;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;+&nbsp;news</span></div>`);
+		else if(row[L.ERN])
+			return(`<div class="l_notify_popout" title="Earnings on ${L.cell(row,L.ERN)}">&#128198;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;earnings</span></div>`);
+		else if(row[L.NWS])
+			return(`<div class="l_notify_popout" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`);
+		return('');
+	},
 	updateLiveTable: (doNotify, doNotResetKeyRow) => {
 		if(!L._stageData)
 			return;
@@ -672,26 +725,19 @@ const L = {
 		html += '</tr>';
 		if(doNotify)
 			L.notifyClear();
-		for(let i in L._stageData['halts']) {
-			const row=L._stageData['halts'][i], notify=L.E('l_notify_halts').checked, notifyExcept=!!L._notifyExceptions[row[L.HSYM]];
+		for(let i=0; i < L._stageData['halts'].length; i++) {
+			const row=L._stageData['halts'][i], notify=L.E('l_notify_halts').checked, notifyExcept=!!L._notifyExceptions[row[L.SYM]];
 			if(notifyExcept)
 				continue;
 			rowClass = (notify ? 'l_notify_halt' : 'l_halt');
-			let optionsColumn = '<div class="l_hover_container">';
-			if(row[L.HOIV])
-				optionsColumn += `<span class="l_hover_active">${L.H(row[L.HOIV]>0?row[L.HOIV]:('~'+Math.abs(row[L.HOIV])))}%iv</span><span class="l_hover_inactive">`;
-			optionsColumn += row[L.HOPT] ? L.H(row[L.HOPT]) : L._emptyCellHtml;
-			if(row[L.HOIV])
-				optionsColumn += '</span>';
-			optionsColumn += '</div>';
-			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow('${L.H(row[L.HSYM])}', event)">
+			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(-${i+1},event)">
 				<td>
-				 <div class="l_notify_disable" title="Disable ${L.H(row[L.HSYM])} notifications for this session" onclick="L.notifyException('${L.H(row[L.HSYM])}', true)">x</div>
-				 ${L.H(row[L.HSYM])}
+				 <div class="l_notify_disable" title="Disable ${L.cell(row,L.SYM)} notifications for this session" onclick="L.notifyException('${L.cell(row,L.SYM)}', true)">x</div>
+				 ${L.cell(row,L.SYM)}
 				</td>
-				<td>${L._forceContentTableShrink?L._emptyCellHtml:L.H(row[L.HNAM])}</td>
-				<td colspan="4">HALT: ${L.H(row[L.HWHY])}</td>
-				<td class="${row[L.HOPT]?'l_options':''}">${optionsColumn}</td>
+				<td class="l_company_name">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
+				<td colspan="4">HALT: ${L.cell(row,L.HLT)}</td>
+				<td class="${row[L.OPT]?'l_options':''}">${L.popoutLiveTableRow(row)}${L.cellRollover(row,L.OPT,L.OIV)}</td>
 				</tr>`;
 			if(notify) {
 				notifyAny = true;
@@ -702,7 +748,7 @@ const L = {
 				htmlNormal += htmlRow;
 		}
 		for(let stocksOrSpikes of ['spikes', 'stocks']) {
-			for(let i in L._stageData[stocksOrSpikes]) {
+			for(let i=0; i < L._stageData[stocksOrSpikes].length; i++) {
 				const row=L._stageData[stocksOrSpikes][i], notifyExcept=!!L._notifyExceptions[row[L.SYM]];
 				const notify=( !notifyExcept && ((rangeUp&&row[L.PCT5]>=rangeUp)||(rangeDown&&rangeDown>=row[L.PCT5])) && (!row[L.VOL]||row[L.VOL]>=rangeVolume) && (!optionsOnly||row[L.OPT]) );
 				if((!includeCrypto && row[L.OPT]=='crypto') || (!includeFutures && row[L.OPT]=='futures'))
@@ -710,64 +756,27 @@ const L = {
 				if(notify) {
 					notifyAny = true;
 					rowClass = `l_notify_${row[L.PCT5]<0?'down':'up'}`;
-					notifyControl = `<div class="l_notify_disable" title="Disable ${L.H(row[L.SYM])} notifications for this session" onclick="L.notifyException('${L.H(row[L.SYM])}', true)">x</div>`;
+					notifyControl = `<div class="l_notify_disable" title="Disable ${L.cell(row,L.SYM)} notifications for this session" onclick="L.notifyException('${L.cell(row,L.SYM)}', true)">x</div>`;
 					notifyRows.push(row);
 				}
 				else {
 					rowClass = '';
 					if(notifyExcept)
-						notifyControl = `<div class="l_notify_enable" title="Re-enable ${L.H(row[L.SYM])} notifications" onclick="L.notifyException('${L.H(row[L.SYM])}', false)">&#10003;</div>`;
+						notifyControl = `<div class="l_notify_enable" title="Re-enable ${L.cell(row,L.SYM)} notifications" onclick="L.notifyException('${L.cell(row,L.SYM)}', false)">&#10003;</div>`;
 					else
 						notifyControl = '';
 				}
-				if(['crypto','futures'].indexOf(row[L.OPT]) >= 0)
+				if(row[L.OPT] && ['crypto','futures'].indexOf(row[L.OPT]) >= 0)
 					rowClass += ` l_${row[L.OPT]}`;
-				let notifyPopout = '';
-				if(row[L.ERN] && row[L.NWS])
-					notifyPopout = `<div class="l_notify_popout" title="News and earnings on ${L.H(row[L.ERN])}">&#128197;&nbsp;${L.H(row[L.ERN])}<span>&nbsp;+&nbsp;news</span></div>`;
-				else if(row[L.ERN])
-					notifyPopout = `<div class="l_notify_popout" title="Earnings on ${L.H(row[L.ERN])}">&#128198;&nbsp;${L.H(row[L.ERN])}<span>&nbsp;earnings</span></div>`;
-				else if(row[L.NWS])
-					notifyPopout = `<div class="l_notify_popout" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`;
-				let priceColumn = '<div class="l_hover_container">';
-				if(row[L.PRC5])
-					priceColumn += `<span class="l_hover_active">${row[L.PRC5]<0?'-':'+'}$${L.D(Math.abs(row[L.PRC5]),2)}</span><span class="l_hover_inactive">`;
-				priceColumn += row[L.PRC] ? ('$'+L.D(row[L.PRC],2)) : L._emptyCellHtml;
-				if(row[L.PRC5])
-					priceColumn += '</span>';
-				priceColumn += '</div>';
-				let volumeColumn = '<div class="l_hover_container">';
-				if(row[L.VOL5])
-					volumeColumn += `<span class="l_hover_active">+${L.F(row[L.VOL5],1)}</span><span class="l_hover_inactive">`;
-				volumeColumn += row[L.VOL] ? L.F(row[L.VOL],1) : L._emptyCellHtml;
-				if(row[L.VOL5])
-					volumeColumn += '</span>';
-				volumeColumn += '</div>';
-				let companyColumn = '<div class="l_hover_container">';
-				if(row[L.NWS] && !L._forceContentTableShrink)
-					companyColumn += `<span class="l_hover_active_left">${L.H(row[L.NWS])}</span><span class="l_hover_inactive">`;
-				companyColumn += L._forceContentTableShrink ? L._emptyCellHtml : L.H(row[L.NAM]);
-				if(row[L.NWS] && !L._forceContentTableShrink)
-					companyColumn += '</span>';
-				companyColumn += '</div>';
-				if(stocksOrSpikes == 'spikes')
-					volumeColumn = 'SPIKE';
-				let optionsColumn = '<div class="l_hover_container">';
-				if(row[L.OIV])
-					optionsColumn += `<span class="l_hover_active">${L.H(row[L.OIV]>0?row[L.OIV]:('~'+Math.abs(row[L.OIV])))}%iv</span><span class="l_hover_inactive">`;
-				optionsColumn += row[L.OPT] ? L.H(row[L.OPT]) : L._emptyCellHtml;
-				if(row[L.OIV])
-					optionsColumn += '</span>';
-				optionsColumn += '</div>';
-				let oswType = (stocksOrSpikes=='spikes' ? `'${L.H(row[L.SYM])}'` : i);
+				const oswType = (stocksOrSpikes=='spikes' ? `'${L.cell(row,L.SYM)}'` : i);
 				htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${oswType}, event)">
-					<td>${notifyControl}${L.H(row[L.SYM])}</td>
-					<td class="l_company_name">${companyColumn}</td>
-					<td>${L.htmlPercent(row[L.PCT5])}</td>
-					<td>${L.htmlPercent(row[L.PCT])}</td>
-					<td>${priceColumn}</td>
-					<td>${volumeColumn}</td>
-					<td class="${row[L.OPT]?'l_options':''}">${notifyPopout}${optionsColumn}</td>
+					<td>${notifyControl}${L.cell(row,L.SYM)}</td>
+					<td class="l_company_name">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
+					<td>${L.cell(row,L.PCT5)}</td>
+					<td>${L.cell(row,L.PCT)}</td>
+					<td>${L.cellRollover(row,L.PRC,L.PRC5)}</td>
+					<td>${stocksOrSpikes=='spikes'?'SPIKES':L.cellRollover(row,L.VOL,L.VOL5)}</td>
+					<td class="${row[L.OPT]?'l_options':''}">${L.popoutLiveTableRow(row)}${L.cellRollover(row,L.OPT,L.OIV)}</td>
 					</tr>`;
 				if(notify)
 					htmlPriority += htmlRow;

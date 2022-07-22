@@ -529,7 +529,7 @@ body:before {
 .l_content_table_notify_7 tr td:nth-child(7) { animation: l_content_table_notify 1s linear forwards; }
 #l_content_table tr td:nth-child(5) { overflow: hidden; }
 #l_content_table tr td:nth-child(6) { overflow: hidden; }
-#l_content_table tr td:nth-child(7) {
+#l_content_table tr td:nth-child(7), .l_notify_halt td:nth-child(4) {
 	text-align: center;
 	position: relative;
 }
