@@ -109,7 +109,7 @@ const L = {
 		L._splashComplete = true;
 		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
-		L.setNextStagePoll(!L._stageData||!L._stageData['stocks'] ? L._setNextStagePollShort : L.getSynchronizedNext());
+		L.setNextStagePoll(!L._stageData||!L._stageData['items'] ? L._setNextStagePollShort : L.getSynchronizedNext());
 		const topType = L.E('l_include_crypto').checked ? 'top_all' : 'top';
 		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData[topType] && L._stageData[topType].length > 1)
 			L.marqueeUpdate(L._marqueeLoopSecondsLong);
@@ -560,17 +560,13 @@ const L = {
 		catch (e) { }
 	},
 	openStockWindow: (symbolOrIndex, e) => {
-		let symbol='', urlType=0, stockOrHalt='stocks';
+		let symbol='', urlType=0;
 		if(e && e.target.nodeName != 'TD')
 			return;
 		if(typeof symbolOrIndex == 'number') {
-			if(symbolOrIndex < 0) {
-				stockOrHalt = 'halts';
-				symbolOrIndex = Math.abs(symbolOrIndex + 1);
-			}
-			symbol = L._stageData[stockOrHalt][symbolOrIndex][L.SYM];
-			if(L._stageData[stockOrHalt][symbolOrIndex][L.LNK] && e && e.target.className == 'l_company_name') {
-				window.open(L._stageData[stockOrHalt][symbolOrIndex][L.LNK], `larval_news_${symbol}`).focus();
+			symbol = L._stageData['items'][symbolOrIndex][L.SYM];
+			if(L._stageData['items'][symbolOrIndex][L.LNK] && e && e.target.className == 'l_company_name') {
+				window.open(L._stageData['items'][symbolOrIndex][L.LNK], `larval_news_${symbol}`).focus();
 				return;
 			}
 			else if(e && e.target.className == 'l_options')
@@ -611,8 +607,8 @@ const L = {
 	},
 	setSortStageData: column => {
 		if(L._stageDataSortByColumn == -column || !column || column > L.E('l_content_table').getElementsByTagName('th').length) {
-			if(L._stageData.stocksImmutable)
-				L._stageData.stocks = structuredClone(L._stageData.stocksImmutable);
+			if(L._stageData.itemsImmutable)
+				L._stageData.items = structuredClone(L._stageData.itemsImmutable);
 			L._stageDataSortByColumn = 0;
 		}
 		else if(L._stageDataSortByColumn == column)
@@ -623,14 +619,16 @@ const L = {
 	},
 	sortStageData: updateView => {
 		if(L._stageData && L._stageDataSortByColumn) {
-			if(!L._stageData.stocksImmutable)
-				L._stageData.stocksImmutable = structuredClone(L._stageData.stocks);
-			L._stageData.stocks = L._stageData.stocks.sort((a, b) => {
+			if(!L._stageData.itemsImmutable)
+				L._stageData.itemsImmutable = structuredClone(L._stageData.items);
+			L._stageData.items = L._stageData.items.sort((a, b) => {
 				const column = Math.abs(L._stageDataSortByColumn) - 1;
 				if(a[column] === null || a[column] === false || a[column] === undefined)
 					return 1;
 				else if(b[column] === null || b[column] === false || b[column] === undefined)
 					return -1;
+				else if(typeof a[column] != typeof b[column])
+					return L._stageDataSortByColumn < 0 ? (typeof a[column]=='number'?1:-1) : (typeof a[column]=='number'?1:-1);
 				else if(typeof a[column] == 'string')
 					return L._stageDataSortByColumn < 0 ? b[column].toUpperCase().localeCompare(a[column].toUpperCase()) : a[column].toUpperCase().localeCompare(b[column].toUpperCase());
 				else if(typeof a[column] == 'number')
@@ -652,7 +650,7 @@ const L = {
 		L._contentTableRowCountThatAreInView = total;
 		return(total);
 	},
-	isHaltRow: row => row && !row[L.PRC] && row[L.HLT] && typeof row[L.HLT] == 'string',
+	isHaltRow: row => row && row[L.HLT] && typeof row[L.HLT] == 'string',
 	cell: (row, type) => {
 		if(!row[type])
 			return(L._emptyCellHtml);
@@ -711,7 +709,7 @@ const L = {
 		const rangeUp=parseFloat(L.E('l_range_up_display').innerHTML), rangeDown=parseFloat(L.E('l_range_down_display').innerHTML), rangeVolume=parseInt(L.E('l_range_volume_display').innerHTML)*1000, optionsOnly=L.E('l_options_only').checked, includeCrypto=L.E('l_include_crypto').checked, includeFutures=L.E('l_include_futures').checked;
 		L.E('l_afterhours_left').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
-		let notifyRows=[], notifyAny=false, rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
+		let notifyRows=[], notify=false, notifyControl='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
 		let html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			if(L._stageDataSortByColumn == c)
@@ -725,39 +723,30 @@ const L = {
 		html += '</tr>';
 		if(doNotify)
 			L.notifyClear();
-		for(let i=0; i < L._stageData['halts'].length; i++) {
-			const row=L._stageData['halts'][i], notify=L.E('l_notify_halts').checked, notifyExcept=!!L._notifyExceptions[row[L.SYM]];
-			if(notifyExcept)
-				continue;
-			rowClass = (notify ? 'l_notify_halt' : 'l_halt');
-			htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(-${i+1},event)">
-				<td>
-				 <div class="l_notify_disable" title="Disable ${L.cell(row,L.SYM)} notifications for this session" onclick="L.notifyException('${L.cell(row,L.SYM)}', true)">x</div>
-				 ${L.cell(row,L.SYM)}
-				</td>
-				<td class="l_company_name">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
-				<td colspan="4">HALT: ${L.cell(row,L.HLT)}</td>
-				<td class="${row[L.OPT]?'l_options':''}">${L.popoutLiveTableRow(row)}${L.cellRollover(row,L.OPT,L.OIV)}</td>
-				</tr>`;
-			if(notify) {
-				notifyAny = true;
-				htmlPriority += htmlRow;
-				notifyRows.push(row);
+		for(let i=0; i < L._stageData['items'].length; i++) {
+			const row=L._stageData['items'][i], notifyExcept=!!L._notifyExceptions[row[L.SYM]];
+			if(L.isHaltRow(row)) {
+				if(notifyExcept)
+					continue;
+				notify=L.E('l_notify_halts').checked;
+				rowClass = (notify ? 'l_notify_halt' : 'l_halt');
+				htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${i},event)">
+					<td>
+					 <div class="l_notify_disable" title="Disable ${L.cell(row,L.SYM)} notifications for this session" onclick="L.notifyException('${L.cell(row,L.SYM)}', true)">x</div>
+					 ${L.cell(row,L.SYM)}
+					</td>
+					<td class="l_company_name">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
+					<td colspan="4">HALT: ${L.cell(row,L.HLT)}</td>
+					<td class="${row[L.OPT]?'l_options':''}">${L.popoutLiveTableRow(row)}${L.cellRollover(row,L.OPT,L.OIV)}</td>
+					</tr>`;
 			}
-			else
-				htmlNormal += htmlRow;
-		}
-		for(let stocksOrSpikes of ['spikes', 'stocks']) {
-			for(let i=0; i < L._stageData[stocksOrSpikes].length; i++) {
-				const row=L._stageData[stocksOrSpikes][i], notifyExcept=!!L._notifyExceptions[row[L.SYM]];
-				const notify=( !notifyExcept && ((rangeUp&&row[L.PCT5]>=rangeUp)||(rangeDown&&rangeDown>=row[L.PCT5])) && (!row[L.VOL]||row[L.VOL]>=rangeVolume) && (!optionsOnly||row[L.OPT]) );
+			else {
+				notify=( !notifyExcept && ((rangeUp&&row[L.PCT5]>=rangeUp)||(rangeDown&&rangeDown>=row[L.PCT5])) && (!row[L.VOL]||row[L.VOL]>=rangeVolume) && (!optionsOnly||row[L.OPT]) );
 				if((!includeCrypto && row[L.OPT]=='crypto') || (!includeFutures && row[L.OPT]=='futures'))
 					continue;
 				if(notify) {
-					notifyAny = true;
 					rowClass = `l_notify_${row[L.PCT5]<0?'down':'up'}`;
 					notifyControl = `<div class="l_notify_disable" title="Disable ${L.cell(row,L.SYM)} notifications for this session" onclick="L.notifyException('${L.cell(row,L.SYM)}', true)">x</div>`;
-					notifyRows.push(row);
 				}
 				else {
 					rowClass = '';
@@ -768,21 +757,22 @@ const L = {
 				}
 				if(row[L.OPT] && ['crypto','futures'].indexOf(row[L.OPT]) >= 0)
 					rowClass += ` l_${row[L.OPT]}`;
-				const oswType = (stocksOrSpikes=='spikes' ? `'${L.cell(row,L.SYM)}'` : i);
-				htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${oswType}, event)">
+				htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${i}, event)">
 					<td>${notifyControl}${L.cell(row,L.SYM)}</td>
 					<td class="l_company_name">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
 					<td>${L.cell(row,L.PCT5)}</td>
 					<td>${L.cell(row,L.PCT)}</td>
 					<td>${L.cellRollover(row,L.PRC,L.PRC5)}</td>
-					<td>${stocksOrSpikes=='spikes'?'SPIKES':L.cellRollover(row,L.VOL,L.VOL5)}</td>
+					<td>${L.cellRollover(row,L.VOL,L.VOL5)}</td>
 					<td class="${row[L.OPT]?'l_options':''}">${L.popoutLiveTableRow(row)}${L.cellRollover(row,L.OPT,L.OIV)}</td>
 					</tr>`;
-				if(notify)
-					htmlPriority += htmlRow;
-				else
-					htmlNormal += htmlRow;
 			}
+			if(notify) {
+				htmlPriority += htmlRow;
+				notifyRows.push(row);
+			}
+			else
+				htmlNormal += htmlRow;
 		}
 		if(!htmlPriority && !htmlNormal)
 			html += '<tr><td colspan="7">No results found.</td></tr>';
@@ -801,7 +791,7 @@ const L = {
 			L._forceContentTableShrink = true;
 			L.updateLiveTable(doNotify, doNotResetKeyRow);
 		}
-		else if(notifyAny && doNotify)
-			L.notify(notifyRows.length > 0 ? notifyRows : null);
+		else if(notifyRows.length > 0 && doNotify)
+			L.notify(notifyRows);
 	}
 }
