@@ -741,7 +741,7 @@ const L = {
 					</tr>`;
 			}
 			else {
-				notify=( !notifyExcept && ((((rangeUp&&row[L.PCT5]>=rangeUp)||(rangeDown&&rangeDown>=row[L.PCT5])) && (!row[L.VOL]||row[L.VOL]>=rangeVolume) && (!optionsOnly||row[L.OPT])) || row[L.VOL]=='SPIKE' ));
+				notify=( !notifyExcept && ((((rangeUp&&row[L.PCT5]>=rangeUp)||(rangeDown&&rangeDown>=row[L.PCT5])) && (!row[L.VOL]||row[L.VOL]>=rangeVolume) && (!optionsOnly||row[L.OPT])) || (row[L.VOL]&&typeof row[L.VOL]=='string') ));
 				if((!includeCrypto && row[L.OPT]=='crypto') || (!includeFutures && row[L.OPT]=='futures'))
 					continue;
 				if(notify) {
