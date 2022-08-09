@@ -107,6 +107,7 @@ const L = {
 		if(L._splashComplete)
 			return;
 		L._splashComplete = true;
+		L.E('l_fixed').style.cursor = 'default';
 		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.setNextStagePoll(!L._stageData||!L._stageData['items'] ? L._setNextStagePollShort : L.getSynchronizedNext());

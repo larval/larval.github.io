@@ -186,6 +186,7 @@ body:before {
 	background-color: #303630;
 	transition: 0.5s;
 	animation: l_fixed 0.5s ease 6s 1 normal forwards;
+	cursor: pointer;
 }
 #l_pad {
 	width: 100%;
