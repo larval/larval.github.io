@@ -19,8 +19,9 @@ const L = {
 	_notifyAudio: new Audio('larval.mp3'),
 	_notifyAllowed: null,
 	_contentTableRowCountThatAreInView: 10,
-	_arrowUp: "\u25bc ",
-	_arrowDown: "\u25b2 ",
+	_charUp: "\u25bc ",
+	_charDown: "\u25b2 ",
+	_charHalt: "\u25a0 ",
 	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
 	_title:	document.title,
 	_swipeStartPosition: null,
@@ -495,13 +496,15 @@ const L = {
 		L.marqueeIntervalReset();
 		L.marqueeInitiate(L._marqueeLoopSecondsLong, html);
 	},
+XnotifyRows: [],
 	notify: (notifyRows) => {
 		L.notifyClear();
+L.XnotifyRows.push(notifyRows);
 		try {
 			if(Notification && Notification.permission == 'granted') {
 				void new Notification('Larval - Market volatility found!', {
 					icon: 'icon-192x192.png',
-					body: notifyRows.length > 0 ? 'Volatile stock(s): ' + notifyRows.map(a => (a[L.PCT5]<0?L._arrowUp:L._arrowDown)+a[L.SYM]).filter((v,i,s) => { return s.indexOf(v)===i; }).join(' ') : 'Larval - Market volatility found!'
+					body: notifyRows.length > 0 ? 'Volatile stock(s): ' + notifyRows.map(a => (typeof a[L.HLT]=='string'?L._charHalt:(a[L.PCT5]<0?L._charUp:L._charDown))+a[L.SYM]).filter((v,i,s) => { return s.indexOf(v)===i; }).join(' ') : 'Larval - Market volatility found!'
 				});
 			}
 			else 
@@ -517,7 +520,7 @@ const L = {
 			else if(L.isHaltRow(notifyRows[0]))
 				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.HLT]?notifyRows[0][L.HLT]:'HALTED');
 			else
-				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.PCT5]<0?L._arrowUp:L._arrowDown) + L.D(Math.abs(notifyRows[0][L.PCT5]),2) + '% | ' + (notifyRows[0][L.PCT]<0?L._arrowUp:L._arrowDown) + L.D(Math.abs(notifyRows[0][L.PCT]),2) + '%';
+				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.PCT5]<0?L._charUp:L._charDown) + L.D(Math.abs(notifyRows[0][L.PCT5]),2) + '% | ' + (notifyRows[0][L.PCT]<0?L._charUp:L._charDown) + L.D(Math.abs(notifyRows[0][L.PCT]),2) + '%';
 			notifyRows.push(notifyRows.shift());
 		}, 1000);
 		if(L.E('l_audible').checked)
