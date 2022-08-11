@@ -496,10 +496,8 @@ const L = {
 		L.marqueeIntervalReset();
 		L.marqueeInitiate(L._marqueeLoopSecondsLong, html);
 	},
-XnotifyRows: [],
 	notify: (notifyRows) => {
 		L.notifyClear();
-L.XnotifyRows.push(notifyRows);
 		try {
 			if(Notification && Notification.permission == 'granted') {
 				void new Notification('Larval - Market volatility found!', {
