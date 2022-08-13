@@ -524,7 +524,8 @@ const L = {
 				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.PCT5]<0?L._charUp:L._charDown) + L.D(Math.abs(notifyRows[0][L.PCT5]),2) + '% | ' + (notifyRows[0][L.PCT]<0?L._charUp:L._charDown) + L.D(Math.abs(notifyRows[0][L.PCT]),2) + '%';
 			notifyRows.push(notifyRows.shift());
 		}, 1000);
-		L.notifyPlayAudio(L._audioAlert);
+		if(L._stageDataHistory.length > 1)
+			L.notifyPlayAudio(L._audioAlert);
 		window.scrollTo({top: 0, behavior: 'smooth'});
 	},
 	notifyClear: () => {
