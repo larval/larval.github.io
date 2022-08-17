@@ -64,15 +64,22 @@ const L = {
 		DB: ['Double Bottom', '2x&nbsp;bot<span>tom</span>'],
 		DE: ['Descending Triangle', 'desc<span>&nbsp;triangle</span>'],
 		DT: ['Double Top', '2x&nbsp;top'],
-		HI: ['Inverse Head and Shoulders', 'inv<span>erse</span> h&amp;s'],
-		HS: ['Head and Shoulders', 'h &amp; s'],
+		HI: ['Inverse Head and Shoulders', 'inv<span>erse</span>&nbsp;h&amp;s'],
+		HS: ['Head and Shoulders', 'h&nbsp;&amp;&nbsp;s'],
+		HZ: ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r'],
 		MB: ['Multiple Bottoms', '&gt;2x&nbsp;bot<span>tom</span>s'],
 		MT: ['Multiple Tops', '&gt;2x&nbsp;tops'],
 		TR: ['Technical Resistance', 'resist<span>ance</span>'],
 		TS: ['Technical Support', '<span>tech&nbsp;</span>support'],
-		WE: ['Wedge', 'wedge'],
 		WD: ['Wedge Down', 'wedge<span>&nbsp;down</span>'],
+		WE: ['Wedge', 'wedge'],
 		WU: ['Wedge Up', 'wedge<span>&nbsp;up</span>']
+	},
+	_contentTableRowClassRef: {
+		l_ta: 'https://finviz.com/quote.ashx?t=@',
+		l_news: null,
+		l_options: null,
+		l_marquee_link: null
 	},
 	_audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
@@ -476,7 +483,7 @@ const L = {
 		else {
 			for(let i=L._stageData[topType].length-1; i >= 0; i--) {
 				let item = L._stageData[topType][i];
-				html += `<div class="l_marquee_link" onclick="L.openStockWindow('${item[0]}')"><span class='l_marquee_highlight_padded'>#${i+1}</span>${item[0]} &#177; ${item[1]}%</div> `
+				html += `<div class="l_marquee_link" onclick="L.openStockWindow('${item[0]}',event)"><span class='l_marquee_highlight_padded'>#${i+1}</span>${item[0]} &#177; ${item[1]}%</div> `
 			}
 		}
 		L.marqueeInitiate(seconds, html);
@@ -590,19 +597,31 @@ const L = {
 		catch (e) { }
 	},
 	openStockWindow: (symbolOrIndex, e) => {
-		let symbol='', urlType=0;
-		if(e && e.target.nodeName != 'TD')
+		let symbol='', urlType=0, classRef='', el=(e&&e.target?e.target:null);
+		if(!el)
+			return;
+		if(el.nodeName == 'SPAN' && el.parentElement)
+			el = el.parentElement;
+		for(let c in L._contentTableRowClassRef)
+			if(el.classList.contains(c) && (classRef=c))
+				break;
+		if(!classRef && el.nodeName != 'TD')
 			return;
 		if(typeof symbolOrIndex == 'number') {
 			symbol = L._stageData['items'][symbolOrIndex][L.SYM];
-			if(L._stageData['items'][symbolOrIndex][L.LNK] && e && e.target.className == 'l_company_name') {
-				window.open(L._stageData['items'][symbolOrIndex][L.LNK], `larval_news_${symbol}`).focus();
-				return;
+			switch(classRef) {
+				case 'l_ta':
+					window.open(L._contentTableRowClassRef[classRef].replace('@', symbol), `${classRef}_${symbol}`).focus();
+					return;
+				case 'l_news':
+					window.open(L._stageData['items'][symbolOrIndex][L.LNK], `${classRef}_${symbol}`).focus();
+					return;
+				case 'l_options':
+					urlType = 1;
+					break;
 			}
-			else if(e && e.target.className == 'l_options')
-				urlType = 1;
 		}
-		if(typeof symbolOrIndex == 'string')
+		else if(typeof symbolOrIndex == 'string')
 			symbol = symbolOrIndex;
 		if(symbol[0] == '*') {
 			urlType = 2;
@@ -726,13 +745,13 @@ const L = {
 	},
 	popoutLiveTableRow: row => {
 		if(row[L.TAN] && typeof row[L.TAN] == 'string' && L._taMap[row[L.TAN]])
-			return(`<div class="l_notify_popout" title="${L._taMap[row[L.TAN]][0]}">&#128200;&nbsp;${L._taMap[row[L.TAN]][1]}</div>`);
+			return(`<div class="l_notify_popout l_ta" title="${L._taMap[row[L.TAN]][0]}">&#128200;&nbsp;${L._taMap[row[L.TAN]][1]}</div>`);
 		else if(row[L.ERN] && row[L.NWS])
-			return(`<div class="l_notify_popout" title="News and earnings on ${L.cell(row,L.ERN)}">&#128197;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;+&nbsp;news</span></div>`);
+			return(`<div class="l_notify_popout l_news" title="News and earnings on ${L.cell(row,L.ERN)}">&#128197;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;+&nbsp;news</span></div>`);
 		else if(row[L.ERN])
 			return(`<div class="l_notify_popout" title="Earnings on ${L.cell(row,L.ERN)}">&#128198;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;earnings</span></div>`);
 		else if(row[L.NWS])
-			return(`<div class="l_notify_popout" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`);
+			return(`<div class="l_notify_popout l_news" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`);
 		return('');
 	},
 	updateLiveTable: (doNotify, doNotResetKeyRow) => {
@@ -768,7 +787,7 @@ const L = {
 					 <div class="l_notify_disable" title="Disable ${L.cell(row,L.SYM)} notifications for this session" onclick="L.notifyException('${L.cell(row,L.SYM)}', true)">x</div>
 					 ${L.cell(row,L.SYM)}
 					</td>
-					<td class="l_company_name">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
+					<td class="${row[L.NWS]?'l_news':''}">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
 					<td colspan="4">HALT: ${L.cell(row,L.HLT)}</td>
 					<td class="${row[L.OPT]?'l_options':''}">${L.popoutLiveTableRow(row)}${L.cellRollover(row,L.OPT,L.OIV)}</td>
 					</tr>`;
@@ -790,9 +809,9 @@ const L = {
 				}
 				if(row[L.OPT] && ['crypto','futures'].indexOf(row[L.OPT]) >= 0)
 					rowClass += ` l_${row[L.OPT]}`;
-				htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${i}, event)">
+				htmlRow = `<tr class="${rowClass}" onclick="L.openStockWindow(${i},event)">
 					<td>${notifyControl}${L.cell(row,L.SYM)}</td>
-					<td class="l_company_name">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
+					<td class="${row[L.NWS]?'l_news':''}">${L.cellRollover(row,L.NAM,L.NWS,L._forceContentTableShrink)}</td>
 					<td>${L.cell(row,L.PCT5)}</td>
 					<td>${L.cell(row,L.PCT)}</td>
 					<td>${L.cellRollover(row,L.PRC,L.PRC5)}</td>
