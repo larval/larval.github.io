@@ -5,23 +5,25 @@ const L = {
 	_stageDataSortByColumn: 0,
 	_stageDataHistoryIndex: -1,
 	_stageDataHistory: [],
+	_notifyTitleInterval: null,
+	_notifyAllowed: null,
 	_notifyExceptions: {},
 	_splashComplete: false,
 	_forceContentTableShrink: false,
 	_setNextStagePollTimeout: null,
 	_setNextStagePollLong: 300,
 	_setNextStagePollShort: 30,
-	_marqueeLoopSecondsLong: 120,
-	_marqueeLoopSecondsShort: 60,
+	_marqueeLoopSeconds: 90,
 	_marqueeInterval: null,
 	_marqueeFlashTimeout: null,
-	_notifyTitleInterval: null,
-	_notifyAllowed: null,
-	_contentTableRowCountThatAreInView: 10,
+	_marqueeBlinkHtml: '<span class="l_marquee_blink">&#8226;</span>',
+	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
 	_charUp: "\u25bc ",
 	_charDown: "\u25b2 ",
 	_charHalt: "\u25a0 ",
-	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
+	_charCrypto: '*',
+	_charFutures: '^',
+	_contentTableRowCountThatAreInView: 10,
 	_title:	document.title,
 	_swipeStartPosition: null,
 	_keysIgnore: ['ShiftRight','ShiftLeft'],
@@ -141,11 +143,10 @@ const L = {
 		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.setNextStagePoll(!L._stageData||!L._stageData['items'] ? L._setNextStagePollShort : L.getSynchronizedNext());
-		const topType = L.E('l_include_crypto').checked ? 'top_all' : 'top';
-		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData[topType] && L._stageData[topType].length > 1)
-			L.marqueeUpdate(L._marqueeLoopSecondsLong);
+		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData['top'] && L._stageData['top'].length > 1)
+			L.marqueeUpdate(L._marqueeLoopSeconds);
 		else
-			L.marqueeInitiate(L._marqueeLoopSecondsShort);
+			L.marqueeInitiate(L._marqueeLoopSeconds);
 		L.marqueeIntervalReset();
 		L.notifyPlayAudio(L._audioTest);
 		L.updateLiveTable(true);
@@ -475,16 +476,25 @@ const L = {
 		lb.style.animation = `l_marquee ${seconds}s linear infinite`;
 	},
 	marqueeUpdate: seconds => {
-		const topType = L.E('l_include_crypto').checked ? 'top_all' : 'top';
-		if(!L._stageData || !L._stageData[topType] || L._stageData[topType].length < 2)
+		if(!L._stageData || !L._stageData['top'] || L._stageData['top'].length < 2)
 			return;
-		let html='';
-		if(L._stageData['marquee'])
-			html = L._stageData['marquee'];
-		else {
-			for(let i=L._stageData[topType].length-1; i >= 0; i--) {
-				let item = L._stageData[topType][i];
-				html += `<div class="l_marquee_link" onclick="L.openStockWindow('${item[0]}',event)"><span class='l_marquee_highlight_padded'>#${i+1}</span>${item[0]} &#177; ${item[1]}%</div> `
+		else if(L._stageData['marquee']) {
+			L.marqueeInitiate(seconds, L._stageData['marquee']);
+			return;
+		}
+		let html='', rank=0, includeCrypto=L.E('l_include_crypto').checked;
+		for(let i in L._stageData['top']) {
+			let item=L._stageData['top'][i], isMarketIndex=(item.length==3);
+			if(isMarketIndex) {
+				if(!html) html += L._marqueeBlinkHtml;
+				html += `<div class="l_marquee_link" onclick="L.openStockWindow('${item[0]}',event)"><span class='l_marquee_highlight_padded'>${L.H(item[2])}</span>${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
+			}
+			else if(!includeCrypto && item[0][0] == L._charCrypto)
+				continue;
+			else {
+				if(!rank) html += L._marqueeBlinkHtml;
+				html += `<div class="l_marquee_link" onclick="L.openStockWindow('${item[0]}',event)"><span class='l_marquee_highlight_padded'>#${++rank}</span>${item[0]} &#177; ${item[1]}%</div> `;
+				if(rank >= 20) break;
 			}
 		}
 		L.marqueeInitiate(seconds, html);
@@ -507,23 +517,23 @@ const L = {
 			el.style.animation = `l_content_fade_in 1s ease forwards`;
 		}
 		else
-			L.marqueeUpdate(L._marqueeLoopSecondsLong);
+			L.marqueeUpdate(L._marqueeLoopSeconds);
 	},
 	marqueeIntervalReset: () => {
 		if(L._marqueeInterval)
 			clearInterval(L._marqueeInterval);
-		L._marqueeInterval = setInterval(() => { L.marqueeUpdate(L._marqueeLoopSecondsLong) }, L._marqueeLoopSecondsLong * 1000);
+		L._marqueeInterval = setInterval(() => { L.marqueeUpdate(L._marqueeLoopSeconds) }, L._marqueeLoopSeconds * 1000);
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html='<span class="l_marquee_blink">&#8226;</span> The following hotkeys are available to quickly navigate your history and third party websites. <span class="l_marquee_blink">&#8226;</span> Use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. <span class="l_marquee_blink">&#8226;</span> Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: ';
+		let key, match, html=`${L._marqueeBlinkHtml} The following hotkeys are available to quickly navigate your history and third party websites. ${L._marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${L._marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in L._keyMap) {
 			if((match=L._keyMap[key][L.KSTK].match(/([a-z]+)\.[a-z]+\//i)))
 				html += `<div class="l_marquee_link" onclick="L.setURLFormat('${key}',false)"><span class='l_marquee_highlight_padded'>${key}</span>${L.H(match[1])}</div> `
 		}
-		html += '<span class="l_marquee_blink">&#8226;</span> Hold down the <span class="l_marquee_highlight">shift</span> key to make your selection permanent. <span class="l_marquee_blink">&#8226;</span> The keys <span class="l_marquee_highlight">1-7</span> can be used to sort by each column.';
+		html += `${L._marqueeBlinkHtml} Hold down the <span class="l_marquee_highlight">shift</span> key to make your selection permanent. ${L._marqueeBlinkHtml} The keys <span class="l_marquee_highlight">1-7</span> can be used to sort by each column.`;
 		window.scrollTo({top: 0, behavior: 'smooth'});
 		L.marqueeIntervalReset();
-		L.marqueeInitiate(L._marqueeLoopSecondsLong, html);
+		L.marqueeInitiate(L._marqueeLoopSeconds, html);
 	},
 	notify: (notifyRows) => {
 		L.notifyClear();
@@ -602,7 +612,7 @@ const L = {
 		catch (e) { }
 	},
 	openStockWindow: (symbolOrIndex, e) => {
-		let symbol='', urlType=0, classRef='', el=(e&&e.target?e.target:null);
+		let symbol='', urlType=L.KSTK, classRef='', el=(e&&e.target?e.target:null);
 		if(!el)
 			return;
 		if(el.nodeName == 'SPAN' && el.parentElement)
@@ -622,18 +632,18 @@ const L = {
 					window.open(L._stageData['items'][symbolOrIndex][L.LNK], `${classRef}_${symbol}`).focus();
 					return;
 				case 'l_options':
-					urlType = 1;
+					urlType = L.KOPT;
 					break;
 			}
 		}
 		else if(typeof symbolOrIndex == 'string')
 			symbol = symbolOrIndex;
-		if(symbol[0] == '*') {
-			urlType = 2;
+		if(symbol[0] == L._charCrypto) {
+			urlType = L.KCRP;
 			symbol = symbol.substr(1);
 		}
-		else if(symbol[0] == '^') {
-			urlType = 3;
+		else if(symbol[0] == L._charFutures) {
+			urlType = L.KFTR;
 			symbol = symbol.substr(1);
 		}
 		L.gotoURL(symbol, urlType, `larval_${symbol}`);
