@@ -344,13 +344,14 @@ body:before {
 	text-align: center;
 	animation: l_content_fade_in 1s ease forwards;
 }
-.l_marquee_blink {
+.l_marquee_blink, .l_marquee_blink_wide {
 	color: #ff0;
 	animation: l_fade_in 1s linear infinite; 
 	display: inline-block;
 	padding-left: 10px;
 	padding-right: 10px;
 }
+.l_marquee_blink_wide { padding-left: 15px !important; }
 .l_marquee_highlight, .l_marquee_highlight_padded { color: #A6FDA4; }
 .l_marquee_highlight_padded {
 	padding-left: 10px;

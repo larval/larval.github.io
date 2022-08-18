@@ -10,9 +10,10 @@ const L = {
 	_notifyExceptions: {},
 	_splashComplete: false,
 	_forceContentTableShrink: false,
-	_setNextStagePollTimeout: null,
-	_setNextStagePollLong: 300,
-	_setNextStagePollShort: 30,
+	_nextStagePollTimeout: null,
+	_nextStagePollLong: 300,
+	_nextStagePollShort: 30,
+	_nextStagePollCompleteEpoch: 0,
 	_marqueeLoopSeconds: 90,
 	_marqueeInterval: null,
 	_marqueeFlashTimeout: null,
@@ -125,6 +126,7 @@ const L = {
 		document.addEventListener('click', L.notifySetup);
 		document.addEventListener('touchstart', L.notifySetup);
 		document.addEventListener('scroll', L.onscroll);
+		document.addEventListener('visibilitychange', L.onvisibilitychange);
 		window.addEventListener('resize', L.onresize);
 		window.addEventListener('keydown', L.onkeydown);
 		window.addEventListener('touchstart', L.ontouchstart);
@@ -142,7 +144,7 @@ const L = {
 		L.E('l_fixed').style.cursor = 'default';
 		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
-		L.setNextStagePoll(!L._stageData||!L._stageData['items'] ? L._setNextStagePollShort : L.getSynchronizedNext());
+		L.setNextStagePoll(!L._stageData||!L._stageData['items'] ? L._nextStagePollShort : L.getSynchronizedNext());
 		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData['top'] && L._stageData['top'].length > 1)
 			L.marqueeUpdate(L._marqueeLoopSeconds);
 		else
@@ -249,6 +251,14 @@ const L = {
 		if(L._keyRow > 0)
 			rows[L._keyRow].scrollIntoView({behavior:'smooth', block:'center'});
 	},
+	onvisibilitychange: () => {
+		if(!L._marqueeInterval || document.visibilityState != 'visible')
+			return;
+		L.marqueeIntervalReset();
+		L.marqueeUpdate(L._marqueeLoopSeconds);
+		if(L._nextStagePollCompleteEpoch)
+			L.setNextStagePoll(L._nextStagePollCompleteEpoch - L.epochNow()); 
+	},
 	onmousemoveContentTable: () => {
 		if(L._keyRow)
 			L.onkeydown(false);
@@ -274,10 +284,10 @@ const L = {
 	},
 	getSynchronizedNext: () => {
 		if(!L._stageData || !L._stageData['next'])
-			return(L._setNextStagePollLong);
+			return(L._nextStagePollLong);
 		let next = Math.floor(L._stageData['next'] - (new Date().getTime() / 1000)) + Math.floor(Math.random() * 10);
-		if(next < 0 || next > L._setNextStagePollLong + L._setNextStagePollShort)
-			next = L._setNextStagePollLong;
+		if(next < 0 || next > L._nextStagePollLong + L._nextStagePollShort)
+			next = L._nextStagePollLong;
 		return(next);
 	},
 	getStageData: updateView => {
@@ -312,7 +322,7 @@ const L = {
 			}
 			catch(e) { xhr.onerror(); }
 		}
-		xhr.onerror = () => { L.setNextStagePoll(L._setNextStagePollShort); }
+		xhr.onerror = () => { L.setNextStagePoll(L._nextStagePollShort); }
 		xhr.send();
 	},
 	getHistoryData: () => {
@@ -392,14 +402,15 @@ const L = {
 			void lpd.offsetHeight;
 			lpd.style.animation = `l_progress ${seconds}s linear forwards`;
 		}
-		if(L._setNextStagePollTimeout)
-			clearTimeout(L._setNextStagePollTimeout);
-		L._setNextStagePollTimeout = setTimeout(L.setNextStagePollComplete, seconds * 1000);
+		if(L._nextStagePollTimeout)
+			clearTimeout(L._nextStagePollTimeout);
+		L._nextStagePollTimeout = setTimeout(L.setNextStagePollComplete, seconds * 1000);
+		L._nextStagePollCompleteEpoch = L.epochNow() + seconds;
 	},
 	setNextStagePollComplete: () => {
-		if(L._setNextStagePollTimeout)
-			clearTimeout(L._setNextStagePollTimeout);
-		L._setNextStagePollTimeout = null;
+		if(L._nextStagePollTimeout)
+			clearTimeout(L._nextStagePollTimeout);
+		L._nextStagePollTimeout = null;
 		L.getStageData(true);
 	},
 	forceNextStagePoll: () => { L.setNextStagePollComplete(); },
@@ -486,13 +497,13 @@ const L = {
 		for(let i in L._stageData['top']) {
 			let item=L._stageData['top'][i], isMarketIndex=(item.length==3);
 			if(isMarketIndex) {
-				if(!html) html += L._marqueeBlinkHtml;
+				if(!html) html += '<span class="l_marquee_blink_wide">&#8226;</span>';
 				html += `<div class="l_marquee_link" onclick="L.openStockWindow('${item[0]}',event)"><span class='l_marquee_highlight_padded'>${L.H(item[2])}</span>${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
 			else if(!includeCrypto && item[0][0] == L._charCrypto)
 				continue;
 			else {
-				if(!rank) html += L._marqueeBlinkHtml;
+				if(!rank) html += '<span class="l_marquee_blink_wide">&#8226;</span>';
 				html += `<div class="l_marquee_link" onclick="L.openStockWindow('${item[0]}',event)"><span class='l_marquee_highlight_padded'>#${++rank}</span>${item[0]} &#177; ${item[1]}%</div> `;
 				if(rank >= 20) break;
 			}
