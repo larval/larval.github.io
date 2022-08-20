@@ -88,8 +88,8 @@ const L = {
 	_audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
 	/* SHORTHAND / COMMON */
-	E: id => document.getElementById(id),
-	D: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
+	D: document,
+	E: id => L.D.getElementById(id),
 	F: (number, digits) => {
 		if(number > 999999999)
 			return (number/1000000000).toFixed(digits) + 'B';
@@ -101,18 +101,20 @@ const L = {
 			return number.toString();
 	},
 	H: string => {
-		const p=document.createElement('p');
+		const p=L.D.createElement('p');
 		p.textContent = string;
 		return(p.innerHTML);
 	},
 	I: string => {
-		const p=document.createElement('p');
+		const p=L.D.createElement('p');
 		p.innerHTML = string;
 		return(p.textContent || p.innerText || '');
 	},
+	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
-	T: tag => document.getElementsByTagName(tag),
+	T: tag => L.D.getElementsByTagName(tag),
 	U: string => (string?string[0]:'').toUpperCase() + string.substring(1),
+	W: window,
 
 	/* ENUMERATIONS */
 	SYM:0, NAM:1, PCT5:2, PCT:3, PRC:4, VOL:5, OPT:6, OIV:7, ERN:8, PRC5:9, VOL5:10, NWS:11, LNK:12, HLT:2, TAN:8,
@@ -123,44 +125,28 @@ const L = {
 		L.settingsLoad();
 		L.notifySetup();
 		L.keyMapSetup();
-		document.addEventListener('click', L.notifySetup);
-		document.addEventListener('touchstart', L.notifySetup);
-		document.addEventListener('scroll', L.onscroll);
-		document.addEventListener('visibilitychange', L.onvisibilitychange);
-		window.addEventListener('resize', L.onresize);
-		window.addEventListener('keydown', L.onkeydown);
-		window.addEventListener('touchstart', L.ontouchstart);
-		window.addEventListener('touchend', L.ontouchend);
-		setTimeout(L.onloadAnimationComplete, 5500);
+		L.D.addEventListener('click', L.notifySetup);
+		L.D.addEventListener('touchstart', L.notifySetup);
+		L.D.addEventListener('scroll', L.onscroll);
+		L.D.addEventListener('visibilitychange', L.onvisibilitychange);
+		L.W.addEventListener('resize', L.onresize);
+		L.W.addEventListener('keydown', L.onkeydown);
+		L.W.addEventListener('touchstart', L.ontouchstart);
+		L.W.addEventListener('touchend', L.ontouchend);
+		setTimeout(L.animationsComplete, 6000);
 		L.E('l_range_up').oninput();
 		L.E('l_range_down').oninput();
 		L.E('l_range_volume').oninput();
 		L.getStageData(false);
-	},
-	onloadAnimationComplete: () => {
-		if(L._splashComplete)
-			return;
-		L._splashComplete = true;
-		L.E('l_fixed').style.cursor = 'default';
-		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
-		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
-		L.setNextStagePoll(!L._stageData||!L._stageData['items'] ? L._nextStagePollShort : L.getSynchronizedNext());
-		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData['top'] && L._stageData['top'].length > 1)
-			L.marqueeUpdate(L._marqueeLoopSeconds);
-		else
-			L.marqueeInitiate(L._marqueeLoopSeconds);
-		L.marqueeIntervalReset();
-		L.notifyPlayAudio(L._audioTest);
-		L.updateLiveTable(true);
 	},
 	onresize: () => {
 		L.settingsButtonToggle(true);
 		L.updateContentTableRowCountThatAreInView();
 	},
 	onscroll: () => {
-		const w=window, d=document, e=d.documentElement, g=L.T('body')[0],
-			x=w.innerWidth||e.clientWidth||g.clientWidth, y=w.innerHeight||e.clientHeight||g.clientHeight,
-			s=w.pageYOffset||e.scrollTop, scrolledDown=s>L.E('l_fixed').offsetHeight,
+		const e=L.D.documentElement, b=L.D.body,
+			x=L.W.innerWidth||e.clientWidth||b.clientWidth, y=L.W.innerHeight||e.clientHeight||b.clientHeight,
+			s=L.W.pageYOffset||e.scrollTop, scrolledDown=s>L.E('l_fixed').offsetHeight||L.E('l_NA'),
 			ll=L.E('l_logo'), lf=L.E('l_fixed'), lal=L.E('l_afterhours_left'), lar=L.E('l_afterhours_right');
 		ll.style.transform = scrolledDown ? 'scale(0.5)' : 'scale(1)';
 		lf.style.top = scrolledDown ? '-28px' : '0';
@@ -172,8 +158,8 @@ const L = {
 		if(!L._swipeStartPosition)
 			return;
 		const swipeMovement = [L._swipeStartPosition[0]-e.changedTouches[0].clientX, L._swipeStartPosition[1]-e.changedTouches[0].clientY],
-			width = window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth,
-			height = window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight,
+			width = L.W.innerWidth||L.D.documentElement.clientWidth||L.D.body.clientWidth,
+			height = L.W.innerHeight||L.D.documentElement.clientHeight||L.D.body.clientHeight,
 			movementPercent = [Math.abs(swipeMovement[0])/width*100, Math.abs(swipeMovement[1])/height*100],
 			movementWeighting = (movementPercent[0]+1) / (movementPercent[1]+1);
 		if(movementPercent[0] > 25 && movementWeighting >= 1)
@@ -181,7 +167,7 @@ const L = {
 		L._swipeStartPosition = null;
 	},
 	onkeydown: e => {
-		L.fastSplash();
+		L.animationsFastSplash();
 		if(!L._splashComplete || !L._stageData || (e && (e.ctrlKey || e.altKey || L._keysIgnore.indexOf(e.code) >= 0)))
 			return;
 		const rows=L.E('l_content_table').getElementsByTagName('tr');
@@ -201,7 +187,7 @@ const L = {
 			e.preventDefault();
 			switch(e.code) {
 				case 'Slash':      L.marqueeHotKeyHelp(); break;
-				case 'Tab':        L.settingsButtonToggle(); break;
+				case 'Tab':        L.animationsToggle(null); break;
 				case 'Home':       L._keyRow = 1; break;
 				case 'End':        L._keyRow = rows.length - 1; break;
 				case 'PageUp':     L._keyRow-=L._contentTableRowCountThatAreInView; break;
@@ -252,20 +238,16 @@ const L = {
 			rows[L._keyRow].scrollIntoView({behavior:'smooth', block:'center'});
 	},
 	onvisibilitychange: () => {
-		if(!L._marqueeInterval || document.visibilityState != 'visible')
+		if(!L._marqueeInterval || L.D.visibilityState != 'visible')
 			return;
 		L.marqueeIntervalReset();
 		L.marqueeUpdate(L._marqueeLoopSeconds);
 		if(L._nextStagePollCompleteEpoch)
 			L.setNextStagePoll(L._nextStagePollCompleteEpoch - L.epochNow()); 
 	},
-	onmousemoveContentTable: () => {
-		if(L._keyRow)
-			L.onkeydown(false);
-	},
 
 	/* FUNCTIONS */
-	fastSplash: () => {
+	animationsFastSplash: () => {
 		if(L._splashComplete || !L._stageData)
 			return;
 		const reanimate={
@@ -280,7 +262,50 @@ const L = {
 		}
 		L.E('l_logo_tag').style.display = 'none';
 		L.E('l_progress').style.display = 'block';
-		L.onloadAnimationComplete();
+		L.animationsComplete();
+	},
+	animationsComplete: () => {
+		if(L._splashComplete)
+			return;
+		L._splashComplete = true;
+		L.E('l_fixed').style.cursor = 'default';
+		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
+		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
+		L.setNextStagePoll(!L._stageData||!L._stageData['items'] ? L._nextStagePollShort : L.getSynchronizedNext());
+		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData['top'] && L._stageData['top'].length > 1)
+			L.marqueeUpdate(L._marqueeLoopSeconds);
+		else
+			L.marqueeInitiate(L._marqueeLoopSeconds);
+		L.marqueeIntervalReset();
+		L.notifyPlayAudio(L._audioTest);
+		L.updateLiveTable(true);
+		if(L.isMobile())
+			L.animationsToggle(false);
+	},
+	animationsToggle: explicit => {
+		const noAnimations = (typeof explicit == 'boolean' ? explicit : !!L.E('l_NA'));
+		if(noAnimations)
+			L.marqueeFlash('Full animation experience has been restored.');
+		L.D.body.id = noAnimations ? '' : 'l_NA';
+		L.keyModeReset();
+		L.W.scrollTo({top: 0, behavior: 'auto'});
+		L.onscroll();
+	},
+	keyMapSetup: () => {
+		if(!(L._keyMapIndex=localStorage.getItem('l_keymap_index')))
+			L._keyMapIndex = L._keyMapIndexDefault;
+		for(let key in L._keyMap) {
+			if(!L._keyMap[key][L.KOPT])
+				L._keyMap[key][L.KOPT] = L._keyMap[key][L.KSTK];
+			if(!L._keyMap[key][L.KCRP])
+				L._keyMap[key][L.KCRP] = L._keyMap[L._keyMapIndexDefault][L.KCRP];
+			if(!L._keyMap[key][L.KFTR])
+				L._keyMap[key][L.KFTR] = L._keyMap[L._keyMapIndexDefault][L.KFTR];
+		}
+	},
+	keyModeReset: () => {
+		if(L._keyRow)
+			L.onkeydown(false);
 	},
 	getSynchronizedNext: () => {
 		if(!L._stageData || !L._stageData['next'])
@@ -418,9 +443,9 @@ const L = {
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
 	htmlPercent: number => {
 		if(number > 0)
-			return(L.D(Math.abs(number),2) + '%<span class="l_up">&#9650;</span>');
+			return(L.N(Math.abs(number),2) + '%<span class="l_up">&#9650;</span>');
 		else if(number < 0)
-			return(L.D(Math.abs(number),2) + '%<span class="l_down">&#9660;</span>');
+			return(L.N(Math.abs(number),2) + '%<span class="l_down">&#9660;</span>');
 		else
 			return(L._emptyCellHtml);
 	},
@@ -457,18 +482,6 @@ const L = {
 			}
 		}
 	},
-	keyMapSetup: () => {
-		if(!(L._keyMapIndex=localStorage.getItem('l_keymap_index')))
-			L._keyMapIndex = L._keyMapIndexDefault;
-		for(let key in L._keyMap) {
-			if(!L._keyMap[key][L.KOPT])
-				L._keyMap[key][L.KOPT] = L._keyMap[key][L.KSTK];
-			if(!L._keyMap[key][L.KCRP])
-				L._keyMap[key][L.KCRP] = L._keyMap[L._keyMapIndexDefault][L.KCRP];
-			if(!L._keyMap[key][L.KFTR])
-				L._keyMap[key][L.KFTR] = L._keyMap[L._keyMapIndexDefault][L.KFTR];
-		}
-	},
 	updateRangeDisplay: (id, value) => {
 		if(L.E(id)) L.E(id).innerHTML = (id=='l_range_volume_display' ? value : (value / 10).toFixed(1));
 	},
@@ -480,8 +493,8 @@ const L = {
 		void lb.offsetHeight;
 		const fullWidth=lb.scrollWidth, viewWidth=lb.offsetWidth;
 		lbcc.innerHTML = lbc.innerHTML;
-		document.documentElement.style.setProperty('--marquee-start', '-'+viewWidth+'px');
-		document.documentElement.style.setProperty('--marquee-end', '-'+fullWidth+'px');
+		L.D.documentElement.style.setProperty('--marquee-start', '-'+viewWidth+'px');
+		L.D.documentElement.style.setProperty('--marquee-end', '-'+fullWidth+'px');
 		lb.style.animation = 'none';
 		void lb.offsetWidth;
 		lb.style.animation = `l_marquee ${seconds}s linear infinite`;
@@ -519,7 +532,7 @@ const L = {
 		L.E('l_marquee').style.display = message ? 'none' : 'inline-block';
 		L.E('l_marquee_flash').style.display = message ? 'inline-block' : 'none';
 		if(message) {
-			window.scrollTo({top: 0, behavior: 'smooth'});
+			L.W.scrollTo({top: 0, behavior: 'smooth'});
 			L.marqueeIntervalReset();
 			L.marqueeFlashTimeout = setTimeout(L.marqueeFlash, 5000);
 			const el=L.E('l_marquee_flash');
@@ -536,13 +549,13 @@ const L = {
 		L._marqueeInterval = setInterval(() => { L.marqueeUpdate(L._marqueeLoopSeconds) }, L._marqueeLoopSeconds * 1000);
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html=`${L._marqueeBlinkHtml} The following hotkeys are available to quickly navigate your history and third party websites. ${L._marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${L._marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
+		let key, match, html=`${L._marqueeBlinkHtml} The following hotkeys are available to quickly navigate your history and third party websites. ${L._marqueeBlinkHtml} Use the <span class="l_marquee_highlight">tab</span> key to alternate animation modes. ${L._marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${L._marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in L._keyMap) {
 			if((match=L._keyMap[key][L.KSTK].match(/([a-z]+)\.[a-z]+\//i)))
 				html += `<div class="l_marquee_link" onclick="L.setURLFormat('${key}',false)"><span class='l_marquee_highlight_padded'>${key}</span>${L.H(match[1])}</div> `
 		}
 		html += `${L._marqueeBlinkHtml} Hold down the <span class="l_marquee_highlight">shift</span> key to make your selection permanent. ${L._marqueeBlinkHtml} The keys <span class="l_marquee_highlight">1-7</span> can be used to sort by each column.`;
-		window.scrollTo({top: 0, behavior: 'smooth'});
+		L.W.scrollTo({top: 0, behavior: 'smooth'});
 		L.marqueeIntervalReset();
 		L.marqueeInitiate(L._marqueeLoopSeconds, html);
 	},
@@ -563,25 +576,25 @@ const L = {
 		catch(e) { }
 		notifyRows.push([]);
 		L._notifyTitleInterval = setInterval(() => {
-			if(!document.hidden || !L._notifyTitleInterval)
+			if(!L.D.hidden || !L._notifyTitleInterval)
 				L.notifyClear();
 			else if(!notifyRows[0] || !notifyRows[0][0])
-				document.title = L._title;
+				L.D.title = L._title;
 			else if(L.isHaltRow(notifyRows[0]))
-				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.HLT]?notifyRows[0][L.HLT]:'HALTED');
+				L.D.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.HLT]?notifyRows[0][L.HLT]:'HALTED');
 			else
-				document.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.PCT5]<0?L._charUp:L._charDown) + L.D(Math.abs(notifyRows[0][L.PCT5]),2) + '% | ' + (notifyRows[0][L.PCT]<0?L._charUp:L._charDown) + L.D(Math.abs(notifyRows[0][L.PCT]),2) + '%';
+				L.D.title = notifyRows[0][L.SYM] + ' | ' + (notifyRows[0][L.PCT5]<0?L._charUp:L._charDown) + L.N(Math.abs(notifyRows[0][L.PCT5]),2) + '% | ' + (notifyRows[0][L.PCT]<0?L._charUp:L._charDown) + L.N(Math.abs(notifyRows[0][L.PCT]),2) + '%';
 			notifyRows.push(notifyRows.shift());
 		}, 1000);
 		L.notifyPlayAudio(L._audioAlert);
-		window.scrollTo({top: 0, behavior: 'smooth'});
+		L.W.scrollTo({top: 0, behavior: 'smooth'});
 	},
 	notifyClear: () => {
 		if(L._notifyTitleInterval) {
 			clearInterval(L._notifyTitleInterval);
 			L._notifyTitleInterval = null;
 		}
-		document.title = L._title;
+		L.D.title = L._title;
 	},
 	notifyException: (symbol, disable) => {
 		if(disable)
@@ -611,8 +624,8 @@ const L = {
 		catch(e) { }
 	},
 	notifySetup: () => {
-		document.removeEventListener('click', L.notifySetup);
-		document.removeEventListener('touchstart', L.notifySetup);
+		L.D.removeEventListener('click', L.notifySetup);
+		L.D.removeEventListener('touchstart', L.notifySetup);
 		if(typeof L._audioTest == 'string')
 			L._audioTest = new Audio(L._audioTest);
 		if(typeof L._audioAlert == 'string')
@@ -637,10 +650,10 @@ const L = {
 			symbol = L._stageData['items'][symbolOrIndex][L.SYM];
 			switch(classRef) {
 				case 'l_ta':
-					window.open(L._contentTableRowClassRef[classRef].replace('@', symbol), `${classRef}_${symbol}`).focus();
+					L.W.open(L._contentTableRowClassRef[classRef].replace('@', symbol), `${classRef}_${symbol}`).focus();
 					return;
 				case 'l_news':
-					window.open(L._stageData['items'][symbolOrIndex][L.LNK], `${classRef}_${symbol}`).focus();
+					L.W.open(L._stageData['items'][symbolOrIndex][L.LNK], `${classRef}_${symbol}`).focus();
 					return;
 				case 'l_options':
 					urlType = L.KOPT;
@@ -666,7 +679,7 @@ const L = {
 		return(keyMap[urlType].replace('@', symbol));
 	},
 	gotoURL: (symbol, urlType, windowName) => {
-		window.open(L.createURL(symbol, urlType), windowName).focus();
+		L.W.open(L.createURL(symbol, urlType), windowName).focus();
 	},
 	setURLFormat: (key, saveSettings) => {
 		if(!L._keyMap[key])
@@ -717,7 +730,7 @@ const L = {
 		let rows=L.E('l_content_table').getElementsByTagName('tr'), total=-5;
 		for(let i=0; i < rows.length; i++) {
 			const box=rows[i].getBoundingClientRect();
-			if(box.top < window.innerHeight && box.bottom >= 0)
+			if(box.top < L.W.innerHeight && box.bottom >= 0)
 				total++;
 		}
 		if(total < 10)
@@ -725,6 +738,7 @@ const L = {
 		L._contentTableRowCountThatAreInView = total;
 		return(total);
 	},
+	isMobile: () => 'ontouchstart' in L.D.documentElement && L.D.body.clientWidth/L.D.body.clientHeight < 1,
 	isHaltRow: row => row && row[L.HLT] && typeof row[L.HLT] == 'string',
 	cell: (row, type) => {
 		if(!row[type])
@@ -748,9 +762,9 @@ const L = {
 			case L.VOL5:
 				return('+' + L.F(row[type],1));
 			case L.PRC:
-				return('$' + L.D(row[type],2));
+				return('$' + L.N(row[type],2));
 			case L.PRC5:
-				return((row[type]<0?'-$':'+$') + L.D(Math.abs(row[type]),2));
+				return((row[type]<0?'-$':'+$') + L.N(Math.abs(row[type]),2));
 			case L.OIV:
 				return((L.H(row[type] > 0 ? row[type] : ('~' + Math.abs(row[type])))) + '%iv');
 			case L.LNK:
@@ -865,7 +879,7 @@ const L = {
 			L._keyRow = 0;
 		else
 			L.onkeydown(null);
-		if(!L._forceContentTableShrink && L.E('l_content_table').offsetWidth > document.body.offsetWidth) {
+		if(!L._forceContentTableShrink && L.E('l_content_table').offsetWidth > L.D.body.offsetWidth) {
 			L._forceContentTableShrink = true;
 			L.updateLiveTable(doNotify, doNotResetKeyRow);
 		}

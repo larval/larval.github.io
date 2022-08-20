@@ -19,8 +19,8 @@
  <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
  <link rel="icon" type="image/png" sizes="32x32" href="icon-32x32.png">
  <link rel="icon" type="image/png" sizes="16x16" href="icon-16x16.png">
- <link rel="stylesheet" type="text/css" href="larval.css" />
  <link rel="canonical" href="https://larval.com/" />
+ <link rel="stylesheet" type="text/css" href="larval.css" />
  <script src="larval.js"></script>
  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VEGEC8B549"></script>
  <script>
@@ -31,7 +31,7 @@
 </head>
 <body onload="L.onload()">
 <div id="l_overflow">
- <div id="l_fixed" onclick="L.fastSplash()">
+ <div id="l_fixed" onclick="L.animationsFastSplash()">
   <div id="l_fixed_bg1"></div>
   <div id="l_fixed_bg2"></div>
   <div id="l_fixed_bg3"></div>
@@ -148,7 +148,7 @@
   </table>
  </div>
  <div id="l_content">
-  <table id="l_content_table" onmousemove="L.onmousemoveContentTable()">
+  <table id="l_content_table" onmousemove="L.keyModeReset()">
    <tr><th id="l_awaiting_data">Larval is awaiting market data, please wait. This page will automatically update as soon as market data becomes available.</th></tr>
   </table>
  </div>
