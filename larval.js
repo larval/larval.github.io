@@ -27,6 +27,7 @@ const L = {
 	_contentTableRowCountThatAreInView: 10,
 	_title:	document.title,
 	_swipeStartPosition: null,
+	_na_id: 'l_na',
 	_keysIgnore: ['ShiftRight','ShiftLeft'],
 	_keyRow: 0,
 	_keyMapIndexDefault: 'Y',
@@ -146,7 +147,7 @@ const L = {
 	onscroll: () => {
 		const e=L.D.documentElement, b=L.D.body,
 			x=L.W.innerWidth||e.clientWidth||b.clientWidth, y=L.W.innerHeight||e.clientHeight||b.clientHeight,
-			s=L.W.pageYOffset||e.scrollTop, scrolledDown=s>L.E('l_fixed').offsetHeight||L.E('l_NA'),
+			s=L.W.pageYOffset||e.scrollTop, scrolledDown=s>L.E('l_fixed').offsetHeight||L.E(L._na_id),
 			ll=L.E('l_logo'), lf=L.E('l_fixed'), lal=L.E('l_afterhours_left'), lar=L.E('l_afterhours_right');
 		ll.style.transform = scrolledDown ? 'scale(0.5)' : 'scale(1)';
 		lf.style.top = scrolledDown ? '-28px' : '0';
@@ -187,7 +188,7 @@ const L = {
 			e.preventDefault();
 			switch(e.code) {
 				case 'Slash':      L.marqueeHotKeyHelp(); break;
-				case 'Tab':        L.animationsToggle(null); break;
+				case 'Tab':        L.animationsToggle(null, e.shiftKey); break;
 				case 'Home':       L._keyRow = 1; break;
 				case 'End':        L._keyRow = rows.length - 1; break;
 				case 'PageUp':     L._keyRow-=L._contentTableRowCountThatAreInView; break;
@@ -279,14 +280,16 @@ const L = {
 		L.marqueeIntervalReset();
 		L.notifyPlayAudio(L._audioTest);
 		L.updateLiveTable(true);
-		if(L.isMobile())
-			L.animationsToggle(false);
+		if(L.isMobile() || localStorage.getItem(L._na_id))
+			L.animationsToggle(false, null);
 	},
-	animationsToggle: explicit => {
-		const noAnimations = (typeof explicit == 'boolean' ? explicit : !!L.E('l_NA'));
-		if(noAnimations)
+	animationsToggle: (explicit, saveSettings) => {
+		const animations = (typeof explicit == 'boolean' ? explicit : !!L.E(L._na_id));
+		if(saveSettings)
+			localStorage[animations?'removeItem':'setItem'](L._na_id, L._na_id);
+		if(animations)
 			L.marqueeFlash('Full animation experience has been restored.');
-		L.D.body.id = noAnimations ? '' : 'l_NA';
+		L.D.body.id = animations ? '' : L._na_id;
 		L.keyModeReset();
 		L.W.scrollTo({top: 0, behavior: 'auto'});
 		L.onscroll();
