@@ -8,7 +8,7 @@ const L = {
 	_notifyTitleInterval: null,
 	_notifyAllowed: null,
 	_notifyExceptions: {},
-	_splashComplete: false,
+	_animationsComplete: false,
 	_forceContentTableShrink: false,
 	_nextStagePollTimeout: null,
 	_nextStagePollLong: 300,
@@ -169,7 +169,7 @@ const L = {
 	},
 	onkeydown: e => {
 		L.animationsFastSplash();
-		if(!L._splashComplete || !L._stageData || (e && (e.ctrlKey || e.altKey || L._keysIgnore.indexOf(e.code) >= 0)))
+		if(!L._animationsComplete || !L._stageData || (e && (e.ctrlKey || e.altKey || L._keysIgnore.indexOf(e.code) >= 0)))
 			return;
 		const rows=L.E('l_content_table').getElementsByTagName('tr');
 		let lastKeyRow=L._keyRow;
@@ -249,7 +249,7 @@ const L = {
 
 	/* FUNCTIONS */
 	animationsFastSplash: () => {
-		if(L._splashComplete || !L._stageData)
+		if(L._animationsComplete || !L._stageData)
 			return;
 		const reanimate={
 			'l_logo': 'l_logo 0.5s ease 1 normal 0.5s forwards',
@@ -263,12 +263,14 @@ const L = {
 		}
 		L.E('l_logo_tag').style.display = 'none';
 		L.E('l_progress').style.display = 'block';
-		L.animationsComplete();
+		L.animationsComplete(true);
 	},
-	animationsComplete: () => {
-		if(L._splashComplete)
+	animationsComplete: fastSplash => {
+		if(L._animationsComplete)
 			return;
-		L._splashComplete = true;
+		if(!fastSplash && L.E(L._na_id))
+			L.E(L._na_id).className = L._na_id;
+		L._animationsComplete = true;
 		L.E('l_fixed').style.cursor = 'default';
 		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
@@ -282,14 +284,17 @@ const L = {
 		L.updateLiveTable(true);
 		if(L.isMobile() || localStorage.getItem(L._na_id))
 			L.animationsToggle(false, null);
+
 	},
 	animationsToggle: (explicit, saveSettings) => {
 		const animations = (typeof explicit == 'boolean' ? explicit : !!L.E(L._na_id));
 		if(saveSettings)
 			localStorage[animations?'removeItem':'setItem'](L._na_id, L._na_id);
 		if(animations)
-			L.marqueeFlash('Full animation experience has been restored.');
+			L.marqueeFlash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
 		L.D.body.id = animations ? '' : L._na_id;
+		if(L._animationsComplete)
+			L.D.body.className = L.D.body.id;
 		L.keyModeReset();
 		L.W.scrollTo({top: 0, behavior: 'auto'});
 		L.onscroll();
@@ -423,7 +428,7 @@ const L = {
 			L.setStageDataHistory(L._stageDataHistoryIndex);
 	},
 	setNextStagePoll: seconds => {
-		if(L._splashComplete) {
+		if(L._animationsComplete) {
 			const lp=L.E('l_progress'), lpd=L.E('l_progress_display'); 
 			lp.style.display = 'block';
 			lpd.style.animation = '';
@@ -471,6 +476,7 @@ const L = {
 	},
 	settingsLoad: () => {
 		const now=new Date();
+		L._na_id = L.isMobile() ? 'l_nam' : 'l_na';
 		if(localStorage.length == 0 && (now.getDay() == 0 || now.getDay() == 6))
 			L.E('l_include_crypto').checked = true;
 		for(let i=0; i < localStorage.length; i++) {
@@ -802,8 +808,8 @@ const L = {
 			return;
 		const columns=['symbol', L._forceContentTableShrink?L._emptyCellHtml:'company', '~5min%','total%','price','volume','options'];
 		const rangeUp=parseFloat(L.E('l_range_up_display').innerHTML), rangeDown=parseFloat(L.E('l_range_down_display').innerHTML), rangeVolume=parseInt(L.E('l_range_volume_display').innerHTML)*1000, optionsOnly=L.E('l_options_only').checked, includeCrypto=L.E('l_include_crypto').checked, includeFutures=L.E('l_include_futures').checked;
-		L.E('l_afterhours_left').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
-		L.E('l_afterhours_right').style.display = (!L._splashComplete||!L._stageData['afterhours']?'none':'block');
+		L.E('l_afterhours_left').style.display = (!L._animationsComplete||!L._stageData['afterhours']?'none':'block');
+		L.E('l_afterhours_right').style.display = (!L._animationsComplete||!L._stageData['afterhours']?'none':'block');
 		let notifyRows=[], notify=false, notifyControl='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
 		let html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
