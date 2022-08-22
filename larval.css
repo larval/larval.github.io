@@ -705,11 +705,12 @@ input[type="checkbox"] {
 #l_last_update {
 	font-size: 14px;
 }
+
 #l_na * { transition: 0s !important; }
 .l_na #l_logo * { animation-play-state: paused !important; }
 #l_na #l_progress_display { width: 100% !important; }
 #l_na #l_progress_cap_left, #l_na #l_progress_cap_right { display: none !important; }
-#l_na, #l_na:after, #l_na:before, #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3, #l_na #l_progress_display , #l_na #l_marquee_container, #l_na #l_afterhours_left, #l_na #l_afterhours_right, #l_na .l_logo_worm_in, #l_na .l_logo_worm_out, #l_na .l_logo_worm_blink { animation: none !important; }
+#l_na, #l_na:after, #l_na:before, #l_na tr, #l_na td, #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3, #l_na #l_progress_display , #l_na #l_marquee_container, #l_na #l_afterhours_left, #l_na #l_afterhours_right, #l_na .l_logo_worm_in, #l_na .l_logo_worm_out, #l_na .l_logo_worm_blink { animation: none !important; }
 #l_na, #l_na:after, #l_na:before { background: #222 !important; }
 #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3 { background: none !important; }
 #l_na #l_marquee_container { margin-bottom: 100px !important; }
@@ -719,7 +720,7 @@ input[type="checkbox"] {
 #l_na .l_notify_halt { background-color: #FFDE96 !important; }
 #l_nam * { transition: 0s !important; }
 .l_nam #l_logo * { animation-play-state: paused !important; }
-#l_nam, #l_nam:after, #l_nam:before, #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3, #l_nam #l_marquee_container, #l_nam #l_afterhours_left, #l_nam #l_afterhours_right, #l_nam .l_logo_worm_in, #l_nam .l_logo_worm_out, #l_nam .l_logo_worm_blink { animation: none !important; }
+#l_nam, #l_nam:after, #l_nam:before, #l_na tr, #l_na td, #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3, #l_nam #l_marquee_container, #l_nam #l_afterhours_left, #l_nam #l_afterhours_right, #l_nam .l_logo_worm_in, #l_nam .l_logo_worm_out, #l_nam .l_logo_worm_blink { animation: none !important; }
 #l_nam, #l_nam:after, #l_nam:before { background: #222 !important; }
 #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3 { background: none !important; }
 #l_nam #l_marquee_container { margin-bottom: 78px !important; }
