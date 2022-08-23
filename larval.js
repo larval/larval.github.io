@@ -272,10 +272,9 @@ const L = {
 			L.E(L._na_id).className = L._na_id;
 		L._animationsComplete = true;
 		L.E('l_fixed').style.cursor = 'default';
-		L.E('l_afterhours_left').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
-		L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
+		L.E('l_afterhours_left').style.display = L.E('l_afterhours_right').style.display = (!L._stageData||!L._stageData['afterhours']?'none':'block');
 		L.setNextStagePoll(!L._stageData||!L._stageData['items'] ? L._nextStagePollShort : L.getSynchronizedNext());
-		if(localStorage && localStorage.length > 1 && L._stageData && L._stageData['top'] && L._stageData['top'].length > 1)
+		if(L.hasSettings() && L._stageData && L._stageData['top'] && L._stageData['top'].length > 1)
 			L.marqueeUpdate(L._marqueeLoopSeconds);
 		else
 			L.marqueeInitiate(L._marqueeLoopSeconds);
@@ -284,17 +283,16 @@ const L = {
 		L.updateLiveTable(true);
 		if(L.isMobile() || localStorage.getItem(L._na_id))
 			L.animationsToggle(false, null);
-
 	},
 	animationsToggle: (explicit, saveSettings) => {
 		const animations = (typeof explicit == 'boolean' ? explicit : !!L.E(L._na_id));
 		if(saveSettings)
 			localStorage[animations?'removeItem':'setItem'](L._na_id, L._na_id);
-		if(animations)
-			L.marqueeFlash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
 		L.D.body.id = animations ? '' : L._na_id;
 		if(L._animationsComplete)
 			L.D.body.className = L.D.body.id;
+		if(animations)
+			L.marqueeFlash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
 		L.keyModeReset();
 		L.W.scrollTo({top: 0, behavior: 'auto'});
 		L.onscroll();
@@ -537,6 +535,7 @@ const L = {
 			clearTimeout(L.marqueeFlashTimeout);
 		if(L._stageDataHistoryIndex >= 0 && (!message || !priority))
 			return;
+		L.E('l_marquee_container').classList[L.E(L._na_id)?'add':'remove']('l_na_marquee_container_override');
 		L.E('l_marquee_flash').innerHTML = message ? message : '';
 		L.E('l_marquee').style.display = message ? 'none' : 'inline-block';
 		L.E('l_marquee_flash').style.display = message ? 'inline-block' : 'none';
@@ -549,8 +548,10 @@ const L = {
 			void el.offsetHeight;
 			el.style.animation = `l_content_fade_in 1s ease forwards`;
 		}
-		else
+		else {
+			L.E('l_marquee_container').classList.remove('l_na_marquee_container_override');
 			L.marqueeUpdate(L._marqueeLoopSeconds);
+		}
 	},
 	marqueeIntervalReset: () => {
 		if(L._marqueeInterval)
@@ -747,6 +748,7 @@ const L = {
 		L._contentTableRowCountThatAreInView = total;
 		return(total);
 	},
+	hasSettings: () => localStorage && localStorage.length > 1,
 	isMobile: () => 'ontouchstart' in L.D.documentElement && L.D.body.clientWidth/L.D.body.clientHeight < 1,
 	isHaltRow: row => row && row[L.HLT] && typeof row[L.HLT] == 'string',
 	cell: (row, type) => {
