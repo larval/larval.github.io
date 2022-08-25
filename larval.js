@@ -201,7 +201,7 @@ const L = {
 				case 'Space':
 					let toggleAlertException=L.E('l_content_table').getElementsByTagName('tr')[L._keyRow];
 					if(toggleAlertException && (toggleAlertException=toggleAlertException.querySelector('.l_notify_enable,.l_notify_disable')) && toggleAlertException.onclick)
-						toggleAlertException.onclick();
+						toggleAlertException.dispatchEvent(new Event('click'));
 					return;
 				case 'Enter': case 'NumpadEnter':
 					if(L._keyRow && rows[L._keyRow])
@@ -214,7 +214,7 @@ const L = {
 					else if((match=e.code.match(/^Key([A-Z])$/))) {
 						L.setURLFormat(match[1], e.shiftKey);
 						if(L._keyRow && rows[L._keyRow])
-							rows[L._keyRow].onclick();
+							rows[L._keyRow].dispatchEvent(new Event('click'));
 					}
 					else
 						L.marqueeFlash(`The &quot;<span class='l_marquee_highlight'>${e.code}</span>&quot; key is not mapped, type &quot;<span class='l_marquee_highlight'>?</span>&quot; to see the supported hotkeys.`);
