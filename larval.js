@@ -251,16 +251,9 @@ const L = {
 	animationsFastSplash: () => {
 		if(L._animationsComplete || !L._stageData)
 			return;
-		const reanimate={
-			'l_logo': 'l_logo 0.5s ease 1 normal 0.5s forwards',
-			'l_fixed': 'l_fixed 0.5s ease 1 normal forwards',
-			'l_marquee_container': 'l_marquee_container 0.5s ease forwards'
-		}
-		for(let id in reanimate) {
-			L.E(id).style.animation = 'none';
-			void L.E(id).offsetHeight;
-			L.E(id).style.animation = reanimate[id];
-		}
+		L.animationsReset('l_logo', 'l_logo 0.5s ease 1 normal 0.5s forwards');
+		L.animationsReset('l_fixed', 'l_fixed 0.5s ease 1 normal forwards');
+		L.animationsReset('l_marquee_container', 'l_marquee_container 0.5s ease forwards');
 		L.E('l_logo_tag').style.display = 'none';
 		L.E('l_progress').style.display = 'block';
 		L.animationsComplete(true);
@@ -296,6 +289,12 @@ const L = {
 		L.keyModeReset();
 		L.W.scrollTo({top: 0, behavior: 'auto'});
 		L.onscroll();
+	},
+	animationsReset: (idOrElement, animation) => {
+		const el=(typeof idOrElement=='string' ? L.E(idOrElement) : idOrElement);
+		el.style.animation = 'none';
+		void el.offsetHeight;
+		el.style.animation = animation;
 	},
 	keyMapSetup: () => {
 		if(!(L._keyMapIndex=localStorage.getItem('l_keymap_index')))
@@ -427,11 +426,8 @@ const L = {
 	},
 	setNextStagePoll: seconds => {
 		if(L._animationsComplete) {
-			const lp=L.E('l_progress'), lpd=L.E('l_progress_display'); 
-			lp.style.display = 'block';
-			lpd.style.animation = '';
-			void lpd.offsetHeight;
-			lpd.style.animation = `l_progress ${seconds}s linear forwards`;
+			L.E('l_progress').style.display = 'block';
+			L.animationsReset('l_progress_display', `l_progress ${seconds}s linear forwards`);
 		}
 		if(L._nextStagePollTimeout)
 			clearTimeout(L._nextStagePollTimeout);
@@ -493,18 +489,15 @@ const L = {
 		if(L.E(id)) L.E(id).innerHTML = (id=='l_range_volume_display' ? value : (value / 10).toFixed(1));
 	},
 	marqueeInitiate: (seconds, html) => {
-		const lb=L.E('l_marquee'), lbc=L.E('l_marquee_content'), lbcc=L.E('l_marquee_content_clone');
-		if(html)
-			lbc.innerHTML = html;
-		lbcc.innerHTML = '';
-		void lb.offsetHeight;
-		const fullWidth=lb.scrollWidth, viewWidth=lb.offsetWidth;
-		lbcc.innerHTML = lbc.innerHTML;
-		L.D.documentElement.style.setProperty('--marquee-start', '-'+viewWidth+'px');
-		L.D.documentElement.style.setProperty('--marquee-end', '-'+fullWidth+'px');
-		lb.style.animation = 'none';
-		void lb.offsetWidth;
-		lb.style.animation = `l_marquee ${seconds}s linear infinite`;
+		const m=L.E('l_marquee'), mc=L.E('l_marquee_content'), mcc=L.E('l_marquee_content_clone');
+		if(html) mc.innerHTML = html;
+		mcc.innerHTML = '';
+		void m.offsetWidth;
+		const fullWidthPreClone=m.scrollWidth, viewWidthPreClone=m.offsetWidth;
+		mcc.innerHTML = mc.innerHTML;
+		L.D.documentElement.style.setProperty('--marquee-start', `-${viewWidthPreClone}px`);
+		L.D.documentElement.style.setProperty('--marquee-end', `-${fullWidthPreClone}px`);
+		L.animationsReset(m, `l_marquee ${seconds}s linear infinite`);
 	},
 	marqueeUpdate: seconds => {
 		if(!L._stageData || !L._stageData['top'] || L._stageData['top'].length < 2)
@@ -543,10 +536,7 @@ const L = {
 			L.W.scrollTo({top: 0, behavior: 'smooth'});
 			L.marqueeIntervalReset();
 			L.marqueeFlashTimeout = setTimeout(L.marqueeFlash, 5000);
-			const el=L.E('l_marquee_flash');
-			el.style.animation = 'none';
-			void el.offsetHeight;
-			el.style.animation = `l_content_fade_in 1s ease forwards`;
+			L.animationsReset('l_marquee_flash', 'l_content_fade_in 1s ease forwards');
 		}
 		else {
 			L.E('l_marquee_container').classList.remove('l_na_marquee_container_override');
