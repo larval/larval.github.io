@@ -205,7 +205,7 @@ const L = {
 					return;
 				case 'Enter': case 'NumpadEnter':
 					if(L._keyRow && rows[L._keyRow])
-						rows[L._keyRow].onclick();
+						rows[L._keyRow].dispatchEvent(new Event('click'));
 					return;
 				default:
 					let match=e.code.match(/^(Digit|Numpad)([0-9])$/);
@@ -644,7 +644,7 @@ const L = {
 		for(let c in L._contentTableRowClassRef)
 			if(el.classList.contains(c) && (classRef=c))
 				break;
-		if(!classRef && el.nodeName != 'TD')
+		if(!classRef && ['TD','TR'].indexOf(el.nodeName) < 0)
 			return;
 		if(typeof symbolOrIndex == 'number') {
 			symbol = L._stageData['items'][symbolOrIndex][L.SYM];
