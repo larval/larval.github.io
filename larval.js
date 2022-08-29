@@ -287,7 +287,9 @@ const L = {
 		L.D.body.id = animations ? '' : L._na_id;
 		if(L._animationsComplete)
 			L.D.body.className = L.D.body.id;
-		if(animations)
+		if(L._stageDataHistoryIndex >= 0)
+			L.updateStageDataHistory();
+		else if(animations)
 			L.marqueeFlash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
 		L.keyModeReset();
 		L.W.scrollTo({top: 0, behavior: 'auto'});
@@ -377,7 +379,7 @@ const L = {
 						history.length = h;
 						L._stageDataHistory = history.concat(L._stageDataHistory);
 						L._stageDataHistoryIndex = h - 1;
-						L.setStageDataHistory(L._stageDataHistoryIndex);
+						L.updateStageDataHistory();
 					}
 					else
 						xhr.onerror();
@@ -388,16 +390,6 @@ const L = {
 		xhr.onerror = () => { L.marqueeFlash('Sorry, no additional history is available to rewind to at this time.'); }
 		xhr.send();
 		L.getHistoryData = null;
-	},
-	setStageDataHistory: index => {
-		const historyTotal=L._stageDataHistory.length-1, historyIndex=index<0?historyTotal:index;
-		L._stageData = structuredClone(L._stageDataHistory[index >= 0 ? index : historyTotal]);
-		L.sortStageData(true);
-		const minutesAgo=Math.round((L.epochNow()-L._stageData['ts'])/60,0);
-		if(historyIndex == historyTotal)
-			L.marqueeFlash('All caught up, exiting history mode...', true);
-		else
-			L.marqueeFlash(`<div onclick="L.gotoStageDataHistory(0)">Rewound to ${L.epochToDate(L._stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span>${L.getHistoryData?'':' ['+L.P(historyTotal-historyIndex,historyTotal)+'%]'}</div>`, true);
 	},
 	gotoStageDataHistory: direction => {
 		const lastIndex=L._stageDataHistoryIndex;
@@ -425,7 +417,17 @@ const L = {
 				L.marqueeFlash('<div onclick="L.gotoStageDataHistory(0)">End of history, use <span class="l_marquee_highlight">&#8658;</span> to move forward or <span class="l_marquee_highlight">escape</span> to exit.</div>', true);
 		}
 		if(lastIndex !== L._stageDataHistoryIndex)
-			L.setStageDataHistory(L._stageDataHistoryIndex);
+			L.updateStageDataHistory();
+	},
+	updateStageDataHistory: () => {
+		const historyTotal=L._stageDataHistory.length-1, historyIndex=L._stageDataHistoryIndex<0?historyTotal:L._stageDataHistoryIndex;
+		L._stageData = structuredClone(L._stageDataHistory[L._stageDataHistoryIndex >= 0 ? L._stageDataHistoryIndex : historyTotal]);
+		L.sortStageData(true);
+		const minutesAgo=Math.round((L.epochNow()-L._stageData['ts'])/60,0);
+		if(historyIndex == historyTotal)
+			L.marqueeFlash('All caught up, exiting history mode...', true);
+		else
+			L.marqueeFlash(`<div onclick="L.gotoStageDataHistory(0)">Rewound to ${L.epochToDate(L._stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span>${L.getHistoryData?'':' ['+L.P(historyTotal-historyIndex,historyTotal)+'%]'}</div>`, true);
 	},
 	setNextStagePoll: seconds => {
 		if(L._animationsComplete) {
