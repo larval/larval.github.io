@@ -61,34 +61,27 @@ const L = {
 		Z: ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain']
 	},
 	_taMap: {
-		AS: ['Ascending Triangle', 'asc<span>&nbsp;triangle</span>'],
-		CD: ['Channel Down', 'c<span>hannel&nbsp;</span>down'],
-		CH: ['Channel', 'chan<span>nel</span>'],
-		CU: ['Channel Up', 'c<span>hannel&nbsp;</span>up'],
-		DB: ['Double Bottom', '2x&nbsp;bot<span>tom</span>'],
-		DE: ['Descending Triangle', 'desc<span>&nbsp;triangle</span>'],
-		DT: ['Double Top', '2x&nbsp;top'],
-		HI: ['Inverse Head and Shoulders', 'inv<span>erse</span>&nbsp;h&amp;s'],
-		HS: ['Head and Shoulders', 'h&nbsp;&amp;&nbsp;s'],
-		HZ: ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r'],
-		MB: ['Multiple Bottoms', '&gt;2x&nbsp;bot<span>tom</span>s'],
-		MT: ['Multiple Tops', '&gt;2x&nbsp;tops'],
-		TR: ['Technical Resistance', 'resist<span>ance</span>'],
-		TS: ['Technical Support', '<span>tech&nbsp;</span>support'],
-		WD: ['Wedge Down', 'wedge<span>&nbsp;down</span>'],
-		WE: ['Wedge', 'wedge'],
-		WU: ['Wedge Up', 'wedge<span>&nbsp;up</span>']
+		AS: ['Ascending triangle', 'asc<span>&nbsp;triangle</span>', 'F'],
+		CD: ['Channel down', 'c<span>hannel&nbsp;</span>down', 'F'],
+		CH: ['Channel', 'chan<span>nel</span>', 'F'],
+		CU: ['Channel up', 'c<span>hannel&nbsp;</span>up', 'F'],
+		D1: ['Barchart directional top 1%', '<span>&nbsp;barchart&nbsp;</span>top&nbsp;1%', 'B'],
+		DB: ['Double bottom', '2x&nbsp;bot<span>tom</span>', 'F'],
+		DE: ['Descending triangle', 'desc<span>&nbsp;triangle</span>', 'F'],
+		DT: ['Double top', '2x&nbsp;top', 'F'],
+		HI: ['Inverse head and Ssoulders', 'inv<span>erse</span>&nbsp;h&amp;s', 'F'],
+		HS: ['Head and shoulders', 'h&nbsp;&amp;&nbsp;s', 'F'],
+		HZ: ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r', 'F'],
+		MB: ['Multiple bottoms', '&gt;2x&nbsp;bot<span>tom</span>s', 'F'],
+		MT: ['Multiple tops', '&gt;2x&nbsp;tops', 'F'],
+		S1: ['Barchart strength top 1%', '<span>&nbsp;barchart&nbsp;</span>top&nbsp;1%', 'B'],
+		TR: ['Technical resistance', 'resist<span>ance</span>', 'F'],
+		TS: ['Technical support', '<span>tech&nbsp;</span>support', 'F'],
+		WD: ['Wedge down', 'wedge<span>&nbsp;down</span>', 'F'],
+		WE: ['Wedge', 'wedge', 'F'],
+		WU: ['Wedge up', 'wedge<span>&nbsp;up</span>', 'F']
 	},
-	_contentTableRowClassRef: {
-		l_ta: 'https://finviz.com/quote.ashx?t=@',
-		l_news: null,
-		l_options: null,
-		l_marquee_link: null,
-		l_none: null
-	},
-	_symbolOverrideMap: {
-		'^VIX': '^VIX'
-	},
+	_symbolOverrideMap: { '^VIX': '^VIX' },
 	_audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAgAAAQdgAyMjI8PDxCQkJKSkpTU1NbW1tiYmJoaGhubm5udXV1e3t7gYGBh4eHjo6OlJSUmpqaoaGhoaenp62trbS0tLq6usDAwMfHx83NzdPT09Pa2trg4ODm5ubt7e3z8/P5+fn///8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAXAAAAAAAAAEHarUeu2AAAAAAAAAAAAAAAAAAAAAP/7sGQAAACLAFMVAAAAAAAP8KAAAQt4x1W5CAAAAAA/wwAAAApAD////ggGMHAxwQOf1g+D93AAlAAAktziZCAAAABCKFUwLn/Wpbf/9nXQPGJoTw5I9mo558opDkjQYthiUBvJhA3IgO08sghGkPJ8e0DFMrE8T4txeMi4VWQKCBoThJoPmSJAioaJmpGDmE8qcGAAAACLESGAAXgmdX/////Jr1RCODjmT0O3SrW4S0S8ekMLOMIK51hDcelefsWjsM9hjzYAAWAXoyggACwi9Jf/QWo/I/XFhoUSEtWn8eRsu1jSdv708NaE1dahOBlOebAAoAC9GCEAALkyqRS/20Km4AGQV63ICdySNmrpT/nvDvH+gy9vv+sF2FZgBaSSwABuwHSUGUSGWt30AznhGXJWceHwaWC7FIFKaC4v1wkSFw26F8sACaqXkEKAAk+XGSzC4mkEpddOLHuMKpCwu/nQkaCCiDw4UJihgsIkCCpIu89DDDuwAsAzf4UiAAX0ChfTMov7f+3najILDqu/k+47//ff6fTrx0/6amsLggbHBQi9u7ALv1oAAAOBlDCNEXI0S5IaIxXf/MS5+wg41upO6pfCRob+7n337v839+d2J41gGKBp2gAMy+2ALyS1xpa/UtcaK92z2XSIoN2NZoKAL9WtnfaSj/K+T5GmLeB8+dXx/+IQxpwcqgvsAAzNz7QpgAFbI0yJkyXP/4XQpct1WpPlLKuQsHDoN6DJ3XUo8WExodqvOBUIVugAaAd7q3AAE7YBpOA6Tj17wx7iLniQ7z4YBkMhIStYHXvsszjXEDZIIvDpw84Iu7AAsA1b//swZPAA8ZswVn9IYAIAAA/w4AABBZSXZegAbkAAAD/AAAAERAAAC0FJ8BkmZaAXpT/a06wtirRCx84x7x6FtfQ2o1KsIuQDyNIAAROMHpaAkmZf//BIsJCwsRekKvGsFZZUc2x+IksSJjFzCAAAiAAB7dAAAqnNUv/a2qotk/beuXRmopbUlQya/ZDawz1WNgAOAB/QPi4KCTvO//sQZPwE8VIS2XogEyIAYBpgBAABBRARZ+YxIAABgGtAEAAEf+RrFz1CUIkXTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVRwAPwABwAAAC+RFCfAIT//+bUxGAAK7BRb/+yBk9ADxgwRZey8wEABgGyAEAAEFkEtv6LBAaAKAa0AQAARJTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVCQAAkAAAAAALpO9Q1hf6hdpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqq//swZPQB8Y4TWnnhEeoBwCpQLAABBmhDZ+yBaKgFgGhBAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqHwAAAAZtxAcbGoAFAAUjwJv+t0xBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTAPAAARKoF9LhRhDgABAAARRQMf6A41TEFNRTMuMTAw//sgZPuA8XAYXHogGagAoBrQBAABBdgRb+exgCABgGzAEAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVCYAEAA/qsR8QIQAAUACRZnfhoMpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGT7hPE7BFn5LEgIAGAbUAQAAQTcD2HnsSAgAYBtABAABKqqqqqqqqqqqqqqqqqqqqqqqqqqFAAAAARYQ4ADn9AJqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZPYB8RwvV/ogE7oAYBsQBAABApQHV6wIACABgGrAEAAEqqqqqqqqqqqqqqqqqqqqqhAAKAAEXt9SFoAFAAckg/8vTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBk6ofwkwLV6iIACABgGhAEAAEA1AtWhpggMAGAaEAQAARVVVVVVVVVVVVVVVVVVVVVVQADAAAPOf0hYkAatG/QJ0tMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTmD/BkANfxYAAIAGAaUAQAAQBsA14FgAAgAYBrABAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVUGR2QA4Aos340OtUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZOcD8EUC1aICCAgAYBsABAABATAFUogAACABgGtAEAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUQCAAACF5/JsbiTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk6QPwUAFVQeAADABgGsAEAAEBeAlbxQgAIAGAasAQAASqqqqqqqqqqqqqqqqqqqqqqqqAAAC0uxinpVhAAoJ+kO1MQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTng/BJAVKh4AAIAGAaYAQAAQEgB06FhAAgA4BnwGAABFVVVVVVVVVVVVVVVVVVVVVVVYAAAFgX0vDlAXTAQY8MqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZOQL8DAA1KFgAAoAYBqABAABALgFVIUAACABgGlAEAAEqqqqqqqqqqqqqqqqqqqqqqpACAAAC5NnhjABgBNqPuJVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBk5gPwPQDUIWAACABgGhAEAAEBHAVQhQAAIAAAP8AAAARVVVVVVVVVVVVVVVVVVVVVVcIAAIEAV3nSsAAgAIY99ZlMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTli/BEAVFB4AAIAAAP8AAAAQDkBUEHgAAgAYBowBAABFVVVVVVVVVVVVVVVVVVVVVVgAEAAAlyn4egATQ4S7aWqUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZOMD8BABUIGgAAgAYBpABAABAPgFRwaAACABgGkAEAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVYAAAVsNkGGQ/rHqTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk4o/wPwHQwYEACABgGiAEAAEALAU+AwAAIAAAP8AAAASqqqqqqqqqqqqqqqqqqqqqqkAAADcSGXI7kwACABuH/lpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGTlA/BDAc8p4QAMAAAP8AAAAQDIBT6hgAAgAAA/wAAABKqqqqqqqqqqqqqqqqqDAAFNZ3wVNyAFe2sb97f///6ZekxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZOUH8D0BTqjAAAgAAA/wAAABANAFPqWAACAAAD/AAAAEqqqqQAIAABl/Ej////9Bb+5VCgFABwd5tpz////IL/5aTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk5YPwQgDQQWAACAAAD/AAAAEA5AVDBIAAIAAAP8AAAASqqqqq4AgAIAOK+f////5Qw7/ILwAPWJf3f///5Mg//RVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVYQAE2AAQABI4//7EGTlg/BDAU+oQAAIAAAP8AAAAQD0Bz8BAAAgAAA/wAAABD4cEhkt///+ZDwNf1y3ADAAF7xD0JDX///+LGyX1RHEikxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZOWD8EIBT8DAAAgAAA/wAAABAPADPKeAADAAAD/AAAAEqqqEAAMABAU0Fvzzv///9RD9bHrjYACdhtvx//////+qTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk4w/wLAFQKeAADgAAD/AAAAEAnAU8BAAAIAAAP8AAAASqoAABayj2f////86iCAAAAAAAE/VPTwwCtpm8j////+xMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGTlg/BHAc8oQgAIAAAP8AAAAQDcBUEFgAAgAAA/wAAABKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZOeH8D8BUKngAAwAAA/wAAABAXQHQQeEAAAAAD/AAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk7IPwewDQQWAAAAAAD/AAAAEBzAFDAAAAAAAAP8AAAASqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGTsBfB+AVFAYAAAAAAP8AAAAQGUBUCkgAAAAAA/wAAABKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZPKB8LUBUWFgAAAAAA/wAAABAlgFQwYAAAAAAD/AAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk7QfwkgHRWeAAAAAAD/AAAAEBkAVIhYAAAAAAP8AAAASqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGTtgABZAVAtPAAAAAAP8KAAAQKcCUKY8AAAAAA/wwAAAKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZN2P8AAAf4cAAAgAAA/w4AABAAABpAAAACAAADSAAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo=',
 
 	/* SHORTHAND / COMMON */
@@ -641,13 +634,14 @@ const L = {
 		catch (e) { }
 	},
 	openStockWindow: (symbolOrIndex, e) => {
+		const classRefList=['l_ta','l_news','l_options','l_marquee_link','l_none'];
 		let symbol='', urlType=L.KSTK, classRef='', el=(e&&e.target?e.target:null);
 		if(!el)
 			return;
 		if(el.nodeName == 'SPAN' && el.parentElement)
 			el = el.parentElement;
-		for(let c in L._contentTableRowClassRef)
-			if(el.classList.contains(c) && (classRef=c))
+		for(let c in classRefList)
+			if(el.classList.contains(classRefList[c]) && (classRef=classRefList[c]))
 				break;
 		if(!classRef && ['TD','TR'].indexOf(el.nodeName) < 0)
 			return;
@@ -655,7 +649,8 @@ const L = {
 			symbol = L._stageData['items'][symbolOrIndex][L.SYM];
 			switch(classRef) {
 				case 'l_ta':
-					L.W.open(L._contentTableRowClassRef[classRef].replace('@', symbol), `${classRef}_${symbol}`).focus();
+					const keyMap=L._keyMap[el.dataset.keymap?el.dataset.keymap:L._keyMapIndexDefault];
+					L.W.open(keyMap[L.KSTK].replace('@', symbol), `${classRef}_${symbol}`).focus();
 					return;
 				case 'l_news':
 					L.W.open(L._stageData['items'][symbolOrIndex][L.LNK], `${classRef}_${symbol}`).focus();
@@ -795,7 +790,7 @@ const L = {
 	},
 	popoutLiveTableRow: row => {
 		if(row[L.TAN] && typeof row[L.TAN] == 'string' && L._taMap[row[L.TAN]])
-			return(`<div class="l_notify_popout l_ta" title="${L._taMap[row[L.TAN]][0]}">&#128200;&nbsp;${L._taMap[row[L.TAN]][1]}</div>`);
+			return(`<div class="l_notify_popout l_ta" title="${L._taMap[row[L.TAN]][0]}" data-keymap="${L._taMap[row[L.TAN]][2]?L._taMap[row[L.TAN]][2]:L._keyMapIndexDefault}">&#128200;&nbsp;${L._taMap[row[L.TAN]][1]}</div>`);
 		else if(row[L.ERN] && row[L.NWS])
 			return(`<div class="l_notify_popout l_news" title="News and earnings on ${L.cell(row,L.ERN)}">&#128197;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;+&nbsp;news</span></div>`);
 		else if(row[L.ERN])
