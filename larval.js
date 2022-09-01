@@ -522,8 +522,8 @@ const L = {
 		L.marqueeInitiate(seconds, html);
 	},
 	marqueeFlash: (message, priority) => {
-		if(L.marqueeFlashTimeout)
-			clearTimeout(L.marqueeFlashTimeout);
+		if(L._marqueeFlashTimeout)
+			clearTimeout(L._marqueeFlashTimeout);
 		if(L._stageDataHistoryIndex >= 0 && (!message || !priority))
 			return;
 		L.E('l_marquee_container').classList[L.E(L._na_id)?'add':'remove']('l_na_marquee_container_override');
@@ -533,7 +533,7 @@ const L = {
 		if(message) {
 			L.W.scrollTo({top: 0, behavior: 'smooth'});
 			L.marqueeIntervalReset();
-			L.marqueeFlashTimeout = setTimeout(L.marqueeFlash, 5000);
+			L._marqueeFlashTimeout = setTimeout(L.marqueeFlash, 5000);
 			L.animationsReset('l_marquee_flash', 'l_content_fade_in 1s ease forwards');
 		}
 		else {
