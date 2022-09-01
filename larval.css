@@ -640,6 +640,7 @@ input[type="checkbox"] {
 	color: #f00;
 }
 .l_halt, .l_crypto, .l_futures { color: #825900; }
+.l_noclick { cursor: default !important; }
 .l_notify_popout {
 	position: absolute;
 	top: 2px;

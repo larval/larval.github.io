@@ -634,7 +634,7 @@ const L = {
 		catch (e) { }
 	},
 	openStockWindow: (symbolOrIndex, e) => {
-		const classRefList=['l_ta','l_news','l_options','l_marquee_link','l_none'];
+		const classRefList=['l_ta','l_news','l_options','l_marquee_link','l_none','l_noclick'];
 		let symbol='', urlType=L.KSTK, classRef='', el=(e&&e.target?e.target:null);
 		if(!el)
 			return;
@@ -794,7 +794,7 @@ const L = {
 		else if(row[L.ERN] && row[L.NWS])
 			return(`<div class="l_notify_popout l_news" title="News and earnings on ${L.cell(row,L.ERN)}">&#128197;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;+&nbsp;news</span></div>`);
 		else if(row[L.ERN])
-			return(`<div class="l_notify_popout" title="Earnings on ${L.cell(row,L.ERN)}">&#128198;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;earnings</span></div>`);
+			return(`<div class="l_notify_popout l_noclick" title="Earnings on ${L.cell(row,L.ERN)}">&#128198;&nbsp;${L.cell(row,L.ERN)}<span>&nbsp;earnings</span></div>`);
 		else if(row[L.NWS])
 			return(`<div class="l_notify_popout l_news" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`);
 		return('');
