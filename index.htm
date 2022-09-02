@@ -29,9 +29,9 @@
   gtag('js', new Date()); gtag('config', 'G-VEGEC8B549');
  </script>
 </head>
-<body onload="L.onload()">
+<body onload="$L.onload()">
 <div id="l_overflow">
- <div id="l_fixed" onclick="L.animationsFastSplash()">
+ <div id="l_fixed" onclick="$L.animationsFastSplash()">
   <div id="l_fixed_bg1"></div>
   <div id="l_fixed_bg2"></div>
   <div id="l_fixed_bg3"></div>
@@ -129,31 +129,31 @@
   <div id="l_marquee">
    <div id="l_marquee_content">
     <h1 id="l_info">
-     <span class='l_marquee_blink'>&#8226;</span> Larval is a utility that looks for volatility in the stock market as it happens. <span class='l_marquee_blink'>&#8226;</span> It works by monitoring the market in ~5 minute intervals and alerts you if the price change meets your criteria. <span class='l_marquee_blink'>&#8226;</span> For a list of navigational keyboard shortcuts type <a href="javascript:L.marqueeHotKeyHelp()" style="text-decoration:none">&quot;?&quot;</a> <span class='l_marquee_blink'>&#9650;</span> The countdown slider above indicates the time remaining until the next polling update. <span class='l_marquee_blink'>&#9660;</span> The settings button below allows you to control the criteria that alerts you after each polling update.  <span class='l_marquee_blink'>&#8226;</span> For the backstory and additional information go to <a href="//larval.medium.com/larval-a-journey-into-experimental-stock-option-trading-strategies-873108d95fb0" style="text-decoration:none" target="_blank">larval.medium.com</a>.
+     <span class='l_marquee_blink'>&#8226;</span> Larval is a utility that looks for volatility in the stock market as it happens. <span class='l_marquee_blink'>&#8226;</span> It works by monitoring the market in ~5 minute intervals and alerts you if the price change meets your criteria. <span class='l_marquee_blink'>&#8226;</span> For a list of navigational keyboard shortcuts type <a href="javascript:$L.marqueeHotKeyHelp()" style="text-decoration:none">&quot;?&quot;</a> <span class='l_marquee_blink'>&#9650;</span> The countdown slider above indicates the time remaining until the next polling update. <span class='l_marquee_blink'>&#9660;</span> The settings button below allows you to control the criteria that alerts you after each polling update.  <span class='l_marquee_blink'>&#8226;</span> For the backstory and additional information go to <a href="//larval.medium.com/larval-a-journey-into-experimental-stock-option-trading-strategies-873108d95fb0" style="text-decoration:none" target="_blank">larval.medium.com</a>.
     </h1>
    </div>
    <div id="l_marquee_content_clone"></div>
   </div>
   <div id="l_marquee_flash"></div>
  </div>
- <div id="l_settings_button" onclick="L.settingsButtonToggle(false);">&#9650; settings &#9650;</div>
+ <div id="l_settings_button" onclick="$L.settingsButtonToggle(false);">&#9650; settings &#9650;</div>
  <div id="l_control">
   <table id="l_control_table">
    <tr><th colspan="2">~5 minute % change threshold to alert (<i>0.0% to disable</i>)</th></tr>
-   <tr><td><input type="range" min="0" max="200" value="50" class="l_range" id="l_range_up" oninput="L.updateRangeDisplay('l_range_up_display', this.value)" onchange="L.settingsSave(this)" /></td><td style="width:1%">&gt;<span id="l_range_up_display">0.0</span>%</td></tr>
-   <tr><td><input type="range" min="0" max="200" value="50" class="l_range" id="l_range_down" oninput="L.updateRangeDisplay('l_range_down_display', -this.value)" onchange="L.settingsSave(this)" /></td><td style="width:1%">&lt;<span id="l_range_down_display">0.0</span>%</td></tr>
-   <tr><td><input type="range" min="0" max="999" value="25" class="l_range" id="l_range_volume" oninput="L.updateRangeDisplay('l_range_volume_display', this.value)" onchange="L.settingsSave(this)" /></td><td style="width:1%">&gt;<span id="l_range_volume_display">0</span>k&nbsp;vol</td></tr>
-   <tr><td colspan="2"><input type="checkbox" class="l_checkbox" id="l_audible" name="l_audible" onchange="L.settingsSave(this)" /> <label for="l_audible">Audible notifications</label> <input type="checkbox" class="l_checkbox" id="l_options_only" name="l_options_only" onchange="L.settingsSave(this)" /> <label for="l_options_only">Only notify if stock has options</label></td></tr>
-   <tr><td colspan="2"><input type="checkbox" checked="checked" class="l_checkbox" id="l_notify_halts" name="l_notify_halts" onchange="L.settingsSave(this)" /> <label for="l_notify_halts">Notify when halted</label> <input type="checkbox" class="l_checkbox" id="l_include_futures" name="l_include_futures" onchange="L.settingsSave(this)" value="1" /> <label for="l_include_futures">Show futures</label> <input type="checkbox" class="l_checkbox" id="l_include_crypto" name="l_include_crypto" onchange="L.settingsSave(this)" value="1" /> <label for="l_include_crypto">Show crypto</label></td></tr>
+   <tr><td><input type="range" min="0" max="200" value="50" class="l_range" id="l_range_up" oninput="$L.updateRangeDisplay('l_range_up_display', this.value)" onchange="$L.settingsSave(this)" /></td><td style="width:1%">&gt;<span id="l_range_up_display">0.0</span>%</td></tr>
+   <tr><td><input type="range" min="0" max="200" value="50" class="l_range" id="l_range_down" oninput="$L.updateRangeDisplay('l_range_down_display', -this.value)" onchange="$L.settingsSave(this)" /></td><td style="width:1%">&lt;<span id="l_range_down_display">0.0</span>%</td></tr>
+   <tr><td><input type="range" min="0" max="999" value="25" class="l_range" id="l_range_volume" oninput="$L.updateRangeDisplay('l_range_volume_display', this.value)" onchange="$L.settingsSave(this)" /></td><td style="width:1%">&gt;<span id="l_range_volume_display">0</span>k&nbsp;vol</td></tr>
+   <tr><td colspan="2"><input type="checkbox" class="l_checkbox" id="l_audible" name="l_audible" onchange="$L.settingsSave(this)" /> <label for="l_audible">Audible notifications</label> <input type="checkbox" class="l_checkbox" id="l_options_only" name="l_options_only" onchange="$L.settingsSave(this)" /> <label for="l_options_only">Only notify if stock has options</label></td></tr>
+   <tr><td colspan="2"><input type="checkbox" checked="checked" class="l_checkbox" id="l_notify_halts" name="l_notify_halts" onchange="$L.settingsSave(this)" /> <label for="l_notify_halts">Notify when halted</label> <input type="checkbox" class="l_checkbox" id="l_include_futures" name="l_include_futures" onchange="$L.settingsSave(this)" value="1" /> <label for="l_include_futures">Show futures</label> <input type="checkbox" class="l_checkbox" id="l_include_crypto" name="l_include_crypto" onchange="$L.settingsSave(this)" value="1" /> <label for="l_include_crypto">Show crypto</label></td></tr>
   </table>
  </div>
  <div id="l_content">
-  <table id="l_content_table" onmousemove="L.keyModeReset()">
+  <table id="l_content_table" onmousemove="$L.keyModeReset()">
    <tr><th id="l_awaiting_data">Larval is awaiting market data, please wait. This page will automatically update as soon as market data becomes available.</th></tr>
   </table>
  </div>
  <div id="l_footer">
-  <a href="//larval.com">larval.com</a> &#8226; <a href="mailto:contact@larval.com?subject=Larval%20inquiry"">contact@larval.com</a> &#8226; <a href="#" onclick="L.forceNextStagePoll()" title="Force update now">last update: <span id="l_last_update">NEVER</span></a>
+  <a href="//larval.com">larval.com</a> &#8226; <a href="mailto:contact@larval.com?subject=Larval%20inquiry"">contact@larval.com</a> &#8226; <a href="#" onclick="$L.forceNextStagePoll()" title="Force update now">last update: <span id="l_last_update">NEVER</span></a>
  </div>
 </div>
 </body></html>
