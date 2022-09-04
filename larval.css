@@ -226,6 +226,8 @@ body:before {
 	right: 0;
 	transform: rotate(180deg);
 }
+.l_afterhours #l_afterhours_left, .l_afterhours #l_afterhours_right { display: block !important; }
+.l_not_afterhours #l_afterhours_left, .l_not_afterhours #l_afterhours_right { display: none !important; }
 #l_logo {
 	position: relative;
 	z-index: 3;
@@ -713,6 +715,18 @@ input[type="checkbox"] {
 #l_last_update {
 	font-size: 14px;
 }
+.l_scrolled {
+	top: -28px !important;
+	max-height: 100px !important;
+}
+.l_scrolled #l_logo { transform: scale(0.5) !important; }
+.l_scrolled #l_afterhours_left, .l_scrolled #l_afterhours_right { height: 72px !important; }
+.l_not_scrolled {
+	top: 0 !important;
+	max-height: none !important;
+}
+.l_not_scrolled #l_logo { transform: scale(1) !important; }
+.l_not_scrolled #l_afterhours_left, .l_not_scrolled #l_afterhours_right { height: none !important; }
 #l_na * { transition: 0s !important; }
 .l_na #l_logo * { animation-play-state: paused !important; }
 #l_na #l_marquee_flash, #l_na .l_content_tr_fade_in tr td { animation: l_fade_in 1s ease forwards !important; }

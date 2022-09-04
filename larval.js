@@ -28,6 +28,7 @@ const $L = {
 	_title:	document.title,
 	_swipeStartPosition: null,
 	_na_id: 'l_na',
+	_symbolOverrideMap: { '^VIX': '^VIX' },
 	_keysIgnore: ['ShiftRight','ShiftLeft'],
 	_keyRow: 0,
 	_keyMapIndexDefault: 'Y',
@@ -81,7 +82,24 @@ const $L = {
 		WE: ['Wedge', 'wedge', 'F'],
 		WU: ['Wedge up', 'wedge<span>&nbsp;up</span>', 'F']
 	},
-	_symbolOverrideMap: { '^VIX': '^VIX' },
+	_eventMap: {
+		   'l_audible, l_options_only, l_notify_halts, l_include_futures, l_include_crypto': {
+				change:e	=> $settingsSave(e)
+		}, 'l_range_up, l_range_down, l_range_volume': {
+				input:e		=> $updateRangeDisplay(e),
+				change:e	=> $settingsSave(e)
+		}, 'l_settings_button': {
+				click:e		=> $settingsButtonToggle()
+		}, 'l_fixed': {
+				click:e		=> $animationsFastSplash()
+		}, 'l_hotkey_help': {
+				click:e		=> $marqueeHotKeyHelp()
+		}, 'l_last_update': {
+				click:e		=> $forceNextStagePoll()
+		}, 'l_content_table': {
+				mousemove:e	=> $keyModeReset()
+		}
+	},
 	_audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
 	/* [$] SHORTHAND / COMMON */
@@ -117,8 +135,8 @@ const $L = {
 	SYM:0, NAM:1, PCT5:2, PCT:3, PRC:4, VOL:5, OPT:6, OIV:7, ERN:8, PRC5:9, VOL5:10, NWS:11, LNK:12, HLT:2, TAN:8,
 	KSTK:0, KOPT:1, KCRP:2, KFTR:3,
 
-	/* [$] EVENTS */
-	onload: () => {
+	/* [$] EVENTS (window|document) */
+	LOAD: e => {
 		for(let k of Object.keys($L)) {
 			window[k[0]=='_'?k:('$'+k)] = $L[k];
 			if(k.substr(0,2) != 'on')
@@ -128,26 +146,25 @@ const $L = {
 			else if(typeof document[k] != 'undefined')
 				document.addEventListener(k.substr(2), $L[k]);
 		}
+		for(let ids of Object.keys(_eventMap)) {
+			for(let id of ids.split(/[^A-Z0-9_]+/i))
+				for(let e of Object.keys(_eventMap[ids]))
+					$E(id).addEventListener(e, _eventMap[ids][e]);
+		}
 		$settingsLoad();
 		$notifySetup(true);
 		$keyMapSetup();
 		$getStageData(false);
 		setTimeout($animationsComplete, 6000);
 	},
-	onclick: () => { $notifySetup(); },
-	onresize: () => {
+	onclick: e => { $notifySetup(); },
+	onresize: e => {
 		$settingsButtonToggle(true);
 		$updateContentTableRowCountThatAreInView();
 	},
-	onscroll: () => {
-		const e=$D.documentElement, b=$D.body,
-			x=$W.innerWidth||e.clientWidth||b.clientWidth, y=$W.innerHeight||e.clientHeight||b.clientHeight,
-			s=$W.pageYOffset||e.scrollTop, scrolledDown=s>$E('l_fixed').offsetHeight||$E(_na_id),
-			ll=$E('l_logo'), lf=$E('l_fixed'), lal=$E('l_afterhours_left'), lar=$E('l_afterhours_right');
-		ll.style.transform = scrolledDown ? 'scale(0.5)' : 'scale(1)';
-		lf.style.top = scrolledDown ? '-28px' : '0';
-		lf.style.maxHeight =  scrolledDown ? '100px' : '';
-		lar.style.height = lal.style.height = scrolledDown ? '72px' : '';
+	onscroll: e => {
+		const scrolledDown=$E(_na_id) || (($W.pageYOffset||$D.documentElement.scrollTop) > $E('l_fixed').offsetHeight);
+		$E('l_fixed').className = scrolledDown ? 'l_scrolled' : 'l_not_scrolled';
 	},
 	ontouchstart: e => {
 		if($onclick)
@@ -237,7 +254,7 @@ const $L = {
 		if(_keyRow > 0)
 			rows[_keyRow].scrollIntoView({behavior:'smooth', block:'center'});
 	},
-	onvisibilitychange: () => {
+	onvisibilitychange: e => {
 		if(!_marqueeInterval || $D.visibilityState != 'visible')
 			return;
 		$marqueeIntervalReset();
@@ -264,7 +281,7 @@ const $L = {
 			$E(_na_id).className = _na_id;
 		_animationsComplete = true;
 		$E('l_fixed').style.cursor = 'default';
-		$E('l_afterhours_left').style.display = $E('l_afterhours_right').style.display = (!_stageData||!_stageData['afterhours']?'none':'block');
+		$E('l_menu').className = (!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
 		if($hasSettings() && _stageData && _stageData['top'] && _stageData['top'].length > 1)
 			$marqueeUpdate(_marqueeLoopSeconds);
@@ -457,7 +474,8 @@ const $L = {
 		$E('l_control').style.height = (grow?controlHeight:'0px');
 		$E('l_settings_button').innerHTML = (grow?'&#9660; settings &#9660;':'&#9650; settings &#9650;');
 	},
-	settingsSave: context => {
+	settingsSave: e => { 
+		const context = (e&&e.target) ? e.target : null;
 		for(let inputs=$T('input'), i=0; i < inputs.length; i++) {
 			let input=inputs[i];
 			if(input.type == 'checkbox')
@@ -465,7 +483,7 @@ const $L = {
 			else if(input.type == 'range')
 				localStorage.setItem(input.id, input.value);
 		}
-		if(context.id == 'l_audible' && context.checked)
+		if(context && context.id == 'l_audible' && context.checked)
 			$notifyPlayAudio(_audioTest);
 		$updateLiveTable(false);
 	},
@@ -480,17 +498,26 @@ const $L = {
 				continue;
 			if(input.type == 'checkbox')
 				input.checked = (localStorage.getItem(input.id) == 'true');
-			else if(input.type == 'range') {
+			else if(input.type == 'range')
 				input.value = localStorage.getItem(input.id);
-				$updateRangeDisplay(`${input.id}_display`, input.value);
-			}
 		}
 		for(let id of ['l_range_up','l_range_down','l_range_volume'])
-			$E(id).oninput();
+			$updateRangeDisplay(id);
 	},
-	updateRangeDisplay: (id, value) => {
-		if($E(id))
-			$E(id).innerHTML = (id=='l_range_volume_display' ? value : (value / 10).toFixed(1));
+	updateRangeDisplay: idOrEvent => {
+		let id='';
+		if(typeof idOrEvent == 'string')
+			id = idOrEvent;
+		else if(typeof idOrEvent == 'object' && idOrEvent.target && idOrEvent.target.id)
+			id = idOrEvent.target.id;
+		const input=$E(id), display=$E(`${id}_display`);
+		if(!input || !display)
+			return;
+		switch(id) {
+			case 'l_range_up':     display.innerHTML = (input.value / 10).toFixed(1); break;
+			case 'l_range_down':   display.innerHTML = (-input.value / 10).toFixed(1); break;
+			case 'l_range_volume': display.innerHTML = input.value; break;
+		}
 	},
 	marqueeInitiate: (seconds, html) => {
 		const m=$E('l_marquee'), mc=$E('l_marquee_content'), mcc=$E('l_marquee_content_clone');
@@ -751,7 +778,7 @@ const $L = {
 		return(total);
 	},
 	hasSettings: () => localStorage && localStorage.length > 1,
-	isMobile: () => 'ontouchstart' in $D.documentElement && $D.body.clientWidth/$D.body.clientHeight < 1,
+	isMobile: () => 'ontouchstart' in $D.documentElement && $D.body.clientHeight > $D.body.clientWidth,
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
 	cell: (row, type) => {
 		if(!row[type])
@@ -812,10 +839,8 @@ const $L = {
 			return;
 		const columns=['symbol', _forceContentTableShrink?_emptyCellHtml:'company', '~5min%','total%','price','volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked;
-		$E('l_afterhours_left').style.display = (!_animationsComplete||!_stageData['afterhours']?'none':'block');
-		$E('l_afterhours_right').style.display = (!_animationsComplete||!_stageData['afterhours']?'none':'block');
-		let notifyRows=[], notify=false, notifyControl='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='';
-		let html='<tr>';
+		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
+		let notifyRows=[], notify=false, notifyControl='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			if(_stageDataSortByColumn == c)
 				className = 'l_content_table_header_selected';
