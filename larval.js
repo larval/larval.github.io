@@ -1,6 +1,7 @@
 const $L = {
 
 	/* [_] INTERNALS / DEFAULTS */
+	_stageURL: '//stage.larval.com/',
 	_stageData: null,
 	_stageDataSortByColumn: 0,
 	_stageDataHistoryIndex: -1,
@@ -338,70 +339,61 @@ const $L = {
 			next = _nextStagePollLong;
 		return(next);
 	},
-	getStageData: updateView => {
-		let xhr=new XMLHttpRequest(), url='//stage.larval.com/stage.json?ts='+new Date().getTime();
-		xhr.open('GET', url);
-		xhr.onload = e => {
-			try {
-				const json = JSON.parse(xhr.responseText);
-				if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts'])) {
-					xhr.onerror();
-					return;
-				}
-				else if(_stageDataHistoryIndex >= 0)
-					_stageDataHistory.push(structuredClone(json));
-				else {
-					_stageData = json;
-					if(_stageDataHistory.length == 0 && localStorage.length == 0 && _stageData['afterhours']) {
-						const now=new Date();
-						if(now.getDay() != 0 && now.getDay() != 6)
-							$E('l_include_futures').checked = true;
-					}
-					_stageDataHistory.push(structuredClone(_stageData));
-					$sortStageData(false);
-					_forceContentTableShrink = false;
-					if(updateView)
-						$updateLiveTable(true);
-				}
-				if(json['notify'])
-					$marqueeFlash(json['notify'])
-				$E('l_last_update').innerHTML = $epochToDate(json['ts']);
-				$setNextStagePoll($getSynchronizedNext());
-			}
-			catch(e) { xhr.onerror(); }
-		}
-		xhr.onerror = () => { $setNextStagePoll(_nextStagePollShort); }
-		xhr.send();
+	getData: (jsonFile, jsonCallback, updateView) => {
+		fetch(_stageURL+jsonFile+'?ts='+new Date().getTime())
+		.then(resp => resp.json())
+		.then(json => jsonCallback(json, updateView))
+		.catch(err => jsonCallback(null, updateView));
 	},
-	getHistoryData: () => {
-		$marqueeFlash('Attempting to gather recent history from the server...');
-		let xhr=new XMLHttpRequest(), url='//stage.larval.com/history.json?ts='+new Date().getTime();
-		xhr.open('GET', url);
-		xhr.onload = e => {
-			try {
-				let history = JSON.parse(xhr.responseText);
-				if(!history || history.length < 2)
-					xhr.onerror();
-				else {
-					let h = history.length;
-					while(--h > 0) {
-						if(history[h]['ts'] == _stageDataHistory[0]['ts'])
-							break;
-					}
-					if(h > 0) {
-						history.length = h;
-						_stageDataHistory = history.concat(_stageDataHistory);
-						_stageDataHistoryIndex = h - 1;
-						$updateStageDataHistory();
-					}
-					else
-						xhr.onerror();
-				}
+	getStageData: updateView => $getData('stage.json', $parseStageData, updateView),
+	parseStageData: (json, updateView) => {
+		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
+			$setNextStagePoll(_nextStagePollShort);
+		else if(_stageDataHistoryIndex >= 0)
+			_stageDataHistory.push(structuredClone(json));
+		else {
+			_stageData = json;
+			if(_stageDataHistory.length == 0 && localStorage.length == 0 && _stageData['afterhours']) {
+				const now=new Date();
+				if(now.getDay() != 0 && now.getDay() != 6)
+					$E('l_include_futures').checked = true;
 			}
-			catch(e) { xhr.onerror(); }
+			_stageDataHistory.push(structuredClone(_stageData));
+			$sortStageData(false);
+			_forceContentTableShrink = false;
+			if(updateView)
+				$updateLiveTable(true);
+			if(json['notify'])
+				$marqueeFlash(json['notify'])
+			$E('l_last_update').innerHTML = $epochToDate(json['ts']);
+			$setNextStagePoll($getSynchronizedNext());
 		}
-		xhr.onerror = () => { $marqueeFlash('Sorry, no additional history is available to rewind to at this time.'); }
-		xhr.send();
+	},
+	getHistoryData: updateView => {
+		$marqueeFlash('Attempting to gather recent history from the server...');
+		$getData('history.json', $parseHistoryData, updateView);
+	},
+	parseHistoryData: json => {
+		let error = false;
+		if(!json || json.length < 2)
+			error = true;
+		else {
+			let h = json.length;
+			while(--h > 0) {
+				if(json[h]['ts'] == _stageDataHistory[0]['ts'])
+					break;
+			}
+			if(h > 0) {
+				json.length = h;
+				_stageDataHistory = json.concat(_stageDataHistory);
+				_stageDataHistoryIndex = h - 1;
+				$updateStageDataHistory();
+			}
+			else
+				error = true;
+		}
+		if(error)
+			$marqueeFlash('Sorry, no additional history is available to rewind to at this time.');
 		$getHistoryData = null;
 	},
 	gotoStageDataHistory: direction => {
