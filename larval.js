@@ -350,7 +350,7 @@ const $L = {
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
 			$setNextStagePoll(_nextStagePollShort);
 		else if(_stageDataHistoryIndex >= 0)
-			_stageDataHistory.push(structuredClone(json));
+			_stageDataHistory.push($clone(json));
 		else {
 			_stageData = json;
 			if(_stageDataHistory.length == 0 && localStorage.length == 0 && _stageData['afterhours']) {
@@ -358,7 +358,7 @@ const $L = {
 				if(now.getDay() != 0 && now.getDay() != 6)
 					$E('l_include_futures').checked = true;
 			}
-			_stageDataHistory.push(structuredClone(_stageData));
+			_stageDataHistory.push($clone(_stageData));
 			$sortStageData(false);
 			_forceContentTableShrink = false;
 			if(args && args['updateView'])
@@ -425,7 +425,7 @@ const $L = {
 	},
 	updateStageDataHistory: () => {
 		const historyTotal=_stageDataHistory.length-1, historyIndex=_stageDataHistoryIndex<0?historyTotal:_stageDataHistoryIndex;
-		_stageData = structuredClone(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
+		_stageData = $clone(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
 		$sortStageData(true);
 		const minutesAgo=Math.round(($epochNow()-_stageData['ts'])/60,0);
 		if(historyIndex == historyTotal)
@@ -452,6 +452,7 @@ const $L = {
 	forceNextStagePoll: () => { $setNextStagePollComplete(); },
 	epochNow: () => Math.floor(Date.now() / 1000),
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
+	clone: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
 	htmlPercent: number => {
 		if(number > 0)
 			return($N(Math.abs(number),2) + '%<span class="l_up">&#9650;</span>');
@@ -726,7 +727,7 @@ const $L = {
 	setSortStageData: column => {
 		if(_stageDataSortByColumn == -column || !column || column > $E('l_content_table').getElementsByTagName('th').length) {
 			if(_stageData.itemsImmutable)
-				_stageData.items = structuredClone(_stageData.itemsImmutable);
+				_stageData.items = $clone(_stageData.itemsImmutable);
 			_stageDataSortByColumn = 0;
 		}
 		else if(_stageDataSortByColumn == column)
@@ -738,7 +739,7 @@ const $L = {
 	sortStageData: updateView => {
 		if(_stageData && _stageDataSortByColumn) {
 			if(!_stageData.itemsImmutable)
-				_stageData.itemsImmutable = structuredClone(_stageData.items);
+				_stageData.itemsImmutable = $clone(_stageData.items);
 			_stageData.items = _stageData.items.sort((a, b) => {
 				const column = Math.abs(_stageDataSortByColumn) - 1;
 				if(a[column] === null || a[column] === false || a[column] === undefined)
