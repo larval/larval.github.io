@@ -339,14 +339,14 @@ const $L = {
 			next = _nextStagePollLong;
 		return(next);
 	},
-	getData: (jsonFile, jsonCallback, updateView) => {
+	getData: (jsonFile, jsonCallback, args) => {
 		fetch(_stageURL+jsonFile+'?ts='+new Date().getTime())
 		.then(resp => resp.json())
-		.then(json => jsonCallback(json, updateView))
-		.catch(err => jsonCallback(null, updateView));
+		.then(json => jsonCallback(json, args))
+		.catch(err => jsonCallback(null, args));
 	},
-	getStageData: updateView => $getData('stage.json', $parseStageData, updateView),
-	parseStageData: (json, updateView) => {
+	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
+	parseStageData: (json, args) => {
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
 			$setNextStagePoll(_nextStagePollShort);
 		else if(_stageDataHistoryIndex >= 0)
@@ -361,7 +361,7 @@ const $L = {
 			_stageDataHistory.push(structuredClone(_stageData));
 			$sortStageData(false);
 			_forceContentTableShrink = false;
-			if(updateView)
+			if(args && args['updateView'])
 				$updateLiveTable(true);
 			if(json['notify'])
 				$marqueeFlash(json['notify'])
@@ -369,10 +369,7 @@ const $L = {
 			$setNextStagePoll($getSynchronizedNext());
 		}
 	},
-	getHistoryData: updateView => {
-		$marqueeFlash('Attempting to gather recent history from the server...');
-		$getData('history.json', $parseHistoryData, updateView);
-	},
+	getHistoryData: () => $getData('history.json', $parseHistoryData),
 	parseHistoryData: json => {
 		let error = false;
 		if(!json || json.length < 2)
@@ -412,8 +409,10 @@ const $L = {
 				_stageDataHistoryIndex++;
 		}
 		else if(direction < 0) {
-			if($getHistoryData && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0))
+			if($getHistoryData && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
+				$marqueeFlash('Attempting to gather recent history from the server...');
 				$getHistoryData();
+			}
 			else if(_stageDataHistoryIndex < 0)
 				_stageDataHistoryIndex = _stageDataHistory.length - 2;
 			else if(_stageDataHistoryIndex > 0)
