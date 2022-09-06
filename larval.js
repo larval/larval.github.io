@@ -260,8 +260,7 @@ const $L = {
 			return;
 		$marqueeIntervalReset();
 		$marqueeUpdate(_marqueeLoopSeconds);
-		if(_nextStagePollCompleteEpoch)
-			$setNextStagePoll(_nextStagePollCompleteEpoch - $epochNow()); 
+		$animationsProgressReset();
 	},
 
 	/* [$] FUNCTIONS */
@@ -305,9 +304,14 @@ const $L = {
 			$updateStageDataHistory();
 		else if(animations)
 			$marqueeFlash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
+		$animationsProgressReset();
 		$keyModeReset();
 		$W.scrollTo({top: 0, behavior: 'auto'});
 		$onscroll();
+	},
+	animationsProgressReset: force => {
+		if(_nextStagePollCompleteEpoch || force)
+			$setNextStagePoll(_nextStagePollCompleteEpoch - $epochNow()); 
 	},
 	animationsReset: (idOrElement, animation) => {
 		const el=(typeof idOrElement=='string' ? $E(idOrElement) : idOrElement);
