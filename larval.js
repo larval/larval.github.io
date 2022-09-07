@@ -98,6 +98,7 @@ const $L = {
 		}, 'l_last_update': {
 				click:e		=> $forceNextStagePoll()
 		}, 'l_content_table': {
+				click:e		=> $contentTableClick(e),
 				mousemove:e	=> $keyModeReset()
 		}
 	},
@@ -664,6 +665,12 @@ const $L = {
 		try { if(navigator.wakeLock) navigator.wakeLock.request('screen'); }
 		catch (e) { }
 	},
+	contentTableClick: e => {
+		for(let parent=e.target; !!parent.parentElement ;parent=parent.parentElement) {
+			if(typeof parent.dataset=='object' && typeof parent.dataset.idx=='string')
+				return $openStockWindow(parseInt(parent.dataset.idx,10), e);
+		}
+	},
 	openStockWindow: (symbolOrIndex, e) => {
 		const classRefList=['l_ta','l_news','l_options','l_marquee_link','l_none','l_noclick'];
 		let symbol='', urlType=$KSTK, classRef='', el=(e&&e.target?e.target:null);
@@ -856,7 +863,7 @@ const $L = {
 					continue;
 				notify=$E('l_notify_halts').checked && (!optionsOnly||row[$OPT]);
 				rowClass = (notify ? 'l_notify_halt' : 'l_halt');
-				htmlRow = `<tr class="${rowClass}" onclick="$openStockWindow(${i},event)">
+				htmlRow = `<tr class="${rowClass}" data-idx="${i}">
 					<td>
 					 <div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session" onclick="$notifyException('${$cell(row,$SYM)}', true)">x</div>
 					 ${$cell(row,$SYM)}
@@ -883,7 +890,7 @@ const $L = {
 				}
 				if(row[$OPT] && ['crypto','futures'].indexOf(row[$OPT]) >= 0)
 					rowClass += ` l_${row[$OPT]}`;
-				htmlRow = `<tr class="${rowClass}" onclick="$openStockWindow(${i},event)">
+				htmlRow = `<tr class="${rowClass}" data-idx="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
 					<td>${$cell(row,$PCT5)}</td>
