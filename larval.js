@@ -271,17 +271,15 @@ const $L = {
 		$animationsReset('l_logo', 'l_logo 0.5s ease 1 normal 0.5s forwards');
 		$animationsReset('l_fixed', 'l_fixed 0.5s ease 1 normal forwards');
 		$animationsReset('l_marquee_container', 'l_marquee_container 0.5s ease forwards');
-		$E('l_logo_tag').style.display = 'none';
-		$E('l_progress').style.display = 'block';
 		$animationsComplete(true);
 	},
 	animationsComplete: fastSplash => {
 		if(_animationsComplete)
 			return;
+		_animationsComplete = true;
 		if(!fastSplash && $E(_na_id))
 			$E(_na_id).className = _na_id;
-		_animationsComplete = true;
-		$E('l_fixed').style.cursor = 'default';
+		$E('l_overflow').className = 'l_animations_complete';
 		$E('l_menu').className = (!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
 		if($hasSettings() && _stageData && _stageData['top'] && _stageData['top'].length > 1)
@@ -439,10 +437,8 @@ const $L = {
 			$marqueeFlash(`<div onclick="$gotoStageDataHistory(0)">Rewound to ${$epochToDate(_stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}</div>`, true);
 	},
 	setNextStagePoll: seconds => {
-		if(_animationsComplete) {
-			$E('l_progress').style.display = 'block';
+		if(_animationsComplete)
 			$animationsReset('l_progress_display', `l_progress ${seconds}s linear forwards`);
-		}
 		if(_nextStagePollTimeout)
 			clearTimeout(_nextStagePollTimeout);
 		_nextStagePollTimeout = setTimeout($setNextStagePollComplete, seconds * 1000);

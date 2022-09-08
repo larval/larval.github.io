@@ -287,6 +287,9 @@ body:before {
 .l_logo_worm_in { animation: l_worm 5s ease 0s alternate infinite; }
 .l_logo_worm_out { animation: l_worm 5s ease 5s alternate infinite; }
 .l_logo_worm_blink { animation: l_worm_blink 10s ease 10s alternate infinite; }
+.l_animations_complete #l_logo_tag { display: none !important; }
+.l_animations_complete #l_progress { display: block !important; }
+.l_animations_complete #l_fixed { cursor: default !important; }
 #l_progress {
 	display: none;
 	background: #A6FDA4;
