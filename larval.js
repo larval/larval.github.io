@@ -60,7 +60,7 @@ const $L = {
 		W: ['https://www.twitter.com/search?q=%24@', null, 'https://www.twitter.com/search?q=%24@.X'],
 		X: ['https://www.foxbusiness.com/quote?stockTicker=@'],
 		Y: ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@/options', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F'],
-		Z: ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain']
+		Z: ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain'],
 	},
 	_taMap: {
 		AS: ['Ascending triangle', 'asc<span>&nbsp;triangle</span>', 'F'],
@@ -85,22 +85,45 @@ const $L = {
 	},
 	_eventMap: {
 		   'l_audible, l_options_only, l_notify_halts, l_include_futures, l_include_crypto': {
-				change:e	=> $settingsSave(e)
+				change:e    => $settingsSave(e)
 		}, 'l_range_up, l_range_down, l_range_volume': {
-				input:e		=> $updateRangeDisplay(e),
-				change:e	=> $settingsSave(e)
-		}, 'l_settings_button': {
-				click:e		=> $settingsButtonToggle()
-		}, 'l_fixed': {
-				click:e		=> $animationsFastSplash()
-		}, 'l_hotkey_help': {
-				click:e		=> $marqueeHotKeyHelp()
-		}, 'l_last_update': {
-				click:e		=> $forceNextStagePoll()
+				input:e     => $updateRangeDisplay(e),
+				change:e    => $settingsSave(e)
 		}, 'l_content_table': {
-				click:e		=> $contentTableClick(e),
-				mousemove:e	=> $keyModeReset()
+				mousemove:e => $keyModeReset()
 		}
+	},
+	_clickMap: {
+		'l_hotkey_help':e           => $marqueeHotKeyHelp(),
+		'l_marquee_flash':e         => $gotoStageDataHistory(0),
+		'l_settings_button':e       => $settingsButtonToggle(),
+		'l_fixed':e                 => $animationsFastSplash(),
+		'l_last_update':e           => $forceNextStagePoll(),
+		'l_content_table_header':_  => $setSortStageData(_.idx),
+		'l_notify_enable':_         => $notifyException(_.sym, false),
+		'l_notify_disable':_        => $notifyException(_.sym, true),
+		'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`).focus(),
+		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`).focus(),
+		'l_marquee_info':_          => $setURLFormat(_.sym, false),
+		'l_marquee_link':              null,
+		'l_options':                   null,
+		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`).focus()
+	},
+	_hotKeyMap: {
+		'tab':(e,ev)                => $animationsToggle(null, ev.shiftKey),
+		'slash':e                   => $marqueeHotKeyHelp(),
+		'home':e                    => _keyRow = 1,
+		'end':e                     => _keyRow = e.parentElement.childElementCount - 1,
+		'pageup':e                  => _keyRow-=_contentTableRowCountThatAreInView,
+		'pagedown':e                => _keyRow+=_contentTableRowCountThatAreInView,
+		'arrowup':e                 => _keyRow--,
+		'arrowdown':e               => _keyRow++,
+		'arrowleft':e               => $gotoStageDataHistory(-1),
+		'arrowright':e              => $gotoStageDataHistory(1),
+		'escape':e                  => $gotoStageDataHistory(0),
+		'space':e                   => $onclick(e),
+		'enter':e                   => $onclick(e),
+		'numpadenter':e             => $onclick(e)
 	},
 	_audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
@@ -154,43 +177,51 @@ const $L = {
 					$E(id).addEventListener(e, _eventMap[ids][e]);
 		}
 		$settingsLoad();
-		$notifySetup(true);
+		$notifySetup(false);
 		$keyMapSetup();
 		$getStageData(false);
 		setTimeout($animationsComplete, 6000);
 	},
-	onclick: e => { $notifySetup(); },
-	onresize: e => {
-		$settingsButtonToggle(true);
-		$updateContentTableRowCountThatAreInView();
-	},
-	onscroll: e => {
-		const scrolledDown=$E(_na_id) || (($W.pageYOffset||$D.documentElement.scrollTop) > $E('l_fixed').offsetHeight);
-		$E('l_fixed').className = scrolledDown ? 'l_scrolled' : 'l_not_scrolled';
-	},
-	ontouchstart: e => {
-		if($onclick)
-			$onclick();
-		_swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY];
-	},
-	ontouchend: e => {
-		if(!_swipeStartPosition)
-			return;
-		const swipeMovement = [_swipeStartPosition[0]-e.changedTouches[0].clientX, _swipeStartPosition[1]-e.changedTouches[0].clientY],
-			width = $W.innerWidth||$D.documentElement.clientWidth||$D.body.clientWidth,
-			height = $W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight,
-			movementPercent = [Math.abs(swipeMovement[0])/width*100, Math.abs(swipeMovement[1])/height*100],
-			movementWeighting = (movementPercent[0]+1) / (movementPercent[1]+1);
-		if(movementPercent[0] > 25 && movementWeighting >= 1)
-			$gotoStageDataHistory(swipeMovement[0]);
-		_swipeStartPosition = null;
+	onclick: e => {
+		let idx=0, sym='', type=$KSTK, dataRef=null, ref='', refList=Object.keys(_clickMap), el=(e&&e.target?e.target:e);
+		$notifySetup(true);
+		if(!el) return;
+		for(let next=el; !!next.parentElement; next=next.parentElement) {
+			if(!ref) {
+				for(let c in refList) {
+					if(next.id != refList[c] && !next.classList.contains(refList[c]))
+						continue;
+					ref = refList[c];
+					el = next;
+					break;
+				}
+			}
+			if(dataRef === null && typeof next.dataset=='object' && typeof next.dataset.ref=='string')
+				dataRef = isNaN(next.dataset.ref) ? next.dataset.ref : parseInt(next.dataset.ref, 10);
+			if(dataRef !== null && ref)
+				break;
+		}
+		if(typeof dataRef == 'string')
+			sym = dataRef;
+		else if(typeof dataRef == 'number') {
+			idx = dataRef;
+			sym = _stageData['items'][dataRef][$SYM];
+		}
+		if(!sym && !ref) return;
+		if(_symbolOverrideMap[sym]) {     type = $KSTK; sym = _symbolOverrideMap[sym]; }
+		else if(ref == 'l_options') {     type = $KOPT; }
+		else if(sym[0] == _charCrypto) {  type = $KCRP; sym = sym.substr(1); }
+		else if(sym[0] == _charFutures) { type = $KFTR; sym = sym.substr(1); }
+		if(!ref || !_clickMap[ref])
+			ref = 'default';
+		_clickMap[ref]({'sym':sym, 'idx':idx, 'type':type, 'el':el});
 	},
 	onkeydown: e => {
 		$animationsFastSplash();
 		if(!_animationsComplete || !_stageData || (e && (e.ctrlKey || e.altKey || _keysIgnore.indexOf(e.code) >= 0)))
 			return;
 		const rows=$E('l_content_table').getElementsByTagName('tr');
-		let lastKeyRow=_keyRow;
+		let lastKeyRow=_keyRow, match;
 		if(!_keyRow) {
 			for(let i=0; i < rows.length; i++) {
 				if(!rows[i].matches(':hover'))
@@ -204,40 +235,17 @@ const $L = {
 			_keyRow = 0;
 		else if(e) {
 			e.preventDefault();
-			switch(e.code) {
-				case 'Slash':      $marqueeHotKeyHelp(); break;
-				case 'Tab':        $animationsToggle(null, e.shiftKey); break;
-				case 'Home':       _keyRow = 1; break;
-				case 'End':        _keyRow = rows.length - 1; break;
-				case 'PageUp':     _keyRow-=_contentTableRowCountThatAreInView; break;
-				case 'PageDown':   _keyRow+=_contentTableRowCountThatAreInView; break;
-				case 'ArrowUp':    _keyRow--; break;
-				case 'ArrowDown':  _keyRow++; break;
-				case 'ArrowLeft':  $gotoStageDataHistory(-1); break;
-				case 'ArrowRight': $gotoStageDataHistory(1); break;
-				case 'Escape':     $gotoStageDataHistory(0); break;
-				case 'Space':
-					let toggleAlertException=$E('l_content_table').getElementsByTagName('tr')[_keyRow];
-					if(toggleAlertException && (toggleAlertException=toggleAlertException.querySelector('.l_notify_enable,.l_notify_disable')) && toggleAlertException.onclick)
-						toggleAlertException.dispatchEvent(new Event('click'));
-					return;
-				case 'Enter': case 'NumpadEnter':
-					if(_keyRow && rows[_keyRow])
-						rows[_keyRow].dispatchEvent(new Event('click'));
-					return;
-				default:
-					let match=e.code.match(/^(Digit|Numpad)([0-9])$/);
-					if(match)
-						$setSortStageData(parseInt(match[2]));
-					else if((match=e.code.match(/^Key([A-Z])$/))) {
-						$setURLFormat(match[1], e.shiftKey);
-						if(_keyRow && rows[_keyRow])
-							rows[_keyRow].dispatchEvent(new Event('click'));
-					}
-					else
-						$marqueeFlash(`The &quot;<span class='l_marquee_highlight'>${e.code}</span>&quot; key is not mapped, type &quot;<span class='l_marquee_highlight'>?</span>&quot; to see the supported hotkeys.`);
-					return;
+			const hotKey=e.code.toLowerCase();
+			if(_hotKeyMap[hotKey])
+				_hotKeyMap[hotKey](rows[_keyRow], e)
+			else if((match=hotKey.match(/^(digit|numpad)([0-9])$/)))
+					$setSortStageData(parseInt(match[2]));
+			else if((match=hotKey.match(/^key([a-z])$/))) {
+				$setURLFormat(match[1], e.shiftKey);
+				$onclick(rows[_keyRow]);
 			}
+			else
+				$marqueeFlash(`The &quot;<span class='l_marquee_highlight'>${e.code}</span>&quot; key is not mapped, type &quot;<span class='l_marquee_highlight'>?</span>&quot; to see the supported hotkeys.`);
 		}
 		if(_keyRow < 0)
 			_keyRow = 0;
@@ -262,6 +270,27 @@ const $L = {
 		$marqueeIntervalReset();
 		$marqueeUpdate(_marqueeLoopSeconds);
 		$animationsProgressReset();
+	},
+	onresize: e => {
+		$settingsButtonToggle(true);
+		$updateContentTableRowCountThatAreInView();
+	},
+	onscroll: e => {
+		const scrolledDown=$E(_na_id) || (($W.pageYOffset||$D.documentElement.scrollTop) > $E('l_fixed').offsetHeight);
+		$E('l_fixed').className = scrolledDown ? 'l_scrolled' : 'l_not_scrolled';
+	},
+	ontouchstart: e => { _swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY]; },
+	ontouchend: e => {
+		if(!_swipeStartPosition)
+			return;
+		const swipeMovement = [_swipeStartPosition[0]-e.changedTouches[0].clientX, _swipeStartPosition[1]-e.changedTouches[0].clientY],
+			width = $W.innerWidth||$D.documentElement.clientWidth||$D.body.clientWidth,
+			height = $W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight,
+			movementPercent = [Math.abs(swipeMovement[0])/width*100, Math.abs(swipeMovement[1])/height*100],
+			movementWeighting = (movementPercent[0]+1) / (movementPercent[1]+1);
+		if(movementPercent[0] > 25 && movementWeighting >= 1)
+			$gotoStageDataHistory(swipeMovement[0]);
+		_swipeStartPosition = null;
 	},
 
 	/* [$] FUNCTIONS */
@@ -421,7 +450,7 @@ const $L = {
 			else if(_stageDataHistoryIndex > 0)
 				_stageDataHistoryIndex--;
 			else
-				$marqueeFlash('<div onclick="$gotoStageDataHistory(0)">End of history, use <span class="l_marquee_highlight">&#8658;</span> to move forward or <span class="l_marquee_highlight">escape</span> to exit.</div>', true);
+				$marqueeFlash('End of history, use <span class="l_marquee_highlight">&#8658;</span> to move forward or <span class="l_marquee_highlight">escape</span> to exit.', true);
 		}
 		if(lastIndex !== _stageDataHistoryIndex)
 			$updateStageDataHistory();
@@ -434,7 +463,7 @@ const $L = {
 		if(historyIndex == historyTotal)
 			$marqueeFlash('All caught up, exiting history mode...', true);
 		else
-			$marqueeFlash(`<div onclick="$gotoStageDataHistory(0)">Rewound to ${$epochToDate(_stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}</div>`, true);
+			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
 	},
 	setNextStagePoll: seconds => {
 		if(_animationsComplete)
@@ -450,7 +479,7 @@ const $L = {
 		_nextStagePollTimeout = null;
 		$getStageData(true);
 	},
-	forceNextStagePoll: () => { $setNextStagePollComplete(); },
+	forceNextStagePoll: () => $setNextStagePollComplete(),
 	epochNow: () => Math.floor(Date.now() / 1000),
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
 	clone: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
@@ -535,13 +564,13 @@ const $L = {
 			let item=_stageData['top'][i], isMarketIndex=(item.length==3);
 			if(isMarketIndex) {
 				if(!html) html += '<span class="l_marquee_blink_wide">&#8226;</span>';
-				html += `<div class="l_marquee_link" onclick="$openStockWindow('${item[0]}',event)"><span class='l_marquee_highlight_padded'>${$H(item[2])}</span>${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
+				html += `<div class="l_marquee_link" data-ref="${item[0]}"><span class='l_marquee_highlight_padded'>${$H(item[2])}</span>${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
 			else if(!includeCrypto && item[0][0] == _charCrypto)
 				continue;
 			else {
 				if(!rank) html += '<span class="l_marquee_blink_wide">&#8226;</span>';
-				html += `<div class="l_marquee_link" onclick="$openStockWindow('${item[0]}',event)"><span class='l_marquee_highlight_padded'>#${++rank}</span>${item[0]} &#177; ${item[1]}%</div> `;
+				html += `<div class="l_marquee_link" data-ref="${item[0]}"><span class='l_marquee_highlight_padded'>#${++rank}</span>${item[0]} &#177; ${item[1]}%</div> `;
 				if(rank >= 20) break;
 			}
 		}
@@ -576,7 +605,7 @@ const $L = {
 		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys are available to quickly navigate your history and third party websites. ${_marqueeBlinkHtml} Use the <span class="l_marquee_highlight">tab</span> key to alternate animation modes. ${_marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in _keyMap) {
 			if((match=_keyMap[key][$KSTK].match(/([a-z]+)\.[a-z]+\//i)))
-				html += `<div class="l_marquee_link" onclick="$setURLFormat('${key}',false)"><span class='l_marquee_highlight_padded'>${key}</span>${$H(match[1])}</div> `
+				html += `<div class="l_marquee_info" data-ref="${key}"><span class='l_marquee_highlight_padded'>${key}</span>${$H(match[1])}</div> `
 		}
 		html += `${_marqueeBlinkHtml} Hold down the <span class="l_marquee_highlight">shift</span> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <span class="l_marquee_highlight">1-7</span> can be used to sort by each column.`;
 		$W.scrollTo({top: 0, behavior: 'smooth'});
@@ -647,77 +676,24 @@ const $L = {
 		}
 		catch(e) { }
 	},
-	notifySetup: allowFutureCall => {
-		if(!$onclick)
-			return;
-		if(allowFutureCall !== true)
-			$onclick = $D.removeEventListener('click', $onclick);
+	notifySetup: disableFutureRequests => {
+		if(disableFutureRequests)
+			$notifySetup = ()=>{};
 		if(typeof _audioTest == 'string')
 			_audioTest = new Audio(_audioTest);
-		if(typeof _audioAlert == 'string')
+		if(typeof _audioAlert == 'string') {
 			_audioAlert = new Audio(_audioAlert);
-		_audioAlert.load();
+			_audioAlert.load();
+		}
 		$notifyRequestPermission();
 		try { if(navigator.wakeLock) navigator.wakeLock.request('screen'); }
 		catch (e) { }
 	},
-	contentTableClick: e => {
-		for(let parent=e.target; !!parent.parentElement ;parent=parent.parentElement) {
-			if(typeof parent.dataset=='object' && typeof parent.dataset.idx=='string')
-				return $openStockWindow(parseInt(parent.dataset.idx,10), e);
-		}
-	},
-	openStockWindow: (symbolOrIndex, e) => {
-		const classRefList=['l_ta','l_news','l_options','l_marquee_link','l_none','l_noclick'];
-		let symbol='', urlType=$KSTK, classRef='', el=(e&&e.target?e.target:null);
-		if(!el)
-			return;
-		if(el.nodeName == 'SPAN' && el.parentElement)
-			el = el.parentElement;
-		for(let c in classRefList)
-			if(el.classList.contains(classRefList[c]) && (classRef=classRefList[c]))
-				break;
-		if(!classRef && ['TD','TR'].indexOf(el.nodeName) < 0)
-			return;
-		if(typeof symbolOrIndex == 'number') {
-			symbol = _stageData['items'][symbolOrIndex][$SYM];
-			switch(classRef) {
-				case 'l_ta':
-					const keyMap=_keyMap[el.dataset.keymap?el.dataset.keymap:_keyMapIndexDefault];
-					$W.open(keyMap[$KSTK].replace('@', symbol), `${classRef}_${symbol}`).focus();
-					return;
-				case 'l_news':
-					$W.open(_stageData['items'][symbolOrIndex][$LNK], `${classRef}_${symbol}`).focus();
-					return;
-				case 'l_options':
-					urlType = $KOPT;
-					break;
-			}
-		}
-		else if(typeof symbolOrIndex == 'string')
-			symbol = symbolOrIndex;
-		if(_symbolOverrideMap[symbol]) {
-			urlType = $KSTK;
-			symbol = _symbolOverrideMap[symbol];
-		}
-		else if(symbol[0] == _charCrypto) {
-			urlType = $KCRP;
-			symbol = symbol.substr(1);
-		}
-		else if(symbol[0] == _charFutures) {
-			urlType = $KFTR;
-			symbol = symbol.substr(1);
-		}
-		$gotoURL(symbol, urlType, `larval_${symbol}`);
-	},
-	createURL: (symbol, urlType) => {
+	createURL: (symbol, type) => {
 		let keyMap = _keyMap[_keyMapIndex];
 		if(!keyMap)
 			keyMap = _keyMap[_keyMapIndexDefault];
-		return(keyMap[urlType].replace('@', symbol));
-	},
-	gotoURL: (symbol, urlType, windowName) => {
-		$W.open($createURL(symbol, urlType), windowName).focus();
+		return(keyMap[type].replace('@', symbol));
 	},
 	setURLFormat: (key, saveSettings) => {
 		if(!_keyMap[key])
@@ -828,7 +804,7 @@ const $L = {
 		else if(row[$ERN] && row[$NWS])
 			return(`<div class="l_notify_popout l_news" title="News and earnings on ${$cell(row,$ERN)}">&#128197;&nbsp;${$cell(row,$ERN)}<span>&nbsp;+&nbsp;news</span></div>`);
 		else if(row[$ERN])
-			return(`<div class="l_notify_popout l_noclick" title="Earnings on ${$cell(row,$ERN)}">&#128198;&nbsp;${$cell(row,$ERN)}<span>&nbsp;earnings</span></div>`);
+			return(`<div class="l_notify_popout" title="Earnings on ${$cell(row,$ERN)}">&#128198;&nbsp;${$cell(row,$ERN)}<span>&nbsp;earnings</span></div>`);
 		else if(row[$NWS])
 			return(`<div class="l_notify_popout l_news" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`);
 		return('');
@@ -836,18 +812,17 @@ const $L = {
 	updateLiveTable: (doNotify, doNotResetKeyRow) => {
 		if(!_stageData)
 			return;
-		const columns=['symbol', _forceContentTableShrink?_emptyCellHtml:'company', '~5min%','total%','price','volume','options'];
+		const columns=['symbol', _forceContentTableShrink?_emptyCellHtml:'company','~5min%','total%','price','volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		let notifyRows=[], notify=false, notifyControl='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
+			className = 'l_content_table_header';
 			if(_stageDataSortByColumn == c)
-				className = 'l_content_table_header_selected';
+				className += ' l_content_table_header_selected';
 			else if(_stageDataSortByColumn == -c)
-				className = 'l_content_table_header_selected_reverse';
-			else
-				className = 'l_content_table_header';
-			html += `<th onclick="$setSortStageData(${c})" id="l_content_table_header_${c}" class="${className}">${columns[c-1]}</th>`;
+				className += ' l_content_table_header_selected_reverse';
+			html += `<th id="l_content_table_header_${c}" class="${className}" data-ref="${c}">${columns[c-1]}</th>`;
 		}
 		html += '</tr>';
 		if(doNotify)
@@ -859,9 +834,9 @@ const $L = {
 					continue;
 				notify=$E('l_notify_halts').checked && (!optionsOnly||row[$OPT]);
 				rowClass = (notify ? 'l_notify_halt' : 'l_halt');
-				htmlRow = `<tr class="${rowClass}" data-idx="${i}">
+				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>
-					 <div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session" onclick="$notifyException('${$cell(row,$SYM)}', true)">x</div>
+					 <div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session">x</div>
 					 ${$cell(row,$SYM)}
 					</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
@@ -875,18 +850,18 @@ const $L = {
 					continue;
 				if(notify) {
 					rowClass = `l_notify_${row[$PCT5]<0?'down':'up'}`;
-					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session" onclick="$notifyException('${$cell(row,$SYM)}', true)">x</div>`;
+					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session">x</div>`;
 				}
 				else {
 					rowClass = '';
 					if(notifyExcept)
-						notifyControl = `<div class="l_notify_enable" title="Re-enable ${$cell(row,$SYM)} notifications" onclick="$notifyException('${$cell(row,$SYM)}', false)">&#10003;</div>`;
+						notifyControl = `<div class="l_notify_enable" title="Re-enable ${$cell(row,$SYM)} notifications">&#10003;</div>`;
 					else
 						notifyControl = '';
 				}
 				if(row[$OPT] && ['crypto','futures'].indexOf(row[$OPT]) >= 0)
 					rowClass += ` l_${row[$OPT]}`;
-				htmlRow = `<tr class="${rowClass}" data-idx="${i}">
+				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
 					<td>${$cell(row,$PCT5)}</td>
