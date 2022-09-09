@@ -612,7 +612,7 @@ const $L = {
 		$marqueeIntervalReset();
 		$marqueeInitiate(_marqueeLoopSeconds, html);
 	},
-	notify: (notifyRows) => {
+	notify: notifyRows => {
 		$notifyClear();
 		if(_stageDataHistory.length < 2)
 			return;
