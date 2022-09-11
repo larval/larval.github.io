@@ -752,7 +752,7 @@ const $L = {
 			_symbolsOnTop = {};
 		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*]?[A-Z]+/g)))
 			savedSymbols.forEach(sym => remove ? delete _symbolsOnTop[sym] : _symbolsOnTop[sym]=sym);
-		localStorage.setItem('l_symbols_on_top', Object.keys(_symbolsOnTop).sort().join(', '));
+		localStorage.setItem('l_symbols_on_top', Object.keys(_symbolsOnTop).sort((a, b) => a.localeCompare(b)).join(', '));
 	},
 	setSortStageData: column => {
 		if(_stageDataSortByColumn == -column || !column || column > $E('l_content_table').getElementsByTagName('th').length) {
