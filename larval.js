@@ -109,6 +109,7 @@ const $L = {
 		'l_marquee_info':_          => $setURLFormat(_.sym, false),
 		'l_marquee_link':              null,
 		'l_options':                   null,
+		'ctrl_default':_            => $setSymbolsOnTop(_.raw, null, true),
 		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`).focus()
 	},
 	_hotKeyMap: {
@@ -216,7 +217,9 @@ const $L = {
 		else if(ref == 'l_options') {     type = $KOPT; }
 		else if(sym[0] == _charCrypto) {  type = $KCRP; sym = sym.substr(1); }
 		else if(sym[0] == _charFutures) { type = $KFTR; sym = sym.substr(1); }
-		if(!ref || !_clickMap[ref])
+		if(e.ctrlKey)
+			ref = 'ctrl_default';
+		else if(!ref || !_clickMap[ref])
 			ref = 'default';
 		_clickMap[ref]({'raw':raw, 'sym':sym, 'idx':idx, 'type':type, 'el':el});
 	},
@@ -660,7 +663,7 @@ const $L = {
 	notifyException: (symbol, disable) => {
 		if(disable) {
 			if(_symbolsOnTop[symbol])
-				$setSymbolsOnTop(symbol, true);
+				$setSymbolsOnTop(symbol, true, false);
 			else
 				_notifyExceptions[symbol] = true;
 		}
@@ -733,9 +736,8 @@ const $L = {
 		let symbols=localStorage.getItem('l_symbols_on_top');
 		if((symbols=prompt('Enter the symbols to you would like to have sticky on top:', symbols?symbols:'')) === null)
 			return;
-		$setSymbolsOnTop(null, true);
-		$setSymbolsOnTop(symbols);
-		$updateContentTable(false);
+		$setSymbolsOnTop(null, true, false);
+		$setSymbolsOnTop(symbols, false, true);
 	},
 	getSymbolsOnTop: () => {
 		if(Object.keys(_symbolsOnTop).length)
@@ -746,13 +748,15 @@ const $L = {
 			savedSymbols.forEach(sym => _symbolsOnTop[sym]=sym);
 		return(_symbolsOnTop);
 	},
-	setSymbolsOnTop: (symbols, remove) => {
-		let savedSymbols=$getSymbolsOnTop();
+	setSymbolsOnTop: (symbols, removeOrToggle, updateView) => {
+		let savedSymbols, remove=(removeOrToggle===true), toggle=(removeOrToggle===null);
 		if(!symbols && remove)
 			_symbolsOnTop = {};
 		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*]?[A-Z]+/g)))
-			savedSymbols.forEach(sym => remove ? delete _symbolsOnTop[sym] : _symbolsOnTop[sym]=sym);
+			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? delete _symbolsOnTop[sym] : _symbolsOnTop[sym]=sym);
 		localStorage.setItem('l_symbols_on_top', Object.keys(_symbolsOnTop).sort((a, b) => a.localeCompare(b)).join(', '));
+		if(updateView)
+			$updateContentTable(false);
 	},
 	setSortStageData: column => {
 		if(_stageDataSortByColumn == -column || !column || column > $E('l_content_table').getElementsByTagName('th').length) {
