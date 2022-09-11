@@ -855,7 +855,7 @@ input[type=checkbox]:checked:disabled + label:before {
 }
 @media only screen and (max-width: 1000px) {
 	#l_content, #l_control, #l_marquee_container { width: 90%; }
-	#l_info, #l_marquee_flash { font-size: 13px; }
+	#l_marquee_flash { font-size: 13px; }
 	#l_content { font-size: 12px; }
 	#l_footer { font-size: 15px; }
 	#l_last_update { font-size: 12px; }
@@ -876,7 +876,7 @@ input[type=checkbox]:checked:disabled + label:before {
 		margin-bottom: 0 !important;
 		width: 100%;
 	}
-	#l_info, #l_marquee_flash { font-size: 12px; }
+	#l_marquee_flash { font-size: 12px; }
 	#l_settings_button {
 		padding: 10px 0px 10px 0px;
 		width: 100%;
