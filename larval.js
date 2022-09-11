@@ -102,8 +102,8 @@ const $L = {
 		'l_fixed':e                 => $animationsFastSplash(),
 		'l_last_update':e           => $forceNextStagePoll(),
 		'l_content_table_header':_  => $setSortStageData(_.idx),
-		'l_notify_enable':_         => $notifyException(_.sym, false),
-		'l_notify_disable':_        => $notifyException(_.sym, true),
+		'l_notify_enable':_         => $notifyException(_.raw, false),
+		'l_notify_disable':_        => $notifyException(_.raw, true),
 		'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`).focus(),
 		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`).focus(),
 		'l_marquee_info':_          => $setURLFormat(_.sym, false),
@@ -211,13 +211,15 @@ const $L = {
 			sym = _stageData['items'][dataRef][$SYM];
 		}
 		if(!sym && !ref) return;
+		const raw = sym;
 		if(_symbolOverrideMap[sym]) {     type = $KSTK; sym = _symbolOverrideMap[sym]; }
+		else if(_symbolsOnTop[sym]) {     type = $KSTK; }
 		else if(ref == 'l_options') {     type = $KOPT; }
 		else if(sym[0] == _charCrypto) {  type = $KCRP; sym = sym.substr(1); }
 		else if(sym[0] == _charFutures) { type = $KFTR; sym = sym.substr(1); }
 		if(!ref || !_clickMap[ref])
 			ref = 'default';
-		_clickMap[ref]({'sym':sym, 'idx':idx, 'type':type, 'el':el});
+		_clickMap[ref]({'raw':raw, 'sym':sym, 'idx':idx, 'type':type, 'el':el});
 	},
 	onkeydown: e => {
 		$animationsFastSplash();
@@ -657,8 +659,12 @@ const $L = {
 		$D.title = _title;
 	},
 	notifyException: (symbol, disable) => {
-		if(disable)
-			_notifyExceptions[symbol] = true;
+		if(disable) {
+			if(_symbolsOnTop[symbol])
+				$setSymbolsOnTop(symbol, true);
+			else
+				_notifyExceptions[symbol] = true;
+		}
 		else if(_notifyExceptions[symbol])
 			delete _notifyExceptions[symbol];
 		$updateContentTable(false, true);
@@ -857,7 +863,7 @@ const $L = {
 		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min%','total%','price','volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
-		let notifyRows=[], notify=false, notifyControl='', onTop={}, rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
+		let notifyRows=[], notify=false, onTop={}, rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			className = 'l_content_table_header';
 			if(_stageDataSortByColumn == c)
@@ -870,7 +876,8 @@ const $L = {
 		if(doNotify)
 			$notifyClear();
 		for(let i=0; i < _stageData['items'].length; i++) {
-			let row=_stageData['items'][i], notifyExcept=!!_notifyExceptions[row[$SYM]], isOnTop=!!_symbolsOnTop[row[$SYM]];
+			const row=_stageData['items'][i], notifyExcept=!!_notifyExceptions[row[$SYM]];
+			let isOnTop=!!_symbolsOnTop[row[$SYM]], notifyControl='';
 			if($isHaltRow(row)) {
 				if(notifyExcept)
 					continue;
@@ -899,8 +906,8 @@ const $L = {
 					rowClass = '';
 					if(notifyExcept)
 						notifyControl = `<div class="l_notify_enable" title="Re-enable ${$cell(row,$SYM)} notifications">&#10003;</div>`;
-					else
-						notifyControl = '';
+					else if(isOnTop)
+						notifyControl = `<div class="l_notify_disable" title="Remove ${$cell(row,$SYM)} from top">x</div>`;
 				}
 				if(isOnTop)
 					rowClass += ' l_top';
@@ -925,7 +932,7 @@ const $L = {
 			else
 				htmlNormal += htmlRow;
 		}
-		for(let key of Object.keys(onTop).sort((a, b) => a - b))
+		for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
 			htmlPriority += onTop[key];
 		if(!htmlPriority && !htmlNormal)
 			html += '<tr><td colspan="7">No results found.</td></tr>';
