@@ -30,6 +30,7 @@ const $L = {
 	_swipeStartPosition: null,
 	_naId: 'l_na',
 	_wakeLock: null,
+	_symbolsOnTop: {},
 	_symbolOverrideMap: { '^VIX': '^VIX' },
 	_keysIgnore: ['ShiftRight','ShiftLeft'],
 	_keyRow: 0,
@@ -112,6 +113,7 @@ const $L = {
 	},
 	_hotKeyMap: {
 		'tab':(e,ev)                => $animationsToggle(null, ev.shiftKey),
+		'backquote':e               => $editSymbolsOnTop(),
 		'slash':e                   => $marqueeHotKeyHelp(),
 		'home':e                    => _keyRow = 1,
 		'end':e                     => _keyRow = e.parentElement.childElementCount - 1,
@@ -516,6 +518,7 @@ const $L = {
 	settingsLoad: () => {
 		const now=new Date();
 		_naId = $isMobile() ? 'l_nam' : 'l_na';
+		$getSymbolsOnTop();
 		if(localStorage.length == 0 && (now.getDay() == 0 || now.getDay() == 6))
 			$E('l_include_crypto').checked = true;
 		for(let i=0; i < localStorage.length; i++) {
@@ -606,7 +609,7 @@ const $L = {
 		_marqueeInterval = setInterval(() => { $marqueeUpdate(_marqueeLoopSeconds) }, _marqueeLoopSeconds * 1000);
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys are available to quickly navigate your history and third party websites. ${_marqueeBlinkHtml} Use the <span class="l_marquee_highlight">tab</span> key to alternate animation modes. ${_marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
+		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys are available to quickly navigate your history and third party websites. ${_marqueeBlinkHtml} Use the <span class="l_marquee_highlight">tab</span> key to alternate animation modes. ${_marqueeBlinkHtml} Swipe or use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in _keyMap) {
 			if((match=_keyMap[key][$KSTK].match(/([a-z]+)\.[a-z]+\//i)))
 				html += `<div class="l_marquee_info" data-ref="${key}"><span class='l_marquee_highlight_padded'>${key}</span>${$H(match[1])}</div> `
@@ -713,13 +716,38 @@ const $L = {
 		if(!_keyMap[key])
 			return;
 		_keyMapIndex = key;
-		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain && domain.hostname ? domain.hostname : url);
+		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain&&domain.hostname?domain.hostname:url);
 		if(saveSettings) {
 			localStorage.setItem('l_keymap_index', _keyMapIndex);
 			$marqueeFlash(`Links will now permanently direct to <span class='l_marquee_highlight'>${display}</span> by default.`);
 		}
 		else
 			$marqueeFlash(`Links will now direct to <span class='l_marquee_highlight'>${display}</span> for this session, hold down <span class='l_marquee_highlight'>shift</span> to make it permanent.`);
+	},
+	editSymbolsOnTop: () => {
+		let symbols=localStorage.getItem('l_symbols_on_top');
+		if((symbols=prompt('Enter the symbols to you would like to have sticky on top:', symbols?symbols:'')) === null)
+			return;
+		$setSymbolsOnTop(null, true);
+		$setSymbolsOnTop(symbols);
+		$updateContentTable(false);
+	},
+	getSymbolsOnTop: () => {
+		if(Object.keys(_symbolsOnTop).length)
+			return(_symbolsOnTop);
+		_symbolsOnTop = {};
+		let savedSymbols=localStorage.getItem('l_symbols_on_top');
+		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*]?[A-Z]+/g)))
+			savedSymbols.forEach(sym => _symbolsOnTop[sym]=sym);
+		return(_symbolsOnTop);
+	},
+	setSymbolsOnTop: (symbols, remove) => {
+		let savedSymbols=$getSymbolsOnTop();
+		if(!symbols && remove)
+			_symbolsOnTop = {};
+		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*]?[A-Z]+/g)))
+			savedSymbols.forEach(sym => remove ? delete _symbolsOnTop[sym] : _symbolsOnTop[sym]=sym);
+		localStorage.setItem('l_symbols_on_top', Object.keys(_symbolsOnTop).sort().join(', '));
 	},
 	setSortStageData: column => {
 		if(_stageDataSortByColumn == -column || !column || column > $E('l_content_table').getElementsByTagName('th').length) {
@@ -829,7 +857,7 @@ const $L = {
 		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min%','total%','price','volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
-		let notifyRows=[], notify=false, notifyControl='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
+		let notifyRows=[], notify=false, notifyControl='', onTop={}, rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			className = 'l_content_table_header';
 			if(_stageDataSortByColumn == c)
@@ -842,7 +870,7 @@ const $L = {
 		if(doNotify)
 			$notifyClear();
 		for(let i=0; i < _stageData['items'].length; i++) {
-			const row=_stageData['items'][i], notifyExcept=!!_notifyExceptions[row[$SYM]];
+			let row=_stageData['items'][i], notifyExcept=!!_notifyExceptions[row[$SYM]], isOnTop=!!_symbolsOnTop[row[$SYM]];
 			if($isHaltRow(row)) {
 				if(notifyExcept)
 					continue;
@@ -860,9 +888,10 @@ const $L = {
 			}
 			else {
 				notify=( !notifyExcept && ((((rangeUp&&row[$PCT5]>=rangeUp)||(rangeDown&&rangeDown>=row[$PCT5])) && (!row[$VOL]||row[$VOL]>=rangeVolume) && (!optionsOnly||row[$OPT])) || (row[$VOL]&&typeof row[$VOL]=='string') ));
-				if((!includeCrypto && row[$OPT]=='crypto') || (!includeFutures && row[$OPT]=='futures'))
+				if(!isOnTop && ((!includeCrypto && row[$OPT]=='crypto') || (!includeFutures && row[$OPT]=='futures')))
 					continue;
 				if(notify) {
+					isOnTop = false;
 					rowClass = `l_notify_${row[$PCT5]<0?'down':'up'}`;
 					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session">x</div>`;
 				}
@@ -873,7 +902,9 @@ const $L = {
 					else
 						notifyControl = '';
 				}
-				if(row[$OPT] && ['crypto','futures'].indexOf(row[$OPT]) >= 0)
+				if(isOnTop)
+					rowClass += ' l_top';
+				else if(row[$OPT] && ['crypto','futures'].indexOf(row[$OPT]) >= 0)
 					rowClass += ` l_${row[$OPT]}`;
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
@@ -889,9 +920,13 @@ const $L = {
 				htmlPriority += htmlRow;
 				notifyRows.push(row);
 			}
+			else if(isOnTop)
+				onTop[row[$SYM]] = htmlRow;
 			else
 				htmlNormal += htmlRow;
 		}
+		for(let key of Object.keys(onTop).sort((a, b) => a - b))
+			htmlPriority += onTop[key];
 		if(!htmlPriority && !htmlNormal)
 			html += '<tr><td colspan="7">No results found.</td></tr>';
 		else
