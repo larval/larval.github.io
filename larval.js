@@ -213,7 +213,6 @@ const $L = {
 		if(!sym && !ref) return;
 		const raw = sym;
 		if(_symbolOverrideMap[sym]) {     type = $KSTK; sym = _symbolOverrideMap[sym]; }
-		else if(_symbolsOnTop[sym]) {     type = $KSTK; }
 		else if(ref == 'l_options') {     type = $KOPT; }
 		else if(sym[0] == _charCrypto) {  type = $KCRP; sym = sym.substr(1); }
 		else if(sym[0] == _charFutures) { type = $KFTR; sym = sym.substr(1); }
