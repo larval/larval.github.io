@@ -321,7 +321,7 @@ const $L = {
 			$marqueeInitiate(_marqueeLoopSeconds);
 		$marqueeIntervalReset();
 		$notifyPlayAudio(_audioTest);
-		$updateLiveTable(true);
+		$updateContentTable(true);
 		if($isMobile() || localStorage.getItem(_naId))
 			$animationsToggle(false, null);
 	},
@@ -398,7 +398,7 @@ const $L = {
 			$sortStageData(false);
 			_forceContentTableShrink = false;
 			if(args && args['updateView'])
-				$updateLiveTable(true);
+				$updateContentTable(true);
 			if(json['notify'])
 				$marqueeFlash(json['notify'])
 			$E('l_last_update').innerHTML = $epochToDate(json['ts']);
@@ -511,7 +511,7 @@ const $L = {
 		}
 		if(context && context.id == 'l_audible' && context.checked)
 			$notifyPlayAudio(_audioTest);
-		$updateLiveTable(false);
+		$updateContentTable(false);
 	},
 	settingsLoad: () => {
 		const now=new Date();
@@ -658,7 +658,7 @@ const $L = {
 			_notifyExceptions[symbol] = true;
 		else if(_notifyExceptions[symbol])
 			delete _notifyExceptions[symbol];
-		$updateLiveTable(false, true);
+		$updateContentTable(false, true);
 	},
 	notifyVibrate: pattern => {
 		if(navigator.vibrate)
@@ -752,7 +752,7 @@ const $L = {
 			});
 		}
 		if(updateView)
-			$updateLiveTable(false);
+			$updateContentTable(false);
 	},
 	updateContentTableRowCountThatAreInView: () => {
 		let rows=$E('l_content_table').getElementsByTagName('tr'), total=-5;
@@ -812,7 +812,7 @@ const $L = {
 		cell += '</div>';
 		return(cell);
 	},
-	popoutLiveTableRow: row => {
+	popoutContentTableRow: row => {
 		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
 			return(`<div class="l_notify_popout l_ta" title="${_taMap[row[$TAN]][0]}" data-keymap="${_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:_keyMapIndexDefault}">&#128200;&nbsp;${_taMap[row[$TAN]][1]}</div>`);
 		else if(row[$ERN] && row[$NWS])
@@ -823,7 +823,7 @@ const $L = {
 			return(`<div class="l_notify_popout l_news" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`);
 		return('');
 	},
-	updateLiveTable: (doNotify, doNotResetKeyRow) => {
+	updateContentTable: (doNotify, doNotResetKeyRow) => {
 		if(!_stageData)
 			return;
 		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min%','total%','price','volume','options'];
@@ -855,7 +855,7 @@ const $L = {
 					</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
 					<td colspan="4">HALT: ${$cell(row,$HLT)}</td>
-					<td class="${row[$OPT]?'l_options':''}">${$popoutLiveTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
+					<td class="${row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			else {
@@ -882,7 +882,7 @@ const $L = {
 					<td>${$cell(row,$PCT)}</td>
 					<td>${$cellRollover(row,$PRC,$PRC5)}</td>
 					<td>${$cellRollover(row,$VOL,$VOL5)}</td>
-					<td class="${row[$OPT]?'l_options':''}">${$popoutLiveTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
+					<td class="${row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			if(notify) {
@@ -907,7 +907,7 @@ const $L = {
 			$onkeydown(null);
 		if(!_forceContentTableShrink && $E('l_content_table').offsetWidth > $D.body.offsetWidth) {
 			_forceContentTableShrink = true;
-			$updateLiveTable(doNotify, doNotResetKeyRow);
+			$updateContentTable(doNotify, doNotResetKeyRow);
 		}
 		else if(notifyRows.length > 0 && doNotify)
 			$notify(notifyRows);
