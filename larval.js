@@ -108,7 +108,7 @@ const $L = {
 		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`).focus(),
 		'l_marquee_info':_          => $setURLFormat(_.sym, false),
 		'l_options':_               => $W.open($createURL(_.sym, $KOPT), `l_${_.type}_${$KOPT}`).focus(),
-		'alt_default':_             => (_&&_.raw) ? $setSymbolsOnTop(_.raw, null, true) : $editSymbolsOnTop(),
+		'alt_default':_             => _.raw ? $setSymbolsOnTop(_.raw, null, true) : $editSymbolsOnTop(),
 		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`).focus()
 	},
 	_hotKeyMap: {
@@ -210,7 +210,7 @@ const $L = {
 			idx = dataRef;
 			sym = _stageData['items'][dataRef][$SYM];
 		}
-		if(e.ctrlKey || e.altKey || (e.type&&e.type=='contextmenu'))
+		if((e.ctrlKey || e.altKey || e.type=='contextmenu') && (el.dataset&&el.dataset.alt!='none'))
 			ref = 'alt_default';
 		else if(sym && !ref)
 			ref = 'default';
@@ -876,7 +876,7 @@ const $L = {
 				className += ' l_content_table_header_selected';
 			else if(_stageDataSortByColumn == -c)
 				className += ' l_content_table_header_selected_reverse';
-			html += `<th id="l_content_table_header_${c}" class="${className}" data-ref="${c}">${columns[c-1]}</th>`;
+			html += `<th id="l_content_table_header_${c}" class="${className}" data-ref="${c}" data-alt="none">${columns[c-1]}</th>`;
 		}
 		html += '</tr>';
 		if(doNotify)
