@@ -107,9 +107,8 @@ const $L = {
 		'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`).focus(),
 		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`).focus(),
 		'l_marquee_info':_          => $setURLFormat(_.sym, false),
-		'l_marquee_link':              null,
-		'l_options':                   null,
-		'alt_default':_             => $setSymbolsOnTop(_.raw, null, true),
+		'l_options':_               => $W.open($createURL(_.sym, $KOPT), `l_${_.type}_${$KOPT}`).focus(),
+		'alt_default':_             => (_&&_.raw) ? $setSymbolsOnTop(_.raw, null, true) : $editSymbolsOnTop(),
 		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`).focus()
 	},
 	_hotKeyMap: {
@@ -211,16 +210,16 @@ const $L = {
 			idx = dataRef;
 			sym = _stageData['items'][dataRef][$SYM];
 		}
-		if(!sym && !ref) return;
-		const raw = sym;
-		if(_symbolOverrideMap[sym]) {     type = $KSTK; sym = _symbolOverrideMap[sym]; }
-		else if(ref == 'l_options') {     type = $KOPT; }
-		else if(sym[0] == _charCrypto) {  type = $KCRP; sym = sym.substr(1); }
-		else if(sym[0] == _charFutures) { type = $KFTR; sym = sym.substr(1); }
 		if(e.ctrlKey || e.altKey || (e.type&&e.type=='contextmenu'))
 			ref = 'alt_default';
-		else if(!ref || !_clickMap[ref])
+		else if(sym && !ref)
 			ref = 'default';
+		else if(!ref)
+			return;
+		const raw = sym;
+		if(_symbolOverrideMap[sym]) {     type = $KSTK; sym = _symbolOverrideMap[sym]; }
+		else if(sym[0] == _charCrypto) {  type = $KCRP; sym = sym.substr(1); }
+		else if(sym[0] == _charFutures) { type = $KFTR; sym = sym.substr(1); }
 		_clickMap[ref]({'raw':raw, 'sym':sym, 'idx':idx, 'type':type, 'el':el});
 	},
 	onkeydown: e => {
@@ -738,7 +737,7 @@ const $L = {
 	},
 	editSymbolsOnTop: () => {
 		let symbols=localStorage.getItem('l_symbols_on_top');
-		if((symbols=prompt('Enter the symbols you would like to have sticky on top:', symbols?symbols:'')) === null)
+		if((symbols=prompt("Enter symbols you would like to have sticky on top: \n[NOTE: alt-click rows to individually add or remove]", symbols?symbols:'')) === null)
 			return;
 		$setSymbolsOnTop(null, true, false);
 		$setSymbolsOnTop(symbols, false, true);
