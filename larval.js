@@ -409,7 +409,7 @@ const $L = {
 			_forceContentTableShrink = false;
 			if(args && args['updateView'])
 				$updateContentTable(true);
-			if(json['notify'])
+			if(json['notify'] && $hasSettings())
 				$marqueeFlash(json['notify'])
 			$E('l_last_update').innerHTML = $epochToDate(json['ts']);
 			$setNextStagePoll($getSynchronizedNext());
@@ -738,7 +738,7 @@ const $L = {
 	},
 	editSymbolsOnTop: () => {
 		let symbols=localStorage.getItem('l_symbols_on_top');
-		if((symbols=prompt('Enter the symbols to you would like to have sticky on top:', symbols?symbols:'')) === null)
+		if((symbols=prompt('Enter the symbols you would like to have sticky on top:', symbols?symbols:'')) === null)
 			return;
 		$setSymbolsOnTop(null, true, false);
 		$setSymbolsOnTop(symbols, false, true);
