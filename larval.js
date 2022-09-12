@@ -114,7 +114,7 @@ const $L = {
 	},
 	_hotKeyMap: {
 		'Tab':(e,ev)                => $animationsToggle(null, ev.shiftKey),
-		'BackQuote':e               => $editSymbolsOnTop(),
+		'Backquote':e               => $editSymbolsOnTop(),
 		'Slash':e                   => $marqueeHotKeyHelp(),
 		'Home':e                    => _keyRow = 1,
 		'End':e                     => _keyRow = e.parentElement.childElementCount - 1,
