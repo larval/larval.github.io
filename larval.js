@@ -245,7 +245,7 @@ const $L = {
 			if(_hotKeyMap[hotKey])
 				_hotKeyMap[hotKey](rows[_keyRow], e)
 			else if((match=hotKey.match(/^(Digit|Numpad)([0-9])$/)))
-					$setSortStageData(parseInt(match[2]));
+				$setSortStageData(parseInt(match[2]));
 			else if((match=hotKey.match(/^Key([A-Z])$/))) {
 				$setURLFormat(match[1], e.shiftKey);
 				$onclick(rows[_keyRow]);
@@ -787,6 +787,7 @@ const $L = {
 		else
 			_stageDataSortByColumn = column;
 		$sortStageData(true);
+		$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
 	},
 	sortStageData: updateView => {
 		if(_stageData && _stageDataSortByColumn) {
