@@ -616,7 +616,7 @@ const $L = {
 		_marqueeInterval = setInterval(() => { $marqueeUpdate(_marqueeLoopSeconds) }, _marqueeLoopSeconds * 1000);
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys are available to quickly navigate your history and third party websites. ${_marqueeBlinkHtml} Use the <span class="l_marquee_highlight">tab</span> key to alternate animation modes. ${_marqueeBlinkHtml} Swipe or use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
+		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys and gestures are available: ${_marqueeBlinkHtml} Use the <span class="l_marquee_highlight">tab</span> key to alternate animation modes. ${_marqueeBlinkHtml} Alt-click rows or use the <span class="l_marquee_highlight">~</span> key to keep specific symbols on top. ${_marqueeBlinkHtml} Swipe or use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in _keyMap) {
 			if((match=_keyMap[key][$KSTK].match(/([a-z]+)\.[a-z]+\//i)))
 				html += `<div class="l_marquee_info" data-ref="${key}"><span class='l_marquee_highlight_padded'>${key}</span>${$H(match[1])}</div> `
@@ -747,19 +747,34 @@ const $L = {
 			return(_symbolsOnTop);
 		_symbolsOnTop = {};
 		let savedSymbols=localStorage.getItem('l_symbols_on_top');
-		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*]?[A-Z]+/g)))
+		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*]?[A-Z0-9]+/g)))
 			savedSymbols.forEach(sym => _symbolsOnTop[sym]=sym);
 		return(_symbolsOnTop);
 	},
 	setSymbolsOnTop: (symbols, removeOrToggle, updateView) => {
-		let savedSymbols, remove=(removeOrToggle===true), toggle=(removeOrToggle===null);
+		const remove=(removeOrToggle===true), toggle=(removeOrToggle===null);
+		let msg='', orderedTopList='', savedSymbols, onTopDiff=Object.keys(_symbolsOnTop).length;
 		if(!symbols && remove)
 			_symbolsOnTop = {};
-		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*]?[A-Z]+/g)))
+		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*]?[A-Z0-9]+/g)))
 			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? delete _symbolsOnTop[sym] : _symbolsOnTop[sym]=sym);
-		localStorage.setItem('l_symbols_on_top', Object.keys(_symbolsOnTop).sort((a, b) => a.localeCompare(b)).join(', '));
-		if(updateView)
-			$updateContentTable(false);
+		orderedTopList = Object.keys(_symbolsOnTop).sort((a, b) => a.localeCompare(b)).join(', ').trim(', ');
+		localStorage.setItem('l_symbols_on_top', orderedTopList);
+		if(!updateView)
+			return;
+		onTopDiff -= Object.keys(_symbolsOnTop).length;
+		if(!orderedTopList)
+			msg = 'Your on top list is empty, alt-click a row below to add a symbol.';
+		else if((savedSymbols && savedSymbols.length > 1) || Math.abs(onTopDiff) != 1)
+			msg = 'Symbols on top: ';
+		else if(onTopDiff > 0)
+			msg = `<span class="l_marquee_highlight">${symbols}</span> removed from top: `;
+		else
+			msg = `<span class="l_marquee_highlight">${symbols}</span> added to top: `;
+		if(orderedTopList)
+			msg += `<span class="l_marquee_highlight_padded">${orderedTopList}</span>`;
+		$marqueeFlash(msg);
+		$updateContentTable(false);
 	},
 	setSortStageData: column => {
 		if(_stageDataSortByColumn == -column || !column || column > $E('l_content_table').getElementsByTagName('th').length) {
@@ -906,18 +921,15 @@ const $L = {
 				if(notify) {
 					rowClass = `l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
 					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session">x</div>`;
-					isOnTop = false;
 				}
 				else {
-					rowClass = '';
+					rowClass = isOnTop ? ' l_top' : '';
 					if(notifyExcept)
 						notifyControl = `<div class="l_notify_enable" title="Re-enable ${$cell(row,$SYM)} notifications">&#10003;</div>`;
 					else if(isOnTop)
 						notifyControl = `<div class="l_notify_disable" title="Remove ${$cell(row,$SYM)} from top">x</div>`;
 				}
-				if(isOnTop)
-					rowClass += ' l_top';
-				else if(row[$OPT] && ['crypto','futures'].indexOf(row[$OPT]) >= 0)
+				if(row[$OPT] && ['crypto','futures'].indexOf(row[$OPT]) >= 0)
 					rowClass += ` l_${row[$OPT]}`;
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
@@ -929,21 +941,22 @@ const $L = {
 					<td class="${row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
-			if(notify) {
+			if(isOnTop)
+				onTop[row[$SYM]] = htmlRow;
+			else if(notify) {
 				htmlPriority += htmlRow;
 				notifyRows.push(row);
 			}
-			else if(isOnTop)
-				onTop[row[$SYM]] = htmlRow;
 			else
 				htmlNormal += htmlRow;
 		}
-		for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
-			htmlPriority += onTop[key];
-		if(!htmlPriority && !htmlNormal)
+		if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
 			html += '<tr><td colspan="7">No results found.</td></tr>';
-		else
+		else {
+			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
+				html += onTop[key];
 			html += htmlPriority + htmlNormal;
+		}
 		$E('l_content_table').className = $E('l_awaiting_data') ? '' : 'l_content_tr_fade_in';
 		if(doNotify)
 			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
