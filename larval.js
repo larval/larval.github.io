@@ -904,9 +904,9 @@ const $L = {
 				if(!isOnTop && ((!includeCrypto && row[$OPT]=='crypto') || (!includeFutures && row[$OPT]=='futures')))
 					continue;
 				if(notify) {
-					isOnTop = false;
-					rowClass = `l_notify_${row[$PCT5]<0?'down':'up'}`;
+					rowClass = `l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
 					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session">x</div>`;
+					isOnTop = false;
 				}
 				else {
 					rowClass = '';
