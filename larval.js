@@ -160,7 +160,7 @@ const $L = {
 	W: window,
 
 	/* [$] ENUMERATIONS */
-	SYM:0, NAM:1, PCT5:2, PCT:3, PRC:4, VOL:5, OPT:6, OIV:7, ERN:8, PRC5:9, VOL5:10, NWS:11, LNK:12, HLT:2, TAN:8,
+	SYM:0, NAM:1, PCT5:2, PCT:3, PRC:4, VOL:5, OPT:6, OIV:7, ERN:8, PRC5:9, VOL5:10, PCTM:11, PCTY:12, NWS:13, LNK:14, HLT:2, TAN:8,
 	KSTK:0, KOPT:1, KCRP:2, KFTR:3,
 
 	/* [$] EVENTS (window|document) */
