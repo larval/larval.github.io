@@ -18,7 +18,7 @@ const $L = {
 	_marqueeLoopSeconds: 90,
 	_marqueeInterval: null,
 	_marqueeFlashTimeout: null,
-	_marqueeBlinkHtml: '<span class="l_marquee_blink">&#8226;</span>',
+	_marqueeBlinkHtml: '<i class="l_marquee_blink">&#8226;</i>',
 	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
 	_charUp: "\u25bc ",
 	_charDown: "\u25b2 ",
@@ -65,25 +65,25 @@ const $L = {
 		Z: ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain'],
 	},
 	_taMap: {
-		AS: ['Ascending triangle', 'asc<span>&nbsp;triangle</span>', 'F'],
-		CD: ['Channel down', 'c<span>hannel&nbsp;</span>down', 'F'],
-		CH: ['Channel', 'chan<span>nel</span>', 'F'],
-		CU: ['Channel up', 'c<span>hannel&nbsp;</span>up', 'F'],
-		D1: ['Barchart directional top 1%', '<span>&nbsp;barchart&nbsp;</span>top&nbsp;1%', 'B'],
-		DB: ['Double bottom', '2x&nbsp;bot<span>tom</span>', 'F'],
-		DE: ['Descending triangle', 'desc<span>&nbsp;triangle</span>', 'F'],
+		AS: ['Ascending triangle', 'asc<i>&nbsp;triangle</i>', 'F'],
+		CD: ['Channel down', 'c<i>hannel&nbsp;</i>down', 'F'],
+		CH: ['Channel', 'chan<i>nel</i>', 'F'],
+		CU: ['Channel up', 'c<i>hannel&nbsp;</i>up', 'F'],
+		D1: ['Barchart directional top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
+		DB: ['Double bottom', '2x&nbsp;bot<i>tom</i>', 'F'],
+		DE: ['Descending triangle', 'desc<i>&nbsp;triangle</i>', 'F'],
 		DT: ['Double top', '2x&nbsp;top', 'F'],
-		HI: ['Inverse head and Ssoulders', 'inv<span>erse</span>&nbsp;h&amp;s', 'F'],
+		HI: ['Inverse head and Ssoulders', 'inv<i>erse</i>&nbsp;h&amp;s', 'F'],
 		HS: ['Head and shoulders', 'h&nbsp;&amp;&nbsp;s', 'F'],
 		HZ: ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r', 'F'],
-		MB: ['Multiple bottoms', '&gt;2x&nbsp;bot<span>tom</span>s', 'F'],
+		MB: ['Multiple bottoms', '&gt;2x&nbsp;bot<i>tom</i>s', 'F'],
 		MT: ['Multiple tops', '&gt;2x&nbsp;tops', 'F'],
-		S1: ['Barchart strength top 1%', '<span>&nbsp;barchart&nbsp;</span>top&nbsp;1%', 'B'],
-		TR: ['Technical resistance', 'resist<span>ance</span>', 'F'],
-		TS: ['Technical support', '<span>tech&nbsp;</span>support', 'F'],
-		WD: ['Wedge down', 'wedge<span>&nbsp;down</span>', 'F'],
+		S1: ['Barchart strength top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
+		TR: ['Technical resistance', 'resist<i>ance</i>', 'F'],
+		TS: ['Technical support', '<i>tech&nbsp;</i>support', 'F'],
+		WD: ['Wedge down', 'wedge<i>&nbsp;down</i>', 'F'],
 		WE: ['Wedge', 'wedge', 'F'],
-		WU: ['Wedge up', 'wedge<span>&nbsp;up</span>', 'F']
+		WU: ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
 	},
 	_eventMap: {
 		   'l_audible, l_options_only, l_notify_halts, l_include_futures, l_include_crypto': {
@@ -251,7 +251,7 @@ const $L = {
 				$onclick(rows[_keyRow]);
 			}
 			else
-				$marqueeFlash(`The &quot;<span class='l_marquee_highlight'>${e.code}</span>&quot; key is not mapped, type &quot;<span class='l_marquee_highlight'>?</span>&quot; to see the supported hotkeys.`);
+				$marqueeFlash(`The &quot;<i class='l_marquee_highlight'>${e.code}</i>&quot; key is not mapped, type &quot;<i class='l_marquee_highlight'>?</i>&quot; to see the supported hotkeys.`);
 		}
 		if(_keyRow < 0)
 			_keyRow = 0;
@@ -447,7 +447,7 @@ const $L = {
 		}
 		else if(direction > 0) {
 			if(_stageDataHistory.length < 2 || _stageDataHistoryIndex < 0)
-				$marqueeFlash('You are already viewing live data, use the <span class="l_marquee_highlight">&#8656;</span> key to rewind.');
+				$marqueeFlash('You are already viewing live data, use the <i class="l_marquee_highlight">&#8656;</i> key to rewind.');
 			else if( _stageDataHistoryIndex + 2 >= _stageDataHistory.length)
 				_stageDataHistoryIndex = -1;
 			else
@@ -463,7 +463,7 @@ const $L = {
 			else if(_stageDataHistoryIndex > 0)
 				_stageDataHistoryIndex--;
 			else
-				$marqueeFlash('End of history, use <span class="l_marquee_highlight">&#8658;</span> to move forward or <span class="l_marquee_highlight">escape</span> to exit.', true);
+				$marqueeFlash('End of history, use <i class="l_marquee_highlight">&#8658;</i> to move forward or <i class="l_marquee_highlight">escape</i> to exit.', true);
 		}
 		if(lastIndex !== _stageDataHistoryIndex)
 			$updateStageDataHistory();
@@ -476,7 +476,7 @@ const $L = {
 		if(historyIndex == historyTotal)
 			$marqueeFlash('All caught up, exiting history mode...', true);
 		else
-			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <span class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</span>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
+			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</i>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
 	},
 	setNextStagePoll: seconds => {
 		if(_animationsComplete)
@@ -496,11 +496,11 @@ const $L = {
 	epochNow: () => Math.floor(Date.now() / 1000),
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
 	clone: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
-	htmlPercent: number => {
+	htmlPercent: (number, precision) => {
 		if(number > 0)
-			return($N(Math.abs(number),2) + '%<span class="l_up">&#9650;</span>');
+			return($N(Math.abs(number), precision) + '%<i class="l_up">&#9650;</i>');
 		else if(number < 0)
-			return($N(Math.abs(number),2) + '%<span class="l_down">&#9660;</span>');
+			return($N(Math.abs(number), precision) + '%<i class="l_down">&#9660;</i>');
 		else
 			return(_emptyCellHtml);
 	},
@@ -577,14 +577,14 @@ const $L = {
 		for(let i in _stageData['top']) {
 			let item=_stageData['top'][i], isMarketIndex=(item.length==3);
 			if(isMarketIndex) {
-				if(!html) html += '<span class="l_marquee_blink_wide">&#8226;</span>';
-				html += `<div class="l_marquee_link" data-ref="${item[0]}"><span class='l_marquee_highlight_padded'>${$H(item[2])}</span>${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
+				if(!html) html += '<i class="l_marquee_blink_wide">&#8226;</i>';
+				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_highlight_padded'>${$H(item[2])}</i>${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
 			else if(!includeCrypto && item[0][0] == _charCrypto)
 				continue;
 			else {
-				if(!rank) html += '<span class="l_marquee_blink_wide">&#8226;</span>';
-				html += `<div class="l_marquee_link" data-ref="${item[0]}"><span class='l_marquee_highlight_padded'>#${++rank}</span>${item[0]} &#177; ${item[1]}%</div> `;
+				if(!rank) html += '<i class="l_marquee_blink_wide">&#8226;</i>';
+				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_highlight_padded'>#${++rank}</i>${item[0]} &#177; ${item[1]}%</div> `;
 				if(rank >= 20) break;
 			}
 		}
@@ -616,12 +616,12 @@ const $L = {
 		_marqueeInterval = setInterval(() => { $marqueeUpdate(_marqueeLoopSeconds) }, _marqueeLoopSeconds * 1000);
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys and gestures are available: ${_marqueeBlinkHtml} Use the <span class="l_marquee_highlight">tab</span> key to alternate animation modes. ${_marqueeBlinkHtml} Alt-click rows or use the <span class="l_marquee_highlight">~</span> key to keep specific symbols on top. ${_marqueeBlinkHtml} Swipe or use <span class="l_marquee_highlight">&#8644;</span> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <span class="l_marquee_highlight">&#8645;</span> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
+		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys and gestures are available: ${_marqueeBlinkHtml} Use the <i class="l_marquee_highlight">tab</i> key to alternate animation modes. ${_marqueeBlinkHtml} Alt-click rows or use the <i class="l_marquee_highlight">~</i> key to keep specific symbols on top. ${_marqueeBlinkHtml} Swipe or use <i class="l_marquee_highlight">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <i class="l_marquee_highlight">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in _keyMap) {
 			if((match=_keyMap[key][$KSTK].match(/([a-z]+)\.[a-z]+\//i)))
-				html += `<div class="l_marquee_info" data-ref="${key}"><span class='l_marquee_highlight_padded'>${key}</span>${$H(match[1])}</div> `
+				html += `<div class="l_marquee_info" data-ref="${key}"><i class='l_marquee_highlight_padded'>${key}</i>${$H(match[1])}</div> `
 		}
-		html += `${_marqueeBlinkHtml} Hold down the <span class="l_marquee_highlight">shift</span> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <span class="l_marquee_highlight">1-7</span> can be used to sort by each column.`;
+		html += `${_marqueeBlinkHtml} Hold down the <i class="l_marquee_highlight">shift</i> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <i class="l_marquee_highlight">1-7</i> can be used to sort by each column.`;
 		$W.scrollTo({top: 0, behavior: 'smooth'});
 		$marqueeIntervalReset();
 		$marqueeInitiate(_marqueeLoopSeconds, html);
@@ -730,10 +730,10 @@ const $L = {
 		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain&&domain.hostname?domain.hostname:url);
 		if(saveSettings) {
 			localStorage.setItem('l_keymap_index', _keyMapIndex);
-			$marqueeFlash(`Links will now permanently direct to <span class='l_marquee_highlight'>${display}</span> by default.`);
+			$marqueeFlash(`Links will now permanently direct to <i class='l_marquee_highlight'>${display}</i> by default.`);
 		}
 		else
-			$marqueeFlash(`Links will now direct to <span class='l_marquee_highlight'>${display}</span> for this session, hold down <span class='l_marquee_highlight'>shift</span> to make it permanent.`);
+			$marqueeFlash(`Links will now direct to <i class='l_marquee_highlight'>${display}</i> for this session, hold down <i class='l_marquee_highlight'>shift</i> to make it permanent.`);
 	},
 	editSymbolsOnTop: () => {
 		let symbols=localStorage.getItem('l_symbols_on_top');
@@ -768,11 +768,11 @@ const $L = {
 		else if((savedSymbols && savedSymbols.length > 1) || Math.abs(onTopDiff) != 1)
 			msg = 'Symbols on top: ';
 		else if(onTopDiff > 0)
-			msg = `<span class="l_marquee_highlight">${symbols}</span> removed from top: `;
+			msg = `<i class="l_marquee_highlight">${symbols}</i> removed from top: `;
 		else
-			msg = `<span class="l_marquee_highlight">${symbols}</span> added to top: `;
+			msg = `<i class="l_marquee_highlight">${symbols}</i> added to top: `;
 		if(orderedTopList)
-			msg += `<span class="l_marquee_highlight_padded">${orderedTopList}</span>`;
+			msg += `<i class="l_marquee_highlight_padded">${orderedTopList}</i>`;
 		$marqueeFlash(msg);
 		$updateContentTable(false);
 	},
@@ -828,43 +828,35 @@ const $L = {
 	cell: (row, type) => {
 		if(!row[type])
 			return(_emptyCellHtml);
+		const cell=row[type];
 		switch(type) {
 			case $SYM:
 			case $OPT:
 			case $ERN:
 			case $NWS:
-			case $TAN:
-				return($H(row[type]));
-			case $NAM:
-				return(_forceContentTableShrink ? _emptyCellHtml : $H(row[type]));
-			case $PCT:
-				return($htmlPercent(row[type]));
+			case $TAN:  return($H(cell));
+			case $NAM:  return(_forceContentTableShrink ? _emptyCellHtml : $H(cell));
+			case $PCTM: return('M='+$htmlPercent(cell,0));
+			case $PCTY: return('Y='+$htmlPercent(cell,0));
+			case $PCT:  return($htmlPercent(cell,2));
 			case $PCT5:
-			case $HLT:
-				return($isHaltRow(row) ? $H(row[type]?row[type]:'HALTED') : $htmlPercent(row[type]));
-			case $VOL:
-				return($F(row[type],1));
-			case $VOL5:
-				return('+' + $F(row[type],1));
-			case $PRC:
-				return('$' + $N(row[type],2));
-			case $PRC5:
-				return((row[type]<0?'-$':'+$') + $N(Math.abs(row[type]),2));
-			case $OIV:
-				return(($H(row[type] > 0 ? row[type] : ('~' + Math.abs(row[type])))) + '%iv');
-			case $LNK:
-				return(row[type]);
-			default:
-				return(_emptyCellHtml);
+			case $HLT:  return($isHaltRow(row) ? $H(cell?cell:'HALTED') : $htmlPercent(cell,2));
+			case $VOL:  return($F(cell,1));
+			case $VOL5: return('+' + $F(cell,1));
+			case $PRC:  return('$' + $N(cell,2));
+			case $PRC5: return((cell<0?'-$':'+$') + $N(Math.abs(cell),2));
+			case $OIV:  return(row[$SYM][0]==_charCrypto ? ('MC#'+cell) : ($H(cell>0?cell:('~'+Math.abs(cell))))+'%IV');
+			case $LNK:  return(cell);
+			default:    return(_emptyCellHtml);
 		}
 	},
 	cellRollover: (row, primary, secondary, shrinkMode) => {
 		let cell='<div class="l_hover_container">', left=(secondary==$NWS);
 		if(row[secondary] && !shrinkMode)
-			cell += `<span class="${left?'l_hover_active_left':'l_hover_active'}">${$cell(row,secondary)}</span><span class="l_hover_inactive">`;
+			cell += `<i class="${left?'l_hover_active_left':'l_hover_active'}">${$cell(row,secondary)}</i><i class="l_hover_inactive">`;
 		cell += $cell(row,primary);
 		if(row[secondary] && !shrinkMode)
-			cell += '</span>';
+			cell += '</i>';
 		cell += '</div>';
 		return(cell);
 	},
@@ -872,17 +864,17 @@ const $L = {
 		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
 			return(`<div class="l_notify_popout l_ta" title="${_taMap[row[$TAN]][0]}" data-keymap="${_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:_keyMapIndexDefault}">&#128200;&nbsp;${_taMap[row[$TAN]][1]}</div>`);
 		else if(row[$ERN] && row[$NWS])
-			return(`<div class="l_notify_popout l_news" title="News and earnings on ${$cell(row,$ERN)}">&#128197;&nbsp;${$cell(row,$ERN)}<span>&nbsp;+&nbsp;news</span></div>`);
+			return(`<div class="l_notify_popout l_news" title="News and earnings on ${$cell(row,$ERN)}">&#128197;&nbsp;${$cell(row,$ERN)}<i>&nbsp;+&nbsp;news</i></div>`);
 		else if(row[$ERN])
-			return(`<div class="l_notify_popout" title="Earnings on ${$cell(row,$ERN)}">&#128198;&nbsp;${$cell(row,$ERN)}<span>&nbsp;earnings</span></div>`);
+			return(`<div class="l_notify_popout" title="Earnings on ${$cell(row,$ERN)}">&#128198;&nbsp;${$cell(row,$ERN)}<i>&nbsp;earnings</i></div>`);
 		else if(row[$NWS])
-			return(`<div class="l_notify_popout l_news" title="Company news">&#128197;&nbsp;<span>recent </span>news</div>`);
+			return(`<div class="l_notify_popout l_news" title="Company news">&#128197;&nbsp;<i>recent </i>news</div>`);
 		return('');
 	},
 	updateContentTable: (doNotify, doNotResetKeyRow) => {
 		if(!_stageData)
 			return;
-		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min%','total%','price','volume','options'];
+		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price','volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		let notifyRows=[], notify=false, onTop={}, rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
@@ -935,8 +927,8 @@ const $L = {
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
-					<td>${$cell(row,$PCT5)}</td>
-					<td>${$cell(row,$PCT)}</td>
+					<td>${$cellRollover(row,$PCT5,$PCTM)}</td>
+					<td>${$cellRollover(row,$PCT,$PCTY)}</td>
 					<td>${$cellRollover(row,$PRC,$PRC5)}</td>
 					<td>${$cellRollover(row,$VOL,$VOL5)}</td>
 					<td class="${row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
