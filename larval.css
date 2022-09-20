@@ -831,16 +831,16 @@ input[type=checkbox]:checked:disabled + label:before {
 		cursor: pointer;
 		text-decoration: underline;
 	}
-	#l_content_table tr:hover td .l_hover_inactive, #l_content_table .l_tr_keyrow_selected td .l_hover_inactive {
-		visibility: hidden;
+	#l_content_table tr:hover td .l_hover_inactive, #l_content_table .l_tr_keyrow_selected td .l_hover_inactive, .l_content_table_alt_display tr td .l_hover_inactive {
+		visibility: hidden !important;
 	}
-	#l_content_table tr:hover td .l_hover_active, #l_content_table .l_tr_keyrow_selected td .l_hover_active {
-		display: block;
-		animation: l_hover_active 0.5s ease 0s 1 normal forwards; 
+	#l_content_table tr:hover td .l_hover_active, #l_content_table .l_tr_keyrow_selected td .l_hover_active, .l_content_table_alt_display tr td .l_hover_active {
+		display: block !important;
+		animation: l_hover_active 0.5s ease 0s 1 normal forwards !important; 
 	}
-	#l_content_table tr:hover td .l_hover_active_left,#l_content_table .l_tr_keyrow_selected td .l_hover_active_left {
-		display: block;
-		animation: l_hover_active_left 0.5s ease 0s 1 normal forwards; 
+	#l_content_table tr:hover td .l_hover_active_left,#l_content_table .l_tr_keyrow_selected td .l_hover_active_left, .l_content_table_alt_display tr td .l_hover_active_left {
+		display: block !important;
+		animation: l_hover_active_left 0.5s ease 0s 1 normal forwards !important; 
 	}
 	.l_notify_enable:hover, .l_notify_disable:hover {
 		left: -35px;

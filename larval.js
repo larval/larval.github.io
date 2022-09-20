@@ -32,7 +32,6 @@ const $L = {
 	_wakeLock: null,
 	_symbolsOnTop: {},
 	_symbolOverrideMap: { '^VIX': '^VIX' },
-	_keysIgnore: ['ShiftRight','ShiftLeft'],
 	_keyRow: 0,
 	_keyMapIndexDefault: 'Y',
 	_keyMapIndex: null,
@@ -113,6 +112,8 @@ const $L = {
 	},
 	_hotKeyMap: {
 		'Tab':(e,ev)                => $animationsToggle(null, ev.shiftKey),
+		'ShiftLeft':(e,ev)          => $rollContentTable(ev.shiftKey),
+		'ShiftRight':(e,ev)         => $rollContentTable(ev.shiftKey),
 		'Backquote':e               => $editSymbolsOnTop(),
 		'Slash':e                   => $marqueeHotKeyHelp(),
 		'Home':e                    => _keyRow = 1,
@@ -224,7 +225,7 @@ const $L = {
 	},
 	onkeydown: e => {
 		$animationsFastSplash();
-		if(!_animationsComplete || !_stageData || (e && (e.ctrlKey || e.altKey || _keysIgnore.indexOf(e.code) >= 0)))
+		if(!_animationsComplete || !_stageData || (e && (e.ctrlKey || e.altKey)))
 			return;
 		const rows=$E('l_content_table').getElementsByTagName('tr');
 		let lastKeyRow=_keyRow, match;
@@ -270,6 +271,7 @@ const $L = {
 		if(_keyRow > 0)
 			rows[_keyRow].scrollIntoView({behavior:'smooth', block:'center'});
 	},
+	onkeyup: e => $rollContentTable(e.shiftKey),
 	onvisibilitychange: e => {
 		if($D.visibilityState != 'visible')
 			return;
@@ -871,6 +873,7 @@ const $L = {
 			return(`<div class="l_notify_popout l_news" title="Company news">&#128197;&nbsp;<i>recent </i>news</div>`);
 		return('');
 	},
+	rollContentTable: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
 	updateContentTable: (doNotify, doNotResetKeyRow) => {
 		if(!_stageData)
 			return;
