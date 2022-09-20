@@ -251,7 +251,7 @@ const $L = {
 				$setURLFormat(match[1], e.shiftKey);
 				$onclick(rows[_keyRow]);
 			}
-			else
+			else if(e.code)
 				$marqueeFlash(`The &quot;<i class='l_marquee_highlight'>${e.code}</i>&quot; key is not mapped, type &quot;<i class='l_marquee_highlight'>?</i>&quot; to see the supported hotkeys.`);
 		}
 		if(_keyRow < 0)
