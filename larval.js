@@ -397,7 +397,7 @@ const $L = {
 	},
 	animationsDisableIfUnderFPS: (ms, fps, attempt) => {
 		if(!_frameData) {
-			if($isMobile() || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
+			if($E(_naId) || localStorage.getItem(_naId) || $isMobile() || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
 				return($blackhole('animationsDisableIfUnderFPS'));
 			_frameData = {'fps':fps, 'duration':ms/1000, 'stop':performance.now()+ms, 'frames':0, 'attempt':attempt>0?attempt:0};
 		}
