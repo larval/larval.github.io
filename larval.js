@@ -28,6 +28,7 @@ const $L = {
 	_charFutures: '^',
 	_contentTableRowCountThatAreInView: 10,
 	_title:	document.title,
+	_frameData: null,
 	_swipeStartPosition: null,
 	_naId: 'l_na',
 	_wakeLock: null,
@@ -214,7 +215,8 @@ const $L = {
 		$notifySetup(false);
 		$keyMapSetup();
 		$getStageData(false);
-		setTimeout($animationsComplete, 6000);
+		$animationsDisableIfUnderFPS(6000, 30, 2);
+		setTimeout($animationsComplete, 5750);
 	},
 	onclick: e => {
 		let idx=0, sym='', type=$KSTK, dataRef=null, ref='', refList=Object.keys(_clickMap), el=(e&&e.target?e.target:e);
@@ -303,6 +305,7 @@ const $L = {
 	},
 	onkeyup: e => $rollContentTable(e.shiftKey),
 	onvisibilitychange: e => {
+		_frameData = null;
 		if($D.visibilityState != 'visible')
 			return;
 		$notifyRequestWakeLock();
@@ -392,6 +395,31 @@ const $L = {
 		void el.offsetHeight;
 		el.style.animation = animation;
 	},
+	animationsDisableIfUnderFPS: (ms, fps, attempt) => {
+		if(!_frameData) {
+			if($isMobile() || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
+				return($blackhole('animationsDisableIfUnderFPS'));
+			_frameData = {'fps':fps, 'duration':ms/1000, 'stop':performance.now()+ms, 'frames':0, 'attempt':attempt>0?attempt:0};
+		}
+		else if(!fps)
+			_frameData.frames++;
+		else
+			return;
+		if(_frameData.stop > ms)
+			$W.requestAnimationFrame($animationsDisableIfUnderFPS);
+		else if(_frameData.duration > 0 && (_frameData.frames/_frameData.duration) < _frameData.fps) {
+			$animationsToggle(false, null);
+			$marqueeFlash('Slow graphics detected, disabling most animations.  Use the <i class="l_marquee_highlight">tab</i> key to re-enable.');
+			$blackhole('animationsDisableIfUnderFPS');
+		}
+		else if(--_frameData.attempt > 0) {
+			_frameData.frames = 0;
+			_frameData.stop = performance.now() + (_frameData.duration * 1000);
+			$W.requestAnimationFrame($animationsDisableIfUnderFPS);
+		}
+		else
+			_frameData = null;
+	},
 	keyMapSetup: () => {
 		if(!(_keyMapIndex=localStorage.getItem('l_keymap_index')))
 			_keyMapIndex = _keyMapIndexDefault;
@@ -438,7 +466,7 @@ const $L = {
 			if(args && args['updateView'])
 				$updateContentTable(true);
 			if(json['notify'] && $hasSettings())
-				$marqueeFlash(json['notify'])
+				$marqueeFlash(json['notify']);
 			$E('l_last_update').innerHTML = $epochToDate(json['ts']);
 			$setNextStagePoll($getSynchronizedNext());
 		}
@@ -525,6 +553,7 @@ const $L = {
 	epochNow: () => Math.floor(Date.now() / 1000),
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
 	clone: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
+	blackhole: fn => $W['$'+fn] = $L[fn] = () => {},
 	htmlPercent: (number, precision) => {
 		if(number > 0)
 			return($N(Math.abs(number), precision) + '%<i class="l_up">&#9650;</i>');
@@ -736,7 +765,7 @@ const $L = {
 	},
 	notifySetup: disableFutureRequests => {
 		if(disableFutureRequests)
-			$notifySetup = ()=>{};
+			$blackhole('notifySetup');
 		if(typeof _audioTest == 'string')
 			_audioTest = new Audio(_audioTest);
 		if(typeof _audioAlert == 'string') {
