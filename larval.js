@@ -27,6 +27,7 @@ const $L = {
 	_charHalt: "\u25a0 ",
 	_charCrypto: '*',
 	_charFutures: '^',
+	_charCurrency: '$',
 	_contentTableRowCountThatAreInView: 10,
 	_title:	document.title,
 	_frameData: null,
@@ -63,7 +64,7 @@ const $L = {
 		V: ['https://www.tradingview.com/chart/?symbol=@', null, 'https://www.tradingview.com/chart/?symbol=@USD'],
 		W: ['https://www.twitter.com/search?q=%24@', null, 'https://www.twitter.com/search?q=%24@.X'],
 		X: ['https://www.foxbusiness.com/quote?stockTicker=@'],
-		Y: ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@/options', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F'],
+		Y: ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@/options', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F', 'https://finance.yahoo.com/quote/@=X'],
 		Z: ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain'],
 	},
 	_taMap: {
@@ -88,7 +89,7 @@ const $L = {
 		WU: ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
 	},
 	_eventMap: {
-		   'l_audible, l_options_only, l_notify_halts, l_include_futures, l_include_crypto': {
+		   'l_audible, l_options_only, l_notify_halts, l_include_futures, l_include_crypto, l_include_currency': {
 				change:e    => $settingsSave(e)
 		}, 'l_range_up, l_range_down, l_range_volume': {
 				input:e     => $updateRangeDisplay(e),
@@ -127,7 +128,7 @@ const $L = {
 		'ArrowDown':e               => _keyRow++,
 		'ArrowLeft':e               => $gotoStageDataHistory(-1),
 		'ArrowRight':e              => $gotoStageDataHistory(1),
-		'Escape':e                  => $gotoStageDataHistory(0),
+		'Escape':e                  => $gotoStageDataHistory(0) || $settingsButtonToggle(true),
 		'Space':e                   => $onclick(e),
 		'Enter':e                   => $onclick(e),
 		'NumpadEnter':e             => $onclick(e)
@@ -137,7 +138,7 @@ const $L = {
 		'NAM':_  => _forceContentTableShrink ? _emptyCellHtml : $H(_.val),
 		'PCT5':_ => $isHaltRow(_.row) ? $H(_.val?_.val:'HALTED') : $htmlPercent(_.val,2),
 		'PCT':_  => $htmlPercent(_.val,2),
-		'PRC':_  => '$' + $N(_.val,2),
+		'PRC':_  => '$' + $N(_.val,_.row[$OPT]=='currency'&&_.val<10?4:2),
 		'VOL':_  => $F(_.val,1),
 		'OPT':_  => $H(_.val),
 		'OIV':_  => _.row[$SYM][0]==_charCrypto ? ('MC#'+_.val) : ($H(_.val>0?_.val:('~'+Math.abs(_.val))))+'%IV',
@@ -154,7 +155,8 @@ const $L = {
 		'KSTK':  0,
 		'KOPT':  1,
 		'KCRP':  2,
-		'KFTR':  3
+		'KFTR':  3,
+		'KCUR':  4
 	},
 	_vibrateAlert: [250,250,500,250,750,250,1000], _audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAgAAAQdgAyMjI8PDxCQkJKSkpTU1NbW1tiYmJoaGhubm5udXV1e3t7gYGBh4eHjo6OlJSUmpqaoaGhoaenp62trbS0tLq6usDAwMfHx83NzdPT09Pa2trg4ODm5ubt7e3z8/P5+fn///8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAXAAAAAAAAAEHarUeu2AAAAAAAAAAAAAAAAAAAAAP/7sGQAAACLAFMVAAAAAAAP8KAAAQt4x1W5CAAAAAA/wwAAAApAD////ggGMHAxwQOf1g+D93AAlAAAktziZCAAAABCKFUwLn/Wpbf/9nXQPGJoTw5I9mo558opDkjQYthiUBvJhA3IgO08sghGkPJ8e0DFMrE8T4txeMi4VWQKCBoThJoPmSJAioaJmpGDmE8qcGAAAACLESGAAXgmdX/////Jr1RCODjmT0O3SrW4S0S8ekMLOMIK51hDcelefsWjsM9hjzYAAWAXoyggACwi9Jf/QWo/I/XFhoUSEtWn8eRsu1jSdv708NaE1dahOBlOebAAoAC9GCEAALkyqRS/20Km4AGQV63ICdySNmrpT/nvDvH+gy9vv+sF2FZgBaSSwABuwHSUGUSGWt30AznhGXJWceHwaWC7FIFKaC4v1wkSFw26F8sACaqXkEKAAk+XGSzC4mkEpddOLHuMKpCwu/nQkaCCiDw4UJihgsIkCCpIu89DDDuwAsAzf4UiAAX0ChfTMov7f+3najILDqu/k+47//ff6fTrx0/6amsLggbHBQi9u7ALv1oAAAOBlDCNEXI0S5IaIxXf/MS5+wg41upO6pfCRob+7n337v839+d2J41gGKBp2gAMy+2ALyS1xpa/UtcaK92z2XSIoN2NZoKAL9WtnfaSj/K+T5GmLeB8+dXx/+IQxpwcqgvsAAzNz7QpgAFbI0yJkyXP/4XQpct1WpPlLKuQsHDoN6DJ3XUo8WExodqvOBUIVugAaAd7q3AAE7YBpOA6Tj17wx7iLniQ7z4YBkMhIStYHXvsszjXEDZIIvDpw84Iu7AAsA1b//swZPAA8ZswVn9IYAIAAA/w4AABBZSXZegAbkAAAD/AAAAERAAAC0FJ8BkmZaAXpT/a06wtirRCx84x7x6FtfQ2o1KsIuQDyNIAAROMHpaAkmZf//BIsJCwsRekKvGsFZZUc2x+IksSJjFzCAAAiAAB7dAAAqnNUv/a2qotk/beuXRmopbUlQya/ZDawz1WNgAOAB/QPi4KCTvO//sQZPwE8VIS2XogEyIAYBpgBAABBRARZ+YxIAABgGtAEAAEf+RrFz1CUIkXTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVRwAPwABwAAAC+RFCfAIT//+bUxGAAK7BRb/+yBk9ADxgwRZey8wEABgGyAEAAEFkEtv6LBAaAKAa0AQAARJTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVCQAAkAAAAAALpO9Q1hf6hdpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqq//swZPQB8Y4TWnnhEeoBwCpQLAABBmhDZ+yBaKgFgGhBAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqHwAAAAZtxAcbGoAFAAUjwJv+t0xBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTAPAAARKoF9LhRhDgABAAARRQMf6A41TEFNRTMuMTAw//sgZPuA8XAYXHogGagAoBrQBAABBdgRb+exgCABgGzAEAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVCYAEAA/qsR8QIQAAUACRZnfhoMpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGT7hPE7BFn5LEgIAGAbUAQAAQTcD2HnsSAgAYBtABAABKqqqqqqqqqqqqqqqqqqqqqqqqqqFAAAAARYQ4ADn9AJqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZPYB8RwvV/ogE7oAYBsQBAABApQHV6wIACABgGrAEAAEqqqqqqqqqqqqqqqqqqqqqhAAKAAEXt9SFoAFAAckg/8vTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBk6ofwkwLV6iIACABgGhAEAAEA1AtWhpggMAGAaEAQAARVVVVVVVVVVVVVVVVVVVVVVQADAAAPOf0hYkAatG/QJ0tMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTmD/BkANfxYAAIAGAaUAQAAQBsA14FgAAgAYBrABAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVUGR2QA4Aos340OtUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZOcD8EUC1aICCAgAYBsABAABATAFUogAACABgGtAEAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUQCAAACF5/JsbiTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk6QPwUAFVQeAADABgGsAEAAEBeAlbxQgAIAGAasAQAASqqqqqqqqqqqqqqqqqqqqqqqqAAAC0uxinpVhAAoJ+kO1MQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTng/BJAVKh4AAIAGAaYAQAAQEgB06FhAAgA4BnwGAABFVVVVVVVVVVVVVVVVVVVVVVVYAAAFgX0vDlAXTAQY8MqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZOQL8DAA1KFgAAoAYBqABAABALgFVIUAACABgGlAEAAEqqqqqqqqqqqqqqqqqqqqqqpACAAAC5NnhjABgBNqPuJVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBk5gPwPQDUIWAACABgGhAEAAEBHAVQhQAAIAAAP8AAAARVVVVVVVVVVVVVVVVVVVVVVcIAAIEAV3nSsAAgAIY99ZlMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EGTli/BEAVFB4AAIAAAP8AAAAQDkBUEHgAAgAYBowBAABFVVVVVVVVVVVVVVVVVVVVVVgAEAAAlyn4egATQ4S7aWqUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZOMD8BABUIGgAAgAYBpABAABAPgFRwaAACABgGkAEAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVYAAAVsNkGGQ/rHqTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk4o/wPwHQwYEACABgGiAEAAEALAU+AwAAIAAAP8AAAASqqqqqqqqqqqqqqqqqqqqqqkAAADcSGXI7kwACABuH/lpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGTlA/BDAc8p4QAMAAAP8AAAAQDIBT6hgAAgAAA/wAAABKqqqqqqqqqqqqqqqqqDAAFNZ3wVNyAFe2sb97f///6ZekxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZOUH8D0BTqjAAAgAAA/wAAABANAFPqWAACAAAD/AAAAEqqqqQAIAABl/Ej////9Bb+5VCgFABwd5tpz////IL/5aTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk5YPwQgDQQWAACAAAD/AAAAEA5AVDBIAAIAAAP8AAAASqqqqq4AgAIAOK+f////5Qw7/ILwAPWJf3f///5Mg//RVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVYQAE2AAQABI4//7EGTlg/BDAU+oQAAIAAAP8AAAAQD0Bz8BAAAgAAA/wAAABD4cEhkt///+ZDwNf1y3ADAAF7xD0JDX///+LGyX1RHEikxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZOWD8EIBT8DAAAgAAA/wAAABAPADPKeAADAAAD/AAAAEqqqEAAMABAU0Fvzzv///9RD9bHrjYACdhtvx//////+qTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk4w/wLAFQKeAADgAAD/AAAAEAnAU8BAAAIAAAP8AAAASqoAABayj2f////86iCAAAAAAAE/VPTwwCtpm8j////+xMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGTlg/BHAc8oQgAIAAAP8AAAAQDcBUEFgAAgAAA/wAAABKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZOeH8D8BUKngAAwAAA/wAAABAXQHQQeEAAAAAD/AAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk7IPwewDQQWAAAAAAD/AAAAEBzAFDAAAAAAAAP8AAAASqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGTsBfB+AVFAYAAAAAAP8AAAAQGUBUCkgAAAAAA/wAAABKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZPKB8LUBUWFgAAAAAA/wAAABAlgFQwYAAAAAAD/AAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/+xBk7QfwkgHRWeAAAAAAD/AAAAEBkAVIhYAAAAAAP8AAAASqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/7EGTtgABZAVAtPAAAAAAP8KAAAQKcCUKY8AAAAAA/wwAAAKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//sQZN2P8AAAf4cAAAgAAA/w4AABAAABpAAAACAAADSAAAAEqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo=',
 
@@ -184,7 +186,7 @@ const $L = {
 	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
 	T: tag => $D.getElementsByTagName(tag),
-	U: string => (string?string[0]:'').toUpperCase() + string.substring(1),
+	U: array => array.filter((x,i,a) => array.indexOf(x)==i),
 	W: window,
 
 	/* [$] EVENTS (window|document) */
@@ -251,9 +253,10 @@ const $L = {
 		else if(!ref)
 			return;
 		const raw = sym;
-		if(_symbolOverrideMap[sym]) {     type = $KSTK; sym = _symbolOverrideMap[sym]; }
-		else if(sym[0] == _charCrypto) {  type = $KCRP; sym = sym.substr(1); }
-		else if(sym[0] == _charFutures) { type = $KFTR; sym = sym.substr(1); }
+		if(_symbolOverrideMap[sym]) {     type = $KSTK;  sym = _symbolOverrideMap[sym]; }
+		else if(sym[0] == _charCrypto) {  type = $KCRP;  sym = sym.substr(1); }
+		else if(sym[0] == _charFutures) { type = $KFTR;  sym = sym.substr(1); }
+		else if(sym[0] == _charCurrency) { type = $KCUR; sym = ((sym.substr(-1)=='-'?'USD':sym)+(sym.substr(-1)=='+'?'USD':sym)).replace(/[^A-Z]+/g,''); }
 		_clickMap[ref]({'raw':raw, 'sym':sym, 'idx':idx, 'type':type, 'el':el});
 	},
 	onkeydown: e => {
@@ -433,6 +436,8 @@ const $L = {
 				_keyMap[key][$KCRP] = _keyMap[_keyMapIndexDefault][$KCRP];
 			if(!_keyMap[key][$KFTR])
 				_keyMap[key][$KFTR] = _keyMap[_keyMapIndexDefault][$KFTR];
+			if(!_keyMap[key][$KCUR])
+				_keyMap[key][$KCUR] = _keyMap[_keyMapIndexDefault][$KCUR];
 		}
 	},
 	keyModeReset: () => _keyRow ? $onkeydown(false) : null,
@@ -450,7 +455,7 @@ const $L = {
 		.then(json => jsonCallback(json, args))
 		.catch(err => jsonCallback(null, args));
 	},
-	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
+	getStageData: updateView => $getData('stage.debug.json', $parseStageData, {'updateView':updateView}),
 	parseStageData: (json, args) => {
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
 			$setNextStagePoll(_nextStagePollShort);
@@ -461,7 +466,7 @@ const $L = {
 			if(_stageDataHistory.length == 0 && localStorage.length == 0 && _stageData['afterhours']) {
 				const now=new Date();
 				if(now.getDay() != 0 && now.getDay() != 6)
-					$E('l_include_futures').checked = true;
+					$E('l_include_futures').checked = $E('l_include_currency').checked = true;
 			}
 			_stageDataHistory.push($clone(_stageData));
 			$sortStageData(false);
@@ -525,8 +530,11 @@ const $L = {
 			else
 				$marqueeFlash('End of history, use <i class="l_marquee_highlight">&#8658;</i> to move forward or <i class="l_marquee_highlight">escape</i> to exit.', true);
 		}
-		if(lastIndex !== _stageDataHistoryIndex)
+		if(lastIndex !== _stageDataHistoryIndex) {
 			$updateStageDataHistory();
+			return(true);
+		}
+		return(false);
 	},
 	updateStageDataHistory: () => {
 		const historyTotal=_stageDataHistory.length-1, historyIndex=_stageDataHistoryIndex<0?historyTotal:_stageDataHistoryIndex;
@@ -694,7 +702,7 @@ const $L = {
 		if($D.visibilityState == 'hidden' && typeof Notification != 'undefined' && Notification.permission == 'granted') {
 			_notifications.push(new Notification('Larval - Market volatility found!', {
 				icon: 'icon-192x192.png',
-				body: notifyRows.length > 0 ? 'Volatile stock(s): ' + notifyRows.map(a => (typeof a[$HLT]=='string'?_charHalt:(a[$PCT5]<0?_charUp:_charDown))+a[$SYM]).filter((v,i,s) => { return s.indexOf(v)===i; }).join(' ') : 'Larval - Market volatility found!'
+				body: notifyRows.length > 0 ? 'Volatile stock(s): ' + $U(notifyRows.map(a => (typeof a[$HLT]=='string'?_charHalt:(a[$PCT5]<0?_charUp:_charDown))+a[$SYM])).join(' ') : 'Larval - Market volatility found!'
 			}));
 		}
 		else 
@@ -800,28 +808,31 @@ const $L = {
 		$setSymbolsOnTop(null, true, false);
 		$setSymbolsOnTop(symbols, false, true);
 	},
+	delSymbolFromTop: sym => [sym,sym+'+',sym+'-'].forEach(sym => delete _symbolsOnTop[sym]),
+	addSymbolToTop: sym => sym[0]==_charCurrency ? (_symbolsOnTop[sym]=_symbolsOnTop[sym+'+']=_symbolsOnTop[sym+'-']=sym) : _symbolsOnTop[sym]=sym,
 	getSymbolsOnTop: () => {
 		if(Object.keys(_symbolsOnTop).length)
 			return(_symbolsOnTop);
 		_symbolsOnTop = {};
 		let savedSymbols=localStorage.getItem('l_symbols_on_top');
-		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*]?[A-Z0-9]+/g)))
-			savedSymbols.forEach(sym => _symbolsOnTop[sym]=sym);
+		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*\$]?[A-Z0-9]+/g)))
+			savedSymbols.forEach(sym => $addSymbolToTop(sym));
 		return(_symbolsOnTop);
 	},
 	setSymbolsOnTop: (symbols, removeOrToggle, updateView) => {
 		const remove=(removeOrToggle===true), toggle=(removeOrToggle===null);
-		let msg='', orderedTopList='', savedSymbols, onTopDiff=Object.keys(_symbolsOnTop).length;
+		let msg='', orderedTopListStr='', orderedTopList, savedSymbols, onTopDiff=$U(Object.values(_symbolsOnTop)).length;
 		if(!symbols && remove)
 			_symbolsOnTop = {};
-		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*]?[A-Z0-9]+/g)))
-			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? delete _symbolsOnTop[sym] : _symbolsOnTop[sym]=sym);
-		orderedTopList = Object.keys(_symbolsOnTop).sort((a, b) => a.localeCompare(b)).join(', ').trim(', ');
-		localStorage.setItem('l_symbols_on_top', orderedTopList);
+		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*\$]?[A-Z0-9]+/g)))
+			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? $delSymbolFromTop(sym) : $addSymbolToTop(sym));
+		orderedTopList = $U(Object.values(_symbolsOnTop)).sort((a, b) => a.localeCompare(b));
+		orderedTopListStr = orderedTopList.join(', ').trim(', ');
+		localStorage.setItem('l_symbols_on_top', orderedTopListStr);
 		if(!updateView)
 			return;
-		onTopDiff -= Object.keys(_symbolsOnTop).length;
-		if(!orderedTopList)
+		onTopDiff -= orderedTopList.length;
+		if(!orderedTopListStr)
 			msg = 'Your on top list is empty, alt-click a row below to add a symbol.';
 		else if((savedSymbols && savedSymbols.length > 1) || Math.abs(onTopDiff) != 1)
 			msg = 'Symbols on top: ';
@@ -829,8 +840,8 @@ const $L = {
 			msg = `<i class="l_marquee_highlight">${symbols}</i> removed from top: `;
 		else
 			msg = `<i class="l_marquee_highlight">${symbols}</i> added to top: `;
-		if(orderedTopList)
-			msg += `<i class="l_marquee_highlight_padded">${orderedTopList}</i>`;
+		if(orderedTopListStr)
+			msg += `<i class="l_marquee_highlight_padded">${orderedTopListStr}</i>`;
 		$marqueeFlash(msg);
 		$updateContentTable(false);
 	},
@@ -910,9 +921,9 @@ const $L = {
 		if(!_stageData)
 			return;
 		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price','volume','options'];
-		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked;
+		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked, includeCurrency=$E('l_include_currency').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
-		let notifyRows=[], notify=false, onTop={}, rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
+		let notifyRows=[], notify=false, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			className = 'l_content_table_header';
 			if(_stageDataSortByColumn == c)
@@ -944,7 +955,7 @@ const $L = {
 			}
 			else {
 				notify=( !notifyExcept && ((((rangeUp&&row[$PCT5]>=rangeUp)||(rangeDown&&rangeDown>=row[$PCT5])) && (!row[$VOL]||row[$VOL]>=rangeVolume) && (!optionsOnly||row[$OPT])) || (row[$VOL]&&typeof row[$VOL]=='string') ));
-				if(!isOnTop && ((!includeCrypto && row[$OPT]=='crypto') || (!includeFutures && row[$OPT]=='futures')))
+				if(!isOnTop && ((!includeCrypto && row[$OPT]=='crypto') || (!includeFutures && row[$OPT]=='futures') || (!includeCurrency && row[$OPT]=='currency')))
 					continue;
 				if(notify) {
 					rowClass = `l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
@@ -957,8 +968,13 @@ const $L = {
 					else if(isOnTop)
 						notifyControl = `<div class="l_notify_disable" title="Remove ${$cell(row,$SYM)} from top">x</div>`;
 				}
-				if(row[$OPT] && ['crypto','futures'].indexOf(row[$OPT]) >= 0)
-					rowClass += ` l_${row[$OPT]}`;
+				optionClass='';
+				if(row[$OPT]) {
+					if(['crypto','futures','currency'].indexOf(row[$OPT]) >= 0)
+						rowClass += ` l_${row[$OPT]}`;
+					else
+						optionClass = 'l_options';
+				}
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
@@ -966,7 +982,7 @@ const $L = {
 					<td>${$cellRollover(row,$PCT,$PCTY)}</td>
 					<td>${$cellRollover(row,$PRC,$PRC5)}</td>
 					<td>${$cellRollover(row,$VOL,$VOL5)}</td>
-					<td class="${row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
+					<td class="${optionClass}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			if(isOnTop)
