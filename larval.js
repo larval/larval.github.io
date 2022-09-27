@@ -143,7 +143,7 @@ const $L = {
 		'OPT':_  => $H(_.val),
 		'OIV':_  => _.row[$SYM][0]==_charCrypto ? ('MC#'+_.val) : ($H(_.val>0?_.val:('~'+Math.abs(_.val))))+'%IV',
 		'ERN':_  => $H(_.val),
-		'PRC5':_ => (_.val<0?'-$':'+$') + $N(Math.abs(_.val),2),
+		'PRC5':_ => (_.val<0?'-$':'+$') + $N(Math.abs(_.val),_.row[$OPT]=='currency'?4:2),
 		'VOL5':_ => '+' + $F(_.val,1),
 		'PCTM':_ => 'M=' + $htmlPercent(_.val,0),
 		'PCTY':_ => 'Y=' + $htmlPercent(_.val,0),
