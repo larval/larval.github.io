@@ -455,7 +455,7 @@ const $L = {
 		.then(json => jsonCallback(json, args))
 		.catch(err => jsonCallback(null, args));
 	},
-	getStageData: updateView => $getData('stage.debug.json', $parseStageData, {'updateView':updateView}),
+	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
 	parseStageData: (json, args) => {
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
 			$setNextStagePoll(_nextStagePollShort);
