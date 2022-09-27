@@ -7,6 +7,7 @@ const $L = {
 	_stageDataHistoryIndex: -1,
 	_stageDataHistory: [],
 	_stageDataMap: [],
+	_notifications: [],
 	_notifyTitleInterval: null,
 	_notifyAllowed: null,
 	_notifyExceptions: {},
@@ -309,6 +310,8 @@ const $L = {
 		if($D.visibilityState != 'visible')
 			return;
 		$notifyRequestWakeLock();
+		while(_notifications.length > 0)
+			(_notifications.shift()).close();
 		if(!_marqueeInterval)
 			return;
 		$marqueeIntervalReset();
@@ -397,7 +400,7 @@ const $L = {
 	},
 	animationsDisableIfUnderFPS: (ms, fps, attempt) => {
 		if(!_frameData) {
-			if($E(_naId) || localStorage.getItem(_naId) || $isMobile() || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
+			if(!fps || $E(_naId) || localStorage.getItem(_naId) || $isMobile() || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
 				return($blackhole('animationsDisableIfUnderFPS'));
 			_frameData = {'fps':fps, 'duration':ms/1000, 'stop':performance.now()+ms, 'frames':0, 'attempt':attempt>0?attempt:0};
 		}
@@ -688,17 +691,14 @@ const $L = {
 		$notifyClear();
 		if(_stageDataHistory.length < 2)
 			return;
-		try {
-			if(Notification && Notification.permission == 'granted') {
-				void new Notification('Larval - Market volatility found!', {
-					icon: 'icon-192x192.png',
-					body: notifyRows.length > 0 ? 'Volatile stock(s): ' + notifyRows.map(a => (typeof a[$HLT]=='string'?_charHalt:(a[$PCT5]<0?_charUp:_charDown))+a[$SYM]).filter((v,i,s) => { return s.indexOf(v)===i; }).join(' ') : 'Larval - Market volatility found!'
-				});
-			}
-			else 
-				$notifyRequestPermission();
+		if($D.visibilityState == 'hidden' && typeof Notification != 'undefined' && Notification.permission == 'granted') {
+			_notifications.push(new Notification('Larval - Market volatility found!', {
+				icon: 'icon-192x192.png',
+				body: notifyRows.length > 0 ? 'Volatile stock(s): ' + notifyRows.map(a => (typeof a[$HLT]=='string'?_charHalt:(a[$PCT5]<0?_charUp:_charDown))+a[$SYM]).filter((v,i,s) => { return s.indexOf(v)===i; }).join(' ') : 'Larval - Market volatility found!'
+			}));
 		}
-		catch(e) { }
+		else 
+			$notifyRequestPermission();
 		notifyRows.push([]);
 		_notifyTitleInterval = setInterval(() => {
 			if(!$D.hidden || !_notifyTitleInterval)
