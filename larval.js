@@ -28,6 +28,7 @@ const $L = {
 	_charCrypto: '*',
 	_charFutures: '^',
 	_charCurrency: '$',
+	_contentTableSoftLimit: 100,
 	_contentTableRowCountThatAreInView: 10,
 	_title:	document.title,
 	_frameData: null,
@@ -327,6 +328,11 @@ const $L = {
 	},
 	onscroll: e => {
 		const scrolledDown=$E(_naId) || (($W.pageYOffset||$D.documentElement.scrollTop) > $E('l_fixed').offsetHeight);
+		const percent=($D.documentElement.scrollTop||$D.body.scrollTop) / (($D.documentElement.scrollHeight||$D.body.scrollHeight) - $D.documentElement.clientHeight) * 100;
+		if(percent > 50 && _contentTableSoftLimit > 0) {
+			_contentTableSoftLimit = -_contentTableSoftLimit;
+			$updateContentTable();
+		}
 		$E('l_fixed').className = scrolledDown ? 'l_scrolled' : 'l_not_scrolled';
 	},
 	oncontextmenu: e => {
@@ -388,7 +394,7 @@ const $L = {
 			$marqueeFlash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
 		$animationsProgressReset();
 		$keyModeReset();
-		$W.scrollTo({top: 0, behavior: 'auto'});
+		$scrollToTop();
 		$onscroll();
 	},
 	animationsProgressReset: force => {
@@ -455,14 +461,16 @@ const $L = {
 		.then(json => jsonCallback(json, args))
 		.catch(err => jsonCallback(null, args));
 	},
+	setStageData: stageData => (_stageData=stageData) && (_contentTableSoftLimit=Math.abs(_contentTableSoftLimit)),
 	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
 	parseStageData: (json, args) => {
+		let nextPoll=$getSynchronizedNext();
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
-			$setNextStagePoll(_nextStagePollShort);
+			nextPoll = _nextStagePollShort;
 		else if(_stageDataHistoryIndex >= 0)
 			_stageDataHistory.push($clone(json));
 		else {
-			_stageData = json;
+			$setStageData(json);
 			if(_stageDataHistory.length == 0 && localStorage.length == 0 && _stageData['afterhours']) {
 				const now=new Date();
 				if(now.getDay() != 0 && now.getDay() != 6)
@@ -476,8 +484,8 @@ const $L = {
 			if(json['notify'] && $hasSettings())
 				$marqueeFlash(json['notify']);
 			$E('l_last_update').innerHTML = $epochToDate(json['ts']);
-			$setNextStagePoll($getSynchronizedNext());
 		}
+		$setNextStagePoll(nextPoll);
 	},
 	getHistoryData: () => $getData('history.json', $parseHistoryData),
 	parseHistoryData: json => {
@@ -538,7 +546,8 @@ const $L = {
 	},
 	updateStageDataHistory: () => {
 		const historyTotal=_stageDataHistory.length-1, historyIndex=_stageDataHistoryIndex<0?historyTotal:_stageDataHistoryIndex;
-		_stageData = $clone(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
+		const stageData=$clone(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
+		$setStageData(stageData);
 		$sortStageData(true);
 		const minutesAgo=Math.round(($epochNow()-_stageData['ts'])/60,0);
 		if(historyIndex == historyTotal)
@@ -560,6 +569,7 @@ const $L = {
 		_nextStagePollTimeout = null;
 		$getStageData(true);
 	},
+	scrollToTop: () => $W.scrollTo({top: 0, behavior: 'auto'}),
 	forceNextStagePoll: () => $setNextStagePollComplete(),
 	epochNow: () => Math.floor(Date.now() / 1000),
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
@@ -669,7 +679,7 @@ const $L = {
 		$E('l_marquee').style.display = message ? 'none' : 'inline-block';
 		$E('l_marquee_flash').style.display = message ? 'inline-block' : 'none';
 		if(message) {
-			$W.scrollTo({top: 0, behavior: 'smooth'});
+			$scrollToTop();
 			$marqueeIntervalReset();
 			_marqueeFlashTimeout = setTimeout($marqueeFlash, 5000);
 			$animationsReset('l_marquee_flash', 'l_content_fade_in 1s ease forwards');
@@ -691,7 +701,7 @@ const $L = {
 				html += `<div class="l_marquee_info" data-ref="${key}"><i class='l_marquee_highlight_padded'>${key}</i>${$H(match[1])}</div> `
 		}
 		html += `${_marqueeBlinkHtml} Hold down the <i class="l_marquee_highlight">shift</i> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <i class="l_marquee_highlight">1-7</i> can be used to sort by each column.`;
-		$W.scrollTo({top: 0, behavior: 'smooth'});
+		$scrollToTop();
 		$marqueeIntervalReset();
 		$marqueeInitiate(_marqueeLoopSeconds, html);
 	},
@@ -720,7 +730,7 @@ const $L = {
 			notifyRows.push(notifyRows.shift());
 		}, 1000);
 		$notifyPlayAudio(_audioAlert, true);
-		$W.scrollTo({top: 0, behavior: 'smooth'});
+		$scrollToTop();
 	},
 	notifyClear: () => {
 		if(_notifyTitleInterval) {
@@ -923,7 +933,7 @@ const $L = {
 		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price','volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked, includeCurrency=$E('l_include_currency').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
-		let notifyRows=[], notify=false, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
+		let notifyRows=[], visibleRows=0, notify=false, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			className = 'l_content_table_header';
 			if(_stageDataSortByColumn == c)
@@ -993,7 +1003,13 @@ const $L = {
 			}
 			else
 				htmlNormal += htmlRow;
+			if(_contentTableSoftLimit > 0 && ++visibleRows >= _contentTableSoftLimit) {
+				visibleRows = 0;
+				break;
+			}
 		}
+		if(_contentTableSoftLimit > 0 && visibleRows)
+			_contentTableSoftLimit = -_contentTableSoftLimit;
 		if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
 			html += '<tr><td colspan="7">No results found.</td></tr>';
 		else {
