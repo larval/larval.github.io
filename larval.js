@@ -933,7 +933,7 @@ const $L = {
 		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price','volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked, includeCurrency=$E('l_include_currency').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
-		let notifyRows=[], visibleRows=0, notify=false, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
+		let notifyRows=[], notify=false, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			className = 'l_content_table_header';
 			if(_stageDataSortByColumn == c)
@@ -945,7 +945,7 @@ const $L = {
 		html += '</tr>';
 		if(doNotify)
 			$notifyClear();
-		for(let i=0; i < _stageData['items'].length; i++) {
+		for(let i=0,visibleRows=0; i < _stageData['items'].length; i++) {
 			const row=_stageData['items'][i], notifyExcept=!!_notifyExceptions[row[$SYM]];
 			let isOnTop=!!_symbolsOnTop[row[$SYM]], notifyControl='';
 			if($isHaltRow(row)) {
@@ -995,21 +995,17 @@ const $L = {
 					<td class="${optionClass}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
+			if(visibleRows >= 0 && _contentTableSoftLimit > 0 && ++visibleRows >= _contentTableSoftLimit)
+				visibleRows = -1;
 			if(isOnTop)
 				onTop[row[$SYM]] = htmlRow;
 			else if(notify) {
 				htmlPriority += htmlRow;
 				notifyRows.push(row);
 			}
-			else
+			else if(visibleRows >= 0)
 				htmlNormal += htmlRow;
-			if(_contentTableSoftLimit > 0 && ++visibleRows >= _contentTableSoftLimit) {
-				visibleRows = 0;
-				break;
-			}
 		}
-		if(_contentTableSoftLimit > 0 && visibleRows)
-			_contentTableSoftLimit = -_contentTableSoftLimit;
 		if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
 			html += '<tr><td colspan="7">No results found.</td></tr>';
 		else {
