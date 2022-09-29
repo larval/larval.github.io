@@ -464,9 +464,9 @@ const $L = {
 	setStageData: stageData => (_stageData=stageData) && (_contentTableSoftLimit=Math.abs(_contentTableSoftLimit)),
 	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
 	parseStageData: (json, args) => {
-		let nextPoll=$getSynchronizedNext();
+		let retry = false;
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
-			nextPoll = _nextStagePollShort;
+			retry = true;
 		else if(_stageDataHistoryIndex >= 0)
 			_stageDataHistory.push($clone(json));
 		else {
@@ -485,7 +485,7 @@ const $L = {
 				$marqueeFlash(json['notify']);
 			$E('l_last_update').innerHTML = $epochToDate(json['ts']);
 		}
-		$setNextStagePoll(nextPoll);
+		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
 	},
 	getHistoryData: () => $getData('history.json', $parseHistoryData),
 	parseHistoryData: json => {
