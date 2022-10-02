@@ -36,7 +36,7 @@ const $L = {
 	_naId: 'l_na',
 	_wakeLock: null,
 	_symbolsOnTop: {},
-	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^TNX', '^TYX'],
+	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 	_keyRow: 0,
 	_keyMapIndexDefault: 'Y',
 	_keyMapIndex: null,
