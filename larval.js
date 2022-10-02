@@ -36,7 +36,7 @@ const $L = {
 	_naId: 'l_na',
 	_wakeLock: null,
 	_symbolsOnTop: {},
-	_symbolOverrideMap: { '^VIX': '^VIX' },
+	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^TNX', '^TYX'],
 	_keyRow: 0,
 	_keyMapIndexDefault: 'Y',
 	_keyMapIndex: null,
@@ -253,10 +253,10 @@ const $L = {
 			ref = 'default';
 		else if(!ref)
 			return;
-		const raw = sym;
-		if(_symbolOverrideMap[sym]) {     type = $KSTK;  sym = _symbolOverrideMap[sym]; }
-		else if(sym[0] == _charCrypto) {  type = $KCRP;  sym = sym.substr(1); }
-		else if(sym[0] == _charFutures) { type = $KFTR;  sym = sym.substr(1); }
+		const raw=sym, staticIndex=_symbolsStatic.indexOf(sym);
+		if(staticIndex >= 0)             { type = $KSTK; sym = _symbolsStatic[staticIndex]; }
+		else if(sym[0] == _charCrypto)   { type = $KCRP; sym = sym.substr(1); }
+		else if(sym[0] == _charFutures)  { type = $KFTR; sym = sym.substr(1); }
 		else if(sym[0] == _charCurrency) { type = $KCUR; sym = ((sym.substr(-1)=='-'?'USD':sym)+(sym.substr(-1)=='+'?'USD':sym)).replace(/[^A-Z]+/g,''); }
 		_clickMap[ref]({'raw':raw, 'sym':sym, 'idx':idx, 'type':type, 'el':el});
 	},
