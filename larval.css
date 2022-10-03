@@ -167,7 +167,7 @@ body:before {
 	animation-direction: reverse;
 }
 i { font-style: normal !important; }
-#l_overflow {
+#l_root {
 	max-width: 100%;
 	overflow-x: hidden;
 }
@@ -712,6 +712,13 @@ input[type="checkbox"] {
 	background-color: transparent;
 	animation: l_notify_halt 1s ease alternate infinite;
 }
+#l_more {
+	text-align: center;
+	font-size: 30px;
+	color: #A6FDA4; 
+}
+.l_more { display: block !important; }
+.l_no_more { display: none !important; }
 #l_footer {
 	padding-top: 25px;
 	padding-bottom: 25px;

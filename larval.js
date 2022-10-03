@@ -368,7 +368,7 @@ const $L = {
 		_animationsComplete = true;
 		if(!fastSplash && $E(_naId))
 			$E(_naId).className = _naId;
-		$E('l_overflow').className = 'l_animations_complete';
+		$E('l_root').className = 'l_animations_complete';
 		$E('l_menu').className = (!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
 		if($hasSettings() && _stageData && _stageData['top'] && _stageData['top'].length > 1)
@@ -933,7 +933,7 @@ const $L = {
 		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price','volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked, includeCurrency=$E('l_include_currency').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
-		let notifyRows=[], notify=false, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
+		let notifyRows=[], notify=false, visibleRows=0, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		for(let c=1,className=''; c <= columns.length; c++) {
 			className = 'l_content_table_header';
 			if(_stageDataSortByColumn == c)
@@ -945,7 +945,7 @@ const $L = {
 		html += '</tr>';
 		if(doNotify)
 			$notifyClear();
-		for(let i=0,visibleRows=0; i < _stageData['items'].length; i++) {
+		for(let i=0; i < _stageData['items'].length; i++) {
 			const row=_stageData['items'][i], notifyExcept=!!_notifyExceptions[row[$SYM]];
 			let isOnTop=!!_symbolsOnTop[row[$SYM]], notifyControl='';
 			if($isHaltRow(row)) {
@@ -1006,6 +1006,8 @@ const $L = {
 			else if(visibleRows >= 0)
 				htmlNormal += htmlRow;
 		}
+		if(visibleRows > 0 && _contentTableSoftLimit > 0)
+			_contentTableSoftLimit = -_contentTableSoftLimit;
 		if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
 			html += '<tr><td colspan="7">No results found.</td></tr>';
 		else {
@@ -1013,9 +1015,11 @@ const $L = {
 				html += onTop[key];
 			html += htmlPriority + htmlNormal;
 		}
+		$E('l_more').className = _contentTableSoftLimit > 0 ? 'l_more' : 'l_no_more';
 		$E('l_content_table').className = $E('l_awaiting_data') ? '' : 'l_content_tr_fade_in';
 		if(doNotify)
 			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
+
 		$E('l_content_table').innerHTML = html;
 		$updateContentTableRowCountThatAreInView();
 		if(!doNotResetKeyRow)
