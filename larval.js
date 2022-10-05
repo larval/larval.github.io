@@ -10,7 +10,7 @@ const $L = {
 	_notifications: [],
 	_notifyTitleInterval: null,
 	_notifyAllowed: null,
-	_notifyExceptions: {},
+	_notifyExceptions: [],
 	_animationsComplete: false,
 	_forceContentTableShrink: false,
 	_nextStagePollTimeout: null,
@@ -37,6 +37,7 @@ const $L = {
 	_wakeLock: null,
 	_symbolsOnTop: {},
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
+	_I: -1,
 	_keyRow: 0,
 	_keyMapIndexDefault: 'Y',
 	_keyMapIndex: null,
@@ -179,11 +180,7 @@ const $L = {
 		p.textContent = string;
 		return(p.innerHTML);
 	},
-	I: string => {
-		const p=$D.createElement('p');
-		p.innerHTML = string;
-		return(p.textContent || p.innerText || '');
-	},
+	I: (array, item) => (_I = array.indexOf(item)), 
 	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
 	T: tag => $D.getElementsByTagName(tag),
@@ -253,8 +250,8 @@ const $L = {
 			ref = 'default';
 		else if(!ref)
 			return;
-		const raw=sym, staticIndex=_symbolsStatic.indexOf(sym);
-		if(staticIndex >= 0)             { type = $KSTK; sym = _symbolsStatic[staticIndex]; }
+		const raw=sym;
+		if($I(_symbolsStatic,sym) >= 0)  { type = $KSTK; sym = _symbolsStatic[_I]; }
 		else if(sym[0] == _charCrypto)   { type = $KCRP; sym = sym.substr(1); }
 		else if(sym[0] == _charFutures)  { type = $KFTR; sym = sym.substr(1); }
 		else if(sym[0] == _charCurrency) { type = $KCUR; sym = ((sym.substr(-1)=='-'?'USD':sym)+(sym.substr(-1)=='+'?'USD':sym)).replace(/[^A-Z]+/g,''); }
@@ -602,7 +599,11 @@ const $L = {
 		$updateContentTable(false);
 	},
 	settingsLoad: () => {
-		const now=new Date();
+		let now=new Date(), exs=localStorage.getItem('l_exceptions');
+		if(exs && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
+			_notifyExceptions = exs.filter(e => e);
+		else
+			localStorage.removeItem('l_exceptions');
 		_naId = $isMobile() ? 'l_nam' : 'l_na';
 		$getSymbolsOnTop();
 		if(localStorage.length == 0 && (now.getDay() == 0 || now.getDay() == 6))
@@ -743,11 +744,12 @@ const $L = {
 		if(disable) {
 			if(_symbolsOnTop[symbol])
 				$setSymbolsOnTop(symbol, true, false);
-			else
-				_notifyExceptions[symbol] = true;
+			else if($I(_notifyExceptions, symbol) < 0)
+				_notifyExceptions.push(symbol);
 		}
-		else if(_notifyExceptions[symbol])
-			delete _notifyExceptions[symbol];
+		else if($I(_notifyExceptions, symbol) >= 0)
+			_notifyExceptions.splice(_I, 1);
+		localStorage.setItem('l_exceptions', (new Date()).toLocaleDateString() + ' ' + _notifyExceptions.join(' '));
 		$updateContentTable(false, true);
 	},
 	notifyVibrate: pattern => {
@@ -946,7 +948,7 @@ const $L = {
 		if(doNotify)
 			$notifyClear();
 		for(let i=0; i < _stageData['items'].length; i++) {
-			const row=_stageData['items'][i], notifyExcept=!!_notifyExceptions[row[$SYM]];
+			const row=_stageData['items'][i], notifyExcept=($I(_notifyExceptions,row[$SYM]) >= 0);
 			let isOnTop=!!_symbolsOnTop[row[$SYM]], notifyControl='';
 			if($isHaltRow(row)) {
 				if(notifyExcept)
@@ -955,7 +957,7 @@ const $L = {
 				rowClass = (notify ? 'l_notify_halt' : 'l_halt');
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>
-					 <div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session">x</div>
+					 <div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for today">x</div>
 					 ${$cell(row,$SYM)}
 					</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
@@ -969,7 +971,7 @@ const $L = {
 					continue;
 				if(notify) {
 					rowClass = `l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
-					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for this session">x</div>`;
+					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for today">x</div>`;
 				}
 				else {
 					rowClass = isOnTop ? ' l_top' : '';
@@ -980,7 +982,7 @@ const $L = {
 				}
 				optionClass='';
 				if(row[$OPT]) {
-					if(['crypto','futures','currency'].indexOf(row[$OPT]) >= 0)
+					if($I(['crypto','futures','currency'],row[$OPT]) >= 0)
 						rowClass += ` l_${row[$OPT]}`;
 					else
 						optionClass = 'l_options';
@@ -1019,7 +1021,6 @@ const $L = {
 		$E('l_content_table').className = $E('l_awaiting_data') ? '' : 'l_content_tr_fade_in';
 		if(doNotify)
 			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
-
 		$E('l_content_table').innerHTML = html;
 		$updateContentTableRowCountThatAreInView();
 		if(!doNotResetKeyRow)
