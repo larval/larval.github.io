@@ -360,6 +360,12 @@ i { font-style: normal !important; }
 	text-align: center;
 	animation: l_content_fade_in 1s ease forwards;
 }
+#l_marquee_notify { color: #FFDE96; }
+#l_marquee_notify i {
+	color: #E1FDE4; 
+	padding-left: 2px; 
+	padding-right: 2px;
+}
 .l_marquee_blink, .l_marquee_blink_wide {
 	color: #ff0;
 	animation: l_fade_in 1s linear infinite; 

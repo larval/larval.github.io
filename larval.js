@@ -461,25 +461,22 @@ const $L = {
 	setStageData: stageData => (_stageData=stageData) && (_contentTableSoftLimit=Math.abs(_contentTableSoftLimit)),
 	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
 	parseStageData: (json, args) => {
-		let retry = false;
+		let retry=false, now=new Date();
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
 			retry = true;
 		else if(_stageDataHistoryIndex >= 0)
 			_stageDataHistory.push($clone(json));
 		else {
 			$setStageData(json);
-			if(_stageDataHistory.length == 0 && localStorage.length == 0 && _stageData['afterhours']) {
-				const now=new Date();
-				if(now.getDay() != 0 && now.getDay() != 6)
-					$E('l_include_futures').checked = $E('l_include_currency').checked = true;
-			}
+			if(!$hasSettings() && _stageData['afterhours']=='idle' && $I([0,6], now.getDay()) < 0 && _stageDataHistory.length==0)
+				$E('l_include_futures').checked = $E('l_include_currency').checked = true;
 			_stageDataHistory.push($clone(_stageData));
 			$sortStageData(false);
 			_forceContentTableShrink = false;
 			if(args && args['updateView'])
 				$updateContentTable(true);
 			if(json['notify'] && $hasSettings())
-				$marqueeFlash(json['notify']);
+				$marqueeFlash(`${_marqueeBlinkHtml}<span id="l_marquee_notify">${json['notify']}</span>${_marqueeBlinkHtml}`, false, 8000);
 			$E('l_last_update').innerHTML = $epochToDate(json['ts']);
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
@@ -606,7 +603,7 @@ const $L = {
 			localStorage.removeItem('l_exceptions');
 		_naId = $isMobile() ? 'l_nam' : 'l_na';
 		$getSymbolsOnTop();
-		if(localStorage.length == 0 && (now.getDay() == 0 || now.getDay() == 6))
+		if(!$hasSettings() && $I([0,6], now.getDay()) >= 0)
 			$E('l_include_crypto').checked = true;
 		for(let i=0; i < localStorage.length; i++) {
 			let input=$E(localStorage.key(i));
@@ -670,7 +667,7 @@ const $L = {
 		}
 		$marqueeInitiate(seconds, html);
 	},
-	marqueeFlash: (message, priority) => {
+	marqueeFlash: (message, priority, duration) => {
 		if(_marqueeFlashTimeout)
 			clearTimeout(_marqueeFlashTimeout);
 		if(_stageDataHistoryIndex >= 0 && (!message || !priority))
@@ -682,7 +679,7 @@ const $L = {
 		if(message) {
 			$scrollToTop();
 			$marqueeIntervalReset();
-			_marqueeFlashTimeout = setTimeout($marqueeFlash, 5000);
+			_marqueeFlashTimeout = setTimeout($marqueeFlash, duration?duration:5000);
 			$animationsReset('l_marquee_flash', 'l_content_fade_in 1s ease forwards');
 		}
 		else {
