@@ -37,7 +37,6 @@ const $L = {
 	_wakeLock: null,
 	_symbolsOnTop: {},
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
-	_I: -1,
 	_keyRow: 0,
 	_keyMapIndexDefault: 'Y',
 	_keyMapIndex: null,
@@ -180,7 +179,7 @@ const $L = {
 		p.textContent = string;
 		return(p.innerHTML);
 	},
-	I: (array, item) => (_I = array.indexOf(item)), 
+	I: (array, item) => (_I = array.indexOf(item)), _I: -1,
 	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
 	T: tag => $D.getElementsByTagName(tag),
