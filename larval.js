@@ -479,7 +479,9 @@ const $L = {
 			minutesSinceOpen = args.maxMinutes;
 		for(let i=0; i < stageData['items'].length; i++) { 
 			let minutes = (stageData['items'][i][$SYM][0]==_charCrypto ? minutesInADay : minutesSinceOpen);
-			if(minutes < 1 || stageData['items'][i][$VOL] < 1)
+			if(typeof stageData['items'][i][$VOL] != 'number')
+				continue;
+			else if(minutes < 1 || stageData['items'][i][$VOL] < 1)
 				stageData['items'][i][$VOL] = 0;
 			else if(vpm)
 				stageData['items'][i][$VOL] /= minutes;
