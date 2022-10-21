@@ -430,6 +430,7 @@ i { font-style: normal !important; }
 	width: 45%; 
 	transition: 1s;
 	overflow: hidden;
+	user-select: none;
 }
 #l_control_table {
 	width: 100%;
@@ -643,6 +644,10 @@ i { font-style: normal !important; }
 }
 #l_range_up_display, #l_range_down_display, #l_range_volume_display {
 	padding-left: 5px;
+}
+#l_range_volume_type {
+	text-decoration: underline;
+	cursor: pointer;
 }
 input[type="checkbox"] {
 	background-color: #A6FDA4;

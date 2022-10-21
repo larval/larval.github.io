@@ -105,6 +105,7 @@ const $L = {
 		'l_settings_button':e       => $settingsButtonToggle(),
 		'l_fixed':e                 => $animationsFastSplash(),
 		'l_last_update':e           => $forceNextStagePoll(),
+		'l_range_volume_type':e     => $vpmToggle(),
 		'l_content_table_header':_  => $setSortStageData(_.idx),
 		'l_notify_enable':_         => $notifyException(_.raw, false),
 		'l_notify_disable':_        => $notifyException(_.raw, true),
@@ -119,6 +120,7 @@ const $L = {
 		'Tab':(e,ev)                => $animationsToggle(null, ev.shiftKey),
 		'ShiftLeft':(e,ev)          => $rollContentTable(ev.shiftKey),
 		'ShiftRight':(e,ev)         => $rollContentTable(ev.shiftKey),
+		'Backspace':e               => $vpmToggle(),
 		'Backquote':e               => $editSymbolsOnTop(),
 		'Slash':e                   => $marqueeHotKeyHelp(),
 		'Home':e                    => _keyRow = 1,
@@ -129,7 +131,7 @@ const $L = {
 		'ArrowDown':e               => _keyRow++,
 		'ArrowLeft':e               => $gotoStageDataHistory(-1),
 		'ArrowRight':e              => $gotoStageDataHistory(1),
-		'Escape':e                  => $gotoStageDataHistory(0) || $settingsButtonToggle(true),
+		'Escape':e                  => $gotoStageDataHistory(0) || $settingsButtonToggle(true) || $scrollToTop(),
 		'Space':e                   => $onclick(e),
 		'Enter':e                   => $onclick(e),
 		'NumpadEnter':e             => $onclick(e)
@@ -140,7 +142,7 @@ const $L = {
 		'PCT5':_ => $isHaltRow(_.row) ? $H(_.val?_.val:'HALTED') : $htmlPercent(_.val,2),
 		'PCT':_  => $htmlPercent(_.val,2),
 		'PRC':_  => '$' + $N(_.val,_.row[$OPT]=='currency'&&_.val<10?4:2),
-		'VOL':_  => $F(_.val,1),
+		'VOL':_  => $F(_.val,1,true),
 		'OPT':_  => $H(_.val),
 		'OIV':_  => _.row[$SYM][0]==_charCrypto ? ('MC#'+_.val) : ($H(_.val>0?_.val:('~'+Math.abs(_.val))))+'%IV',
 		'ERN':_  => $H(_.val),
@@ -164,7 +166,7 @@ const $L = {
 	/* [$] SHORTHAND / COMMON */
 	D: document,
 	E: id => $D.getElementById(id),
-	F: (number, digits) => {
+	F: (number, digits, approx) => {
 		if(number > 999999999)
 			return (number/1000000000).toFixed(digits) + 'B';
 		else if(number > 999999)
@@ -172,7 +174,7 @@ const $L = {
 		else if(number > 999)
 			return (number/1000).toFixed(digits) + 'K';
 		else 
-			return number.toString();
+			return (approx ? '~'+(Math.ceil(number/100)*100) : number.toString());
 	},
 	H: string => {
 		const p=$D.createElement('p');
@@ -182,6 +184,7 @@ const $L = {
 	I: (array, item) => (_I = array.indexOf(item)), _I: -1,
 	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
+	S: window.localStorage,
 	T: tag => $D.getElementsByTagName(tag),
 	U: array => array.filter((x,i,a) => array.indexOf(x)==i),
 	W: window,
@@ -374,13 +377,13 @@ const $L = {
 		$marqueeIntervalReset();
 		$notifyPlayAudio(_audioTest);
 		$updateContentTable(true);
-		if($isMobile() || localStorage.getItem(_naId))
+		if($isMobile() || $S.getItem(_naId))
 			$animationsToggle(false, null);
 	},
 	animationsToggle: (explicit, saveSettings) => {
 		const animations = (typeof explicit == 'boolean' ? explicit : !!$E(_naId));
 		if(saveSettings)
-			localStorage[animations?'removeItem':'setItem'](_naId, _naId);
+			$S[animations?'removeItem':'setItem'](_naId, _naId);
 		$D.body.id = animations ? '' : _naId;
 		if(_animationsComplete)
 			$D.body.className = $D.body.id;
@@ -405,7 +408,7 @@ const $L = {
 	},
 	animationsDisableIfUnderFPS: (ms, fps, attempt) => {
 		if(!_frameData) {
-			if(!fps || $E(_naId) || localStorage.getItem(_naId) || $isMobile() || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
+			if(!fps || $E(_naId) || $S.getItem(_naId) || $isMobile() || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
 				return($blackhole('animationsDisableIfUnderFPS'));
 			_frameData = {'fps':fps, 'duration':ms/1000, 'stop':performance.now()+ms, 'frames':0, 'attempt':attempt>0?attempt:0};
 		}
@@ -429,7 +432,7 @@ const $L = {
 			_frameData = null;
 	},
 	keyMapSetup: () => {
-		if(!(_keyMapIndex=localStorage.getItem('l_keymap_index')))
+		if(!(_keyMapIndex=$S.getItem('l_keymap_index')))
 			_keyMapIndex = _keyMapIndexDefault;
 		for(let key in _keyMap) {
 			if(!_keyMap[key][$KOPT])
@@ -451,13 +454,46 @@ const $L = {
 			next = _nextStagePollLong;
 		return(next);
 	},
+	vpmToggle: () => {
+		if($S.getItem('vpm') === null && !confirm('Toggle from "volume per day" to the average "volume per minute" (VPM)?'))
+			return;
+		$S.setItem('vpm', $S.getItem('vpm')=='true'?'false':'true');
+		_stageData = $vpmStageData(_stageData);
+		$updateRangeDisplay('l_range_volume');
+		$updateContentTable();
+	},
+	vpmStageData: stageData => {
+		const vpm=($S.getItem('vpm')=='true');
+		if(!(stageData['vpm'] ^ vpm))
+			return(stageData);
+		let stageTime=new Date(stageData['ts']*1000), minutesSinceOpen=0, minutesInADay=1440, args;
+		if(!stageData['afterhours'])
+			args = {'hourOffset':9.5, 'maxMinutes':390};
+		else if(stageTime.getHours() < 10)
+			args = {'hourOffset':7,   'maxMinutes':150};
+		else
+			args = {'hourOffset':16,  'maxMinutes':240};
+		if((minutesSinceOpen=(stageTime.getHours()-args.hourOffset)*60+stageTime.getMinutes()) > args.maxMinutes)
+			minutesSinceOpen = args.maxMinutes;
+		for(let i=0; i < stageData['items'].length; i++) { 
+			let minutes = (stageData['items'][i][$SYM][0]==_charCrypto ? minutesInADay : minutesSinceOpen);
+			if(minutes < 1 || stageData['items'][i][$VOL] < 1)
+				stageData['items'][i][$VOL] = 0;
+			else if(vpm)
+				stageData['items'][i][$VOL] /= minutes;
+			else
+				stageData['items'][i][$VOL] *= minutes;
+		}
+		stageData['vpm'] = vpm;
+		return(stageData);
+	},
 	getData: (jsonFile, jsonCallback, args) => {
 		fetch(_stageURL+jsonFile+'?ts='+new Date().getTime())
 		.then(resp => resp.json())
 		.then(json => jsonCallback(json, args))
 		.catch(err => jsonCallback(null, args));
 	},
-	setStageData: stageData => (_stageData=stageData) && (_contentTableSoftLimit=Math.abs(_contentTableSoftLimit)),
+	setStageData: stageData => (_stageData=$vpmStageData(stageData)) && (_contentTableSoftLimit=Math.abs(_contentTableSoftLimit)),
 	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
 	parseStageData: (json, args) => {
 		let retry=false, now=new Date();
@@ -577,47 +613,48 @@ const $L = {
 			return(_emptyCellHtml);
 	},
 	settingsButtonToggle: forceClosed => {
-		const controlHeight=($E('l_control').scrollHeight > 200 ? $E('l_control_table').scrollHeight : 250)+'px', grow=(!forceClosed && $E('l_control').style.height!=controlHeight);
+		const controlHeight=($E('l_control').scrollHeight > 200 ? $E('l_control_table').scrollHeight : 250)+'px', closed=($E('l_control').style.height!=controlHeight), grow=(!forceClosed&&closed);
 		$E('l_control').style.height = (grow?controlHeight:'0px');
 		$E('l_settings_button').innerHTML = (grow?'&#9660; settings &#9660;':'&#9650; settings &#9650;');
+		return !(closed ^ grow);
 	},
 	settingsSave: e => { 
 		const context = (e&&e.target) ? e.target : null;
 		for(let inputs=$T('input'), i=0; i < inputs.length; i++) {
 			let input=inputs[i];
 			if(input.type == 'checkbox')
-				localStorage.setItem(input.id, input.checked ? 'true' : 'false');
+				$S.setItem(input.id, input.checked ? 'true' : 'false');
 			else if(input.type == 'range')
-				localStorage.setItem(input.id, input.value);
+				$S.setItem(input.id, input.value);
 		}
 		if(context && context.id == 'l_audible' && context.checked)
 			$notifyPlayAudio(_audioTest);
 		$updateContentTable(false);
 	},
 	settingsLoad: () => {
-		let now=new Date(), exs=localStorage.getItem('l_exceptions');
+		let now=new Date(), exs=$S.getItem('l_exceptions');
 		if(exs && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
 			_notifyExceptions = exs.filter(e => e);
 		else
-			localStorage.removeItem('l_exceptions');
+			$S.removeItem('l_exceptions');
 		_naId = $isMobile() ? 'l_nam' : 'l_na';
 		$getSymbolsOnTop();
 		if(!$hasSettings() && $I([0,6], now.getDay()) >= 0)
 			$E('l_include_crypto').checked = true;
-		for(let i=0; i < localStorage.length; i++) {
-			let input=$E(localStorage.key(i));
+		for(let i=0; i < $S.length; i++) {
+			let input=$E($S.key(i));
 			if(!input || !input['type'])
 				continue;
 			if(input.type == 'checkbox')
-				input.checked = (localStorage.getItem(input.id) == 'true');
+				input.checked = ($S.getItem(input.id) == 'true');
 			else if(input.type == 'range')
-				input.value = localStorage.getItem(input.id);
+				input.value = $S.getItem(input.id);
 		}
 		for(let id of ['l_range_up','l_range_down','l_range_volume'])
 			$updateRangeDisplay(id);
 	},
 	updateRangeDisplay: idOrEvent => {
-		let id='';
+		let id='', vpm=$S.getItem('vpm');
 		if(typeof idOrEvent == 'string')
 			id = idOrEvent;
 		else if(typeof idOrEvent == 'object' && idOrEvent.target && idOrEvent.target.id)
@@ -628,8 +665,10 @@ const $L = {
 		switch(id) {
 			case 'l_range_up':     display.innerHTML = (input.value / 10).toFixed(1); break;
 			case 'l_range_down':   display.innerHTML = (-input.value / 10).toFixed(1); break;
-			case 'l_range_volume': display.innerHTML = input.value; break;
+			case 'l_range_volume': display.innerHTML = (vpm=='true' ? (input.value/10).toFixed(1) : input.value); break;
 		}
+		if(vpm !== null)
+			$E('l_range_volume_type').innerHTML = (vpm=='true' ? 'vpm' : 'vol');
 	},
 	marqueeInitiate: (seconds, html) => {
 		const m=$E('l_marquee'), mc=$E('l_marquee_content'), mcc=$E('l_marquee_content_clone');
@@ -745,7 +784,7 @@ const $L = {
 		}
 		else if($I(_notifyExceptions, symbol) >= 0)
 			_notifyExceptions.splice(_I, 1);
-		localStorage.setItem('l_exceptions', (new Date()).toLocaleDateString() + ' ' + _notifyExceptions.join(' '));
+		$S.setItem('l_exceptions', (new Date()).toLocaleDateString() + ' ' + _notifyExceptions.join(' '));
 		$updateContentTable(false, true);
 	},
 	notifyVibrate: pattern => {
@@ -803,14 +842,14 @@ const $L = {
 		_keyMapIndex = key;
 		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain&&domain.hostname?domain.hostname:url);
 		if(saveSettings) {
-			localStorage.setItem('l_keymap_index', _keyMapIndex);
+			$S.setItem('l_keymap_index', _keyMapIndex);
 			$marqueeFlash(`Links will now permanently direct to <i class='l_marquee_highlight'>${display}</i> by default.`);
 		}
 		else
 			$marqueeFlash(`Links will now direct to <i class='l_marquee_highlight'>${display}</i> for this session, hold down <i class='l_marquee_highlight'>shift</i> to make it permanent.`);
 	},
 	editSymbolsOnTop: () => {
-		let symbols=localStorage.getItem('l_symbols_on_top');
+		let symbols=$S.getItem('l_symbols_on_top');
 		if((symbols=prompt("Enter symbols you would like to have sticky on top: \n[NOTE: alt-click rows to individually add or remove]", symbols?symbols:'')) === null)
 			return;
 		$setSymbolsOnTop(null, true, false);
@@ -822,7 +861,7 @@ const $L = {
 		if(Object.keys(_symbolsOnTop).length)
 			return(_symbolsOnTop);
 		_symbolsOnTop = {};
-		let savedSymbols=localStorage.getItem('l_symbols_on_top');
+		let savedSymbols=$S.getItem('l_symbols_on_top');
 		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*\$]?[A-Z0-9]+/g)))
 			savedSymbols.forEach(sym => $addSymbolToTop(sym));
 		return(_symbolsOnTop);
@@ -836,7 +875,7 @@ const $L = {
 			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? $delSymbolFromTop(sym) : $addSymbolToTop(sym));
 		orderedTopList = $U(Object.values(_symbolsOnTop)).sort((a, b) => a.localeCompare(b));
 		orderedTopListStr = orderedTopList.join(', ').trim(', ');
-		localStorage.setItem('l_symbols_on_top', orderedTopListStr);
+		$S.setItem('l_symbols_on_top', orderedTopListStr);
 		if(!updateView)
 			return;
 		onTopDiff -= orderedTopList.length;
@@ -899,7 +938,7 @@ const $L = {
 		_contentTableRowCountThatAreInView = total;
 		return(total);
 	},
-	hasSettings: () => localStorage && localStorage.length > 1,
+	hasSettings: () => $S && $S.length > 1,
 	isMobile: () => 'ontouchstart' in $D.documentElement && $D.body.clientHeight > $D.body.clientWidth,
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
 	cell: (row, type) => row[type] && _stageDataMap[type] ? _stageDataMap[type]({'val':row[type], 'row':row, 'type':type}) : _emptyCellHtml,
@@ -928,7 +967,7 @@ const $L = {
 	updateContentTable: (doNotify, doNotResetKeyRow) => {
 		if(!_stageData)
 			return;
-		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price','volume','options'];
+		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options'];
 		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked, includeCurrency=$E('l_include_currency').checked;
 		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		let notifyRows=[], notify=false, visibleRows=0, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
