@@ -167,7 +167,9 @@ const $L = {
 	D: document,
 	E: id => $D.getElementById(id),
 	F: (number, digits, approx) => {
-		if(number > 999999999)
+		if(typeof number != 'number')
+			return (number);
+		else if(number > 999999999)
 			return (number/1000000000).toFixed(digits) + 'B';
 		else if(number > 999999)
 			return (number/1000000).toFixed(digits) + 'M';
