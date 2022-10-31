@@ -694,7 +694,7 @@ const $L = {
 		}
 		let html='', rank=0, includeCrypto=$E('l_include_crypto').checked;
 		for(let i in _stageData['top']) {
-			let item=_stageData['top'][i], isMarketIndex=(item.length==3);
+			let item=_stageData['top'][i], isMarketIndex=(item.length>2&&typeof item[2]=='string');
 			if(isMarketIndex) {
 				if(!html) html += '<i class="l_marquee_blink_wide">&#8226;</i>';
 				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_highlight_padded'>${$H(item[2])}</i>${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
