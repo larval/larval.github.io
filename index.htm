@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
- <title>Larval - Live market volatility</title>
+ <title>Larval - Live market volatility dashboard</title>
  <meta charset="UTF-8" /> 
  <meta name="description" content="A tool to help traders find live volatility in the stock market as it happens, alerting you to the biggest movements in the last 5 minutes." />
  <meta name="keywords" content="live,stock,market,volatility,vega,implied,iv" />
@@ -9,7 +9,7 @@
  <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, width=device-width" />
  <meta name="theme-color" content="#303630" />
  <meta property="og:type" content="website" />
- <meta property="og:title" content="Larval - Live market volatility" />
+ <meta property="og:title" content="Larval - Live market volatility dashboard" />
  <meta property="og:description" content="A tool to help traders find live volatility in the stock market as it happens, alerting you to the biggest movements in the last 5 minutes." />
  <meta property="og:url" content="https://larval.com" />
  <meta property="og:image" content="https://larval.com/screenshot.png" />
@@ -128,8 +128,8 @@
  <div id="l_marquee_container">
   <div id="l_marquee">
    <div id="l_marquee_content">
-    <h1 id="l_info">
-     <i class='l_marquee_blink'>&#8226;</i> Larval is a utility that looks for volatility in the stock market as it happens. <i class='l_marquee_blink'>&#8226;</i> It works by monitoring the market in ~5 minute intervals and alerts you if the price change meets your criteria. <i class='l_marquee_blink'>&#8226;</i> For a list of navigational keyboard shortcuts type <a id="l_hotkey_help" href="#0" style="text-decoration:none">&quot;?&quot;</a> <i class='l_marquee_blink'>&#9650;</i> The countdown slider above indicates the time remaining until the next polling update. <i class='l_marquee_blink'>&#9660;</i> The settings button below allows you to control the criteria that alerts you after each polling update.  <i class='l_marquee_blink'>&#8226;</i> For the backstory and additional information go to <a href="//larval.medium.com/larval-a-journey-into-experimental-stock-option-trading-strategies-873108d95fb0" style="text-decoration:none" target="_blank">larval.medium.com</a>.
+    <h1 id="l_marquee_about">
+     <i class="l_marquee_blink">&#8226;</i> Larval is a utility that looks for volatility in the stock market as it happens. <i class="l_marquee_blink">&#8226;</i> It works by monitoring the market in ~5 minute intervals and alerts you if the price change meets your criteria. <i class="l_marquee_blink">&#8226;</i> For a list of navigational keyboard shortcuts type <a id="l_hotkey_help" href="#0" style="text-decoration:none">&quot;?&quot;</a> <i class="l_marquee_blink">&#9650;</i> The countdown slider above indicates the time remaining until the next polling update. <i class="l_marquee_blink">&#9660;</i> The settings button below allows you to control the criteria that alerts you after each polling update. <i class="l_marquee_blink">&#8226;</i> For the backstory and additional information go to <a href="//larval.medium.com/larval-a-journey-into-experimental-stock-option-trading-strategies-873108d95fb0" style="text-decoration:none" target="_blank">larval.medium.com</a>.
     </h1>
    </div>
    <div id="l_marquee_content_clone"></div>
@@ -139,12 +139,17 @@
  <div id="l_settings_button">&#9650; settings &#9650;</div>
  <div id="l_control">
   <table id="l_control_table">
-   <tr><th colspan="2">~5 minute % change threshold to alert (<i>0.0% to disable</i>)</th></tr>
-   <tr><td><input type="range" min="0" max="200" value="50" class="l_range" id="l_range_up" /></td><td style="width:1%">&gt;<i id="l_range_up_display">0.0</i>%</td></tr>
-   <tr><td><input type="range" min="0" max="200" value="50" class="l_range" id="l_range_down" /></td><td style="width:1%">&lt;<i id="l_range_down_display">0.0</i>%</td></tr>
-   <tr><td><input type="range" min="0" max="999" value="25" class="l_range" id="l_range_volume" /></td><td style="width:1%">&gt;<i id="l_range_volume_display">0</i>k&nbsp;<i id="l_range_volume_type" title="Toggle volume per minute (VPM)">vol?</i></td></tr>
-   <tr><td colspan="2"><input type="checkbox" class="l_checkbox" id="l_audible" name="l_audible" /> <label for="l_audible">Audible notifications</label> <input type="checkbox" class="l_checkbox" id="l_options_only" name="l_options_only" /> <label for="l_options_only">Only notify if a stock has options</label></td></tr>
-   <tr><td colspan="2"><input type="checkbox" class="l_checkbox" id="l_notify_halts" name="l_notify_halts" checked="checked" /> <label for="l_notify_halts">Notify when halted</label> <input type="checkbox" class="l_checkbox" id="l_include_futures" name="l_include_futures" value="1" /> <label for="l_include_futures">Futures</label> <input type="checkbox" class="l_checkbox" id="l_include_currency" name="l_include_currency" value="1" /> <label for="l_include_currency">Currency</label> <input type="checkbox" class="l_checkbox" id="l_include_crypto" name="l_include_crypto" value="1" /> <label for="l_include_crypto">Crypto</label></td></tr>
+   <tr><th colspan="6">~5 minute % change threshold to alert (<i>0.0% to disable</i>)</th></tr>
+   <tr>
+    <td class="l_tab" id="l_stocks"><i>&#10003;</i>Stocks<span>&nbsp;(AH)</span></td>
+    <td class="l_tab" id="l_crypto"><i>&#10003;</i>Crypto</td>
+    <td class="l_tab" id="l_futures"><i>&#10003;</i>Futures</td>
+    <td class="l_tab" id="l_currency"><i>&#10003;</i>Currency</td>
+    <td id="l_tab_show">&nbsp;&nbsp;<input type="checkbox" class="l_checkbox" id="l_show" name="l_show" /><label for="l_show">Show</label>&nbsp;&nbsp;</td></tr>
+   <tr><td colspan="4"><input type="range" min="0" max="200" value="0" class="l_range" id="l_range_up" /></td><td style="width:1%">&gt;<i id="l_range_up_display">0.0</i>%</td></tr>
+   <tr><td colspan="4"><input type="range" min="0" max="200" value="0" class="l_range" id="l_range_down" /></td><td style="width:1%">&lt;<i id="l_range_down_display">0.0</i>%</td></tr>
+   <tr><td colspan="4"><input type="range" min="0" max="999" value="0" class="l_range" id="l_range_volume" /></td><td style="width:1%">&gt;<i id="l_range_volume_display">0</i>&nbsp;<i id="l_range_volume_type" title="Toggle volume per minute (VPM)">vol?</i></td></tr>
+   <tr><td colspan="6"><input type="checkbox" class="l_checkbox" id="l_audible" name="l_audible" />&nbsp;<label for="l_audible">Audible notifications</label> <input type="checkbox" class="l_checkbox" id="l_options_only" name="l_options_only" />&nbsp;<label for="l_options_only">Only notify if a stock has options</label> <input type="checkbox" class="l_checkbox" id="l_notify_halts" name="l_notify_halts" />&nbsp;<label for="l_notify_halts">Notify when halted</label></td></tr>
   </table>
  </div>
  <div id="l_content">

@@ -20,8 +20,7 @@ const $L = {
 	_marqueeLoopSeconds: 90,
 	_marqueeInterval: null,
 	_marqueeFlashTimeout: null,
-	_marqueeBlinkHtml: '<i class="l_marquee_blink">&#8226;</i>',
-	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
+	_naId: 'l_na',
 	_charUp: "\u25bc ",
 	_charDown: "\u25b2 ",
 	_charHalt: "\u25a0 ",
@@ -33,79 +32,80 @@ const $L = {
 	_title:	document.title,
 	_frameData: null,
 	_swipeStartPosition: null,
-	_naId: 'l_na',
 	_wakeLock: null,
 	_symbolsOnTop: {},
+	_marqueeBlinkHtml: '<i class="l_marquee_blink">&#8226;</i>',
+	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
-	_keyRow: 0,
-	_keyMapIndexDefault: 'Y',
-	_keyMapIndex: null,
+	_assetTypes: ['l_stocks', 'l_crypto', 'l_futures', 'l_currency'],
+	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_keyMap: {
-		A: ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@/options', 'https://www.seekingalpha.com/symbol/@-USD'],
-		B: ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/stocks/quotes/@/options', 'https://www.barchart.com/crypto/coins/@'],
-		C: ['https://www.cnbc.com/quotes/@', 'https://www.cnbc.com/quotes/@?tab=options', 'https://www.cnbc.com/quotes/@.CM='],
-		D: ['https://research.tdameritrade.com/grid/public/research/stocks/summary?symbol=@'],
-		E: ['https://www.etrade.wallst.com/v1/stocks/snapshot/snapshot.asp?symbol=@'],
-		F: ['https://www.finviz.com/quote.ashx?t=@',  null, 'https://www.finviz.com/crypto_charts.ashx?t=@USD'],
-		G: ['https://www.benzinga.com/quote/@', null, 'https://www.benzinga.com/quote/@-USD'],
-		H: ['https://www.stockcharts.com/h-sc/ui?s=@'],
-		I: ['https://www.investing.com/search/?q=@'],
-		J: ['https://www.wsj.com/market-data/quotes/@', 'https://www.wsj.com/market-data/quotes/@/options'],
-		K: ['https://www.morningstar.com/stocks/xnas/@/quote'],
-		L: ['https://www.fool.com/quote/@', null, 'https://www.fool.com/quote/crypto/@'],
-		M: ['https://www.marketwatch.com/investing/stock/@', 'https://www.marketwatch.com/investing/stock/@/options', 'https://www.marketwatch.com/investing/cryptocurrency/@USD'],
-		N: ['https://money.cnn.com/quote/quote.html?symb=@'],
-		O: ['https://www.cboe.com/delayed_quotes/@', 'https://www.cboe.com/delayed_quotes/@/quote_table'],
-		P: ['https://eresearch.fidelity.com/eresearch/goto/evaluate/snapshot.jhtml?symbols=@'],
-		Q: ['https://www.nasdaq.com/market-activity/stocks/@', 'https://www.nasdaq.com/market-activity/stocks/@/option-chain'],
-		R: ['https://www.robinhood.com/stocks/@', null, 'https://www.robinhood.com/crypto/@'],
-		S: ['https://www.stocktwits.com/symbol/@', null, 'https://www.stocktwits.com/symbol/@.X'],
-		T: ['https://www.tradestation.com/research/stocks/@'],
-		U: ['https://www.gurufocus.com/stock/@'],
-		V: ['https://www.tradingview.com/chart/?symbol=@', null, 'https://www.tradingview.com/chart/?symbol=@USD'],
-		W: ['https://www.twitter.com/search?q=%24@', null, 'https://www.twitter.com/search?q=%24@.X'],
-		X: ['https://www.foxbusiness.com/quote?stockTicker=@'],
-		Y: ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@/options', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F', 'https://finance.yahoo.com/quote/@=X'],
-		Z: ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain'],
-	},
+		'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@/options', 'https://www.seekingalpha.com/symbol/@-USD'],
+		'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/stocks/quotes/@/options', 'https://www.barchart.com/crypto/coins/@'],
+		'C': ['https://www.cnbc.com/quotes/@', 'https://www.cnbc.com/quotes/@?tab=options', 'https://www.cnbc.com/quotes/@.CM='],
+		'D': ['https://research.tdameritrade.com/grid/public/research/stocks/summary?symbol=@'],
+		'E': ['https://www.etrade.wallst.com/v1/stocks/snapshot/snapshot.asp?symbol=@'],
+		'F': ['https://www.finviz.com/quote.ashx?t=@',  null, 'https://www.finviz.com/crypto_charts.ashx?t=@USD'],
+		'G': ['https://www.benzinga.com/quote/@', null, 'https://www.benzinga.com/quote/@-USD'],
+		'H': ['https://www.stockcharts.com/h-sc/ui?s=@'],
+		'I': ['https://www.investing.com/search/?q=@'],
+		'J': ['https://www.wsj.com/market-data/quotes/@', 'https://www.wsj.com/market-data/quotes/@/options'],
+		'K': ['https://www.morningstar.com/stocks/xnas/@/quote'],
+		'L': ['https://www.fool.com/quote/@', null, 'https://www.fool.com/quote/crypto/@'],
+		'M': ['https://www.marketwatch.com/investing/stock/@', 'https://www.marketwatch.com/investing/stock/@/options', 'https://www.marketwatch.com/investing/cryptocurrency/@USD'],
+		'N': ['https://money.cnn.com/quote/quote.html?symb=@'],
+		'O': ['https://www.cboe.com/delayed_quotes/@', 'https://www.cboe.com/delayed_quotes/@/quote_table'],
+		'P': ['https://eresearch.fidelity.com/eresearch/goto/evaluate/snapshot.jhtml?symbols=@'],
+		'Q': ['https://www.nasdaq.com/market-activity/stocks/@', 'https://www.nasdaq.com/market-activity/stocks/@/option-chain'],
+		'R': ['https://www.robinhood.com/stocks/@', null, 'https://www.robinhood.com/crypto/@'],
+		'S': ['https://www.stocktwits.com/symbol/@', null, 'https://www.stocktwits.com/symbol/@.X'],
+		'T': ['https://www.tradestation.com/research/stocks/@'],
+		'U': ['https://www.gurufocus.com/stock/@'],
+		'V': ['https://www.tradingview.com/chart/?symbol=@', null, 'https://www.tradingview.com/chart/?symbol=@USD'],
+		'W': ['https://www.twitter.com/search?q=%24@', null, 'https://www.twitter.com/search?q=%24@.X'],
+		'X': ['https://www.foxbusiness.com/quote?stockTicker=@'],
+		'Y': ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@/options', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F', 'https://finance.yahoo.com/quote/@=X'],
+		'Z': ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain'],
+	}, _keyRow: 0, _keyMapIndexDefault: 'Y', _keyMapIndex: null,
 	_taMap: {
-		AS: ['Ascending triangle', 'asc<i>&nbsp;triangle</i>', 'F'],
-		CD: ['Channel down', 'c<i>hannel&nbsp;</i>down', 'F'],
-		CH: ['Channel', 'chan<i>nel</i>', 'F'],
-		CU: ['Channel up', 'c<i>hannel&nbsp;</i>up', 'F'],
-		D1: ['Barchart directional top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
-		DB: ['Double bottom', '2x&nbsp;bot<i>tom</i>', 'F'],
-		DE: ['Descending triangle', 'desc<i>&nbsp;triangle</i>', 'F'],
-		DT: ['Double top', '2x&nbsp;top', 'F'],
-		HI: ['Inverse head and Ssoulders', 'inv<i>erse</i>&nbsp;h&amp;s', 'F'],
-		HS: ['Head and shoulders', 'h&nbsp;&amp;&nbsp;s', 'F'],
-		HZ: ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r', 'F'],
-		MB: ['Multiple bottoms', '&gt;2x&nbsp;bot<i>tom</i>s', 'F'],
-		MT: ['Multiple tops', '&gt;2x&nbsp;tops', 'F'],
-		S1: ['Barchart strength top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
-		TR: ['Technical resistance', 'resist<i>ance</i>', 'F'],
-		TS: ['Technical support', '<i>tech&nbsp;</i>support', 'F'],
-		WD: ['Wedge down', 'wedge<i>&nbsp;down</i>', 'F'],
-		WE: ['Wedge', 'wedge', 'F'],
-		WU: ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
+		'AS': ['Ascending triangle', 'asc<i>&nbsp;triangle</i>', 'F'],
+		'CD': ['Channel down', 'c<i>hannel&nbsp;</i>down', 'F'],
+		'CH': ['Channel', 'chan<i>nel</i>', 'F'],
+		'CU': ['Channel up', 'c<i>hannel&nbsp;</i>up', 'F'],
+		'D1': ['Barchart directional top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
+		'DB': ['Double bottom', '2x&nbsp;bot<i>tom</i>', 'F'],
+		'DE': ['Descending triangle', 'desc<i>&nbsp;triangle</i>', 'F'],
+		'DT': ['Double top', '2x&nbsp;top', 'F'],
+		'HI': ['Inverse head and Ssoulders', 'inv<i>erse</i>&nbsp;h&amp;s', 'F'],
+		'HS': ['Head and shoulders', 'h&nbsp;&amp;&nbsp;s', 'F'],
+		'HZ': ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r', 'F'],
+		'MB': ['Multiple bottoms', '&gt;2x&nbsp;bot<i>tom</i>s', 'F'],
+		'MT': ['Multiple tops', '&gt;2x&nbsp;tops', 'F'],
+		'S1': ['Barchart strength top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
+		'TR': ['Technical resistance', 'resist<i>ance</i>', 'F'],
+		'TS': ['Technical support', '<i>tech&nbsp;</i>support', 'F'],
+		'WD': ['Wedge down', 'wedge<i>&nbsp;down</i>', 'F'],
+		'WE': ['Wedge', 'wedge', 'F'],
+		'WU': ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
 	},
 	_eventMap: {
-		   'l_audible, l_options_only, l_notify_halts, l_include_futures, l_include_crypto, l_include_currency': {
-				change:e    => $settingsSave(e)
+		   'l_audible, l_options_only, l_notify_halts, l_show': {
+				change:e    => $settingsChange(e)
 		}, 'l_range_up, l_range_down, l_range_volume': {
 				input:e     => $updateRangeDisplay(e),
-				change:e    => $settingsSave(e)
+				change:e    => $settingsChange(e)
 		}, 'l_content_table': {
 				mousemove:e => $keyModeReset()
 		}
 	},
 	_clickMap: {
-		'l_hotkey_help':e           => $marqueeHotKeyHelp(),
-		'l_marquee_flash':e         => $gotoStageDataHistory(0),
-		'l_settings_button':e       => $settingsButtonToggle(),
-		'l_fixed':e                 => $animationsFastSplash(),
-		'l_last_update':e           => $forceNextStagePoll(),
-		'l_range_volume_type':e     => $vpmToggle(),
+		'l_hotkey_help':_           => $marqueeHotKeyHelp(),
+		'l_marquee_flash':_         => $gotoStageDataHistory(0),
+		'l_fixed':_                 => $animationsFastSplash(),
+		'l_last_update':_           => $forceNextStagePoll(),
+		'l_range_volume_type':_     => $vpmToggle(),
+		'l_settings_button':_       => $settingsButtonToggle(),
+		'l_tab':_                   => $settingsTabSelect(_.el),
 		'l_content_table_header':_  => $setSortStageData(_.idx),
 		'l_notify_enable':_         => $notifyException(_.raw, false),
 		'l_notify_disable':_        => $notifyException(_.raw, true),
@@ -161,22 +161,34 @@ const $L = {
 		'KFTR':  3,
 		'KCUR':  4
 	},
+	_settings: {
+		'l_version':          1,
+		'l_audible':          false,
+		'l_notify_halts':     true,
+		'l_options_only':     false,
+		'l_keymap_index':     '',
+		'l_symbols_on_top':   '',
+		'l_exceptions':       '',
+		'l_vpm':              null,
+		'l_stocks':           { 'l_show':true,  'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'K', 'vpm_precision':1, 'vpm_shift':10,   'percent_shift':10 },
+		'l_stocks_ah':        { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':null, 'multiplier':'K', 'vpm_precision':0, 'vpm_shift':1,    'percent_shift':10 },
+		'l_crypto':           { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'M', 'vpm_precision':0, 'vpm_shift':1000, 'percent_shift':10 },
+		'l_futures':          { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':null, 'multiplier':'K', 'vpm_precision':0, 'vpm_shift':1,    'percent_shift':100 },
+		'l_currency':         { 'l_show':false, 'l_range_up':25,  'l_range_down':25,  'l_range_volume':null, 'multiplier':'K', 'vpm_precision':0, 'vpm_shift':1,    'percent_shift':100 }
+	}, _settingsSelectedTab: {}, _settingsSelectedTabName: '',
 	_vibrateAlert: [250,250,500,250,750,250,1000], _audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
 	/* [$] SHORTHAND / COMMON */
 	D: document,
-	E: id => $D.getElementById(id),
+	E: id => (_E = $D.getElementById(id)), _E: null,
 	F: (number, digits, approx) => {
 		if(typeof number != 'number')
 			return (number);
-		else if(number > 999999999)
-			return (number/1000000000).toFixed(digits) + 'B';
-		else if(number > 999999)
-			return (number/1000000).toFixed(digits) + 'M';
-		else if(number > 999)
-			return (number/1000).toFixed(digits) + 'K';
-		else 
-			return (approx ? '~'+(Math.ceil(number/100)*100) : number.toString());
+		for(let prefix in _multipliers) {
+			if(number >= _multipliers[prefix])
+				return((number/_multipliers[prefix]).toFixed(digits) + prefix);
+		}
+		return (approx ? '~'+(Math.ceil(number/100)*100).toString() : number.toString());
 	},
 	H: string => {
 		const p=$D.createElement('p');
@@ -186,7 +198,6 @@ const $L = {
 	I: (array, item) => (_I = array.indexOf(item)), _I: -1,
 	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
-	S: window.localStorage,
 	T: tag => $D.getElementsByTagName(tag),
 	U: array => array.filter((x,i,a) => array.indexOf(x)==i),
 	W: window,
@@ -290,7 +301,7 @@ const $L = {
 				$onclick(rows[_keyRow]);
 			}
 			else if(e.code)
-				$marqueeFlash(`The &quot;<i class='l_marquee_highlight'>${e.code}</i>&quot; key is not mapped, type &quot;<i class='l_marquee_highlight'>?</i>&quot; to see the supported hotkeys.`);
+				$marqueeFlash(`The &quot;<i class='l_marquee_alt'>${e.code}</i>&quot; key is not mapped, type &quot;<i class='l_marquee_alt'>?</i>&quot; to see the supported hotkeys.`);
 		}
 		if(_keyRow < 0)
 			_keyRow = 0;
@@ -324,6 +335,7 @@ const $L = {
 		$animationsProgressReset();
 	},
 	onresize: e => {
+		if($isMobile(false)) return;
 		$settingsButtonToggle(true);
 		$updateContentTableRowCountThatAreInView();
 	},
@@ -368,7 +380,7 @@ const $L = {
 			return;
 		_animationsComplete = true;
 		if(!fastSplash && $E(_naId))
-			$E(_naId).className = _naId;
+			_E.className = _naId;
 		$E('l_root').className = 'l_animations_complete';
 		$E('l_menu').className = (!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
@@ -379,13 +391,13 @@ const $L = {
 		$marqueeIntervalReset();
 		$notifyPlayAudio(_audioTest);
 		$updateContentTable(true);
-		if($isMobile() || $S.getItem(_naId))
+		if($isMobile(true) || _settings[_naId])
 			$animationsToggle(false, null);
 	},
 	animationsToggle: (explicit, saveSettings) => {
 		const animations = (typeof explicit == 'boolean' ? explicit : !!$E(_naId));
 		if(saveSettings)
-			$S[animations?'removeItem':'setItem'](_naId, _naId);
+			$settings(_naId, !animations);
 		$D.body.id = animations ? '' : _naId;
 		if(_animationsComplete)
 			$D.body.className = $D.body.id;
@@ -410,8 +422,8 @@ const $L = {
 	},
 	animationsDisableIfUnderFPS: (ms, fps, attempt) => {
 		if(!_frameData) {
-			if(!fps || $E(_naId) || $S.getItem(_naId) || $isMobile() || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
-				return($blackhole('animationsDisableIfUnderFPS'));
+			if(!fps || $E(_naId) || _settings[_naId] || $isMobile(true) || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
+				return($removeFunction('animationsDisableIfUnderFPS'));
 			_frameData = {'fps':fps, 'duration':ms/1000, 'stop':performance.now()+ms, 'frames':0, 'attempt':attempt>0?attempt:0};
 		}
 		else if(!fps)
@@ -422,8 +434,8 @@ const $L = {
 			$W.requestAnimationFrame($animationsDisableIfUnderFPS);
 		else if(_frameData.duration > 0 && (_frameData.frames/_frameData.duration) < _frameData.fps) {
 			$animationsToggle(false, null);
-			$marqueeFlash('Slow graphics detected, disabling most animations.  Use the <i class="l_marquee_highlight">tab</i> key to re-enable.');
-			$blackhole('animationsDisableIfUnderFPS');
+			$marqueeFlash('Slow graphics detected, disabling most animations.  Use the <i class="l_marquee_alt">tab</i> key to re-enable.');
+			$removeFunction('animationsDisableIfUnderFPS');
 		}
 		else if(--_frameData.attempt > 0) {
 			_frameData.frames = 0;
@@ -434,17 +446,15 @@ const $L = {
 			_frameData = null;
 	},
 	keyMapSetup: () => {
-		if(!(_keyMapIndex=$S.getItem('l_keymap_index')))
+		if(!(_keyMapIndex=_settings['l_keymap_index']))
 			_keyMapIndex = _keyMapIndexDefault;
 		for(let key in _keyMap) {
 			if(!_keyMap[key][$KOPT])
 				_keyMap[key][$KOPT] = _keyMap[key][$KSTK];
-			if(!_keyMap[key][$KCRP])
-				_keyMap[key][$KCRP] = _keyMap[_keyMapIndexDefault][$KCRP];
-			if(!_keyMap[key][$KFTR])
-				_keyMap[key][$KFTR] = _keyMap[_keyMapIndexDefault][$KFTR];
-			if(!_keyMap[key][$KCUR])
-				_keyMap[key][$KCUR] = _keyMap[_keyMapIndexDefault][$KCUR];
+			for(let type of [$KCRP,$KFTR,$KCUR]) {
+				if(!_keyMap[key][type])
+					_keyMap[key][type] = _keyMap[_keyMapIndexDefault][type];
+			}
 		}
 	},
 	keyModeReset: () => _keyRow ? $onkeydown(false) : null,
@@ -457,15 +467,15 @@ const $L = {
 		return(next);
 	},
 	vpmToggle: () => {
-		if($S.getItem('vpm') === null && !confirm('Toggle from "volume per day" to the average "volume per minute" (VPM)?'))
+		if(_settings['l_vpm'] === null && !confirm('Toggle from "volume per day" to the average "volume per minute" (VPM)?'))
 			return;
-		$S.setItem('vpm', $S.getItem('vpm')=='true'?'false':'true');
+		$settings('l_vpm', !_settings['l_vpm']);
 		_stageData = $vpmStageData(_stageData);
 		$updateRangeDisplay('l_range_volume');
 		$updateContentTable();
 	},
 	vpmStageData: stageData => {
-		const vpm=($S.getItem('vpm')=='true');
+		const vpm=_settings['l_vpm'];
 		if(!(stageData['vpm'] ^ vpm))
 			return(stageData);
 		let stageTime=new Date(stageData['ts']*1000), minutesSinceOpen=0, minutesInADay=1440, args;
@@ -507,8 +517,10 @@ const $L = {
 			_stageDataHistory.push($clone(json));
 		else {
 			$setStageData(json);
-			if(!$hasSettings() && _stageData['afterhours']=='idle' && $I([0,6], now.getDay()) < 0 && _stageDataHistory.length==0)
-				$E('l_include_futures').checked = $E('l_include_currency').checked = true;
+			if(!$hasSettings() && _stageData['afterhours']=='idle' && $I([0,6], now.getDay()) < 0 && _stageDataHistory.length==0) {
+				$settings('l_show', true, true, 'l_futures');
+				$settings('l_show', true, true, 'l_currency');
+			}
 			_stageDataHistory.push($clone(_stageData));
 			$sortStageData(false);
 			_forceContentTableShrink = false;
@@ -553,7 +565,7 @@ const $L = {
 		}
 		else if(direction > 0) {
 			if(_stageDataHistory.length < 2 || _stageDataHistoryIndex < 0)
-				$marqueeFlash('You are already viewing live data, use the <i class="l_marquee_highlight">&#8656;</i> key to rewind.');
+				$marqueeFlash('You are already viewing live data, use the <i class="l_marquee_alt">&#8656;</i> key to rewind.');
 			else if( _stageDataHistoryIndex + 2 >= _stageDataHistory.length)
 				_stageDataHistoryIndex = -1;
 			else
@@ -569,7 +581,7 @@ const $L = {
 			else if(_stageDataHistoryIndex > 0)
 				_stageDataHistoryIndex--;
 			else
-				$marqueeFlash('End of history, use <i class="l_marquee_highlight">&#8658;</i> to move forward or <i class="l_marquee_highlight">escape</i> to exit.', true);
+				$marqueeFlash('End of history, use <i class="l_marquee_alt">&#8658;</i> to move forward or <i class="l_marquee_alt">escape</i> to exit.', true);
 		}
 		if(lastIndex !== _stageDataHistoryIndex) {
 			$updateStageDataHistory();
@@ -586,7 +598,7 @@ const $L = {
 		if(historyIndex == historyTotal)
 			$marqueeFlash('All caught up, exiting history mode...', true);
 		else
-			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_highlight_padded'>${minutesAgo} minutes ago</i>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
+			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
 	},
 	setNextStagePoll: seconds => {
 		if(_animationsComplete)
@@ -602,12 +614,6 @@ const $L = {
 		_nextStagePollTimeout = null;
 		$getStageData(true);
 	},
-	scrollToTop: () => $W.scrollTo({top: 0, behavior: 'auto'}),
-	forceNextStagePoll: () => $setNextStagePollComplete(),
-	epochNow: () => Math.floor(Date.now() / 1000),
-	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
-	clone: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
-	blackhole: fn => $W['$'+fn] = $L[fn] = () => {},
 	htmlPercent: (number, precision) => {
 		if(number > 0)
 			return($N(Math.abs(number), precision) + '%<i class="l_up">&#9650;</i>');
@@ -616,49 +622,91 @@ const $L = {
 		else
 			return(_emptyCellHtml);
 	},
+	scrollToTop: () => $W.scrollTo({top: 0, behavior: 'auto'}),
+	forceNextStagePoll: () => $setNextStagePollComplete(),
+	epochNow: () => Math.floor(Date.now() / 1000),
+	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
+	clone: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
+	removeFunction: fn => $W['$'+fn] = $L[fn] = () => {},
+	explicitMultiplier: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
+	settingsTabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
+	settingsTabSelect: el => {
+		const id=(el?el.id:_settingsSelectedTabName);
+		if(!id) return;
+		if($E(_settingsSelectedTabName))
+			_E.classList.remove('l_tab_selected');
+		if($E(id))
+			_E.classList.add('l_tab_selected');
+		_settingsSelectedTab = _settings[_settingsSelectedTabName=id];
+		$settingsLoad(true);
+		$settingsTabUpdateUI();
+	},
 	settingsButtonToggle: forceClosed => {
+		if(!_stageData) return;
 		const controlHeight=($E('l_control').scrollHeight > 200 ? $E('l_control_table').scrollHeight : 250)+'px', closed=($E('l_control').style.height!=controlHeight), grow=(!forceClosed&&closed);
 		$E('l_control').style.height = (grow?controlHeight:'0px');
 		$E('l_settings_button').innerHTML = (grow?'&#9660; settings &#9660;':'&#9650; settings &#9650;');
 		return !(closed ^ grow);
 	},
-	settingsSave: e => { 
+	settingsChange: e => { 
 		const context = (e&&e.target) ? e.target : null;
 		for(let inputs=$T('input'), i=0; i < inputs.length; i++) {
 			let input=inputs[i];
 			if(input.type == 'checkbox')
-				$S.setItem(input.id, input.checked ? 'true' : 'false');
-			else if(input.type == 'range')
-				$S.setItem(input.id, input.value);
+				$settings(input.id, input.checked);
+			else if(input.type == 'range' && !input.disabled)
+				$settings(input.id, parseInt(input.value,10));
 		}
 		if(context && context.id == 'l_audible' && context.checked)
 			$notifyPlayAudio(_audioTest);
+		$settingsTabUpdateUI();
 		$updateContentTable(false);
 	},
-	settingsLoad: () => {
-		let now=new Date(), exs=$S.getItem('l_exceptions');
+	settings: (name, value, passive, tab) => {
+		if(tab)
+			_settings[tab][name] = value;
+		else if(_settingsSelectedTab && typeof _settingsSelectedTab[name] != 'undefined')
+			_settingsSelectedTab[name] = value;
+		else
+			_settings[name] = value;
+		if(!passive || $hasSettings())
+			localStorage.setItem('larval', JSON.stringify(_settings));
+	},
+	settingsLoad: passive => {
+		_naId = $isMobile(true) ? 'l_nam' : 'l_na';
+		let now=new Date(), exs=_settings['l_exceptions'], settings=null;
+		if(!passive && localStorage.getItem('larval') && (settings=JSON.parse(localStorage.getItem('larval')))) {
+			if(settings['l_version'] == _settings['l_version'])
+				_settings = settings;
+			else 
+				localStorage.removeItem('larval');
+		}
 		if(exs && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
 			_notifyExceptions = exs.filter(e => e);
 		else
-			$S.removeItem('l_exceptions');
-		_naId = $isMobile() ? 'l_nam' : 'l_na';
+			$settings('l_exceptions', '', true);
 		$getSymbolsOnTop();
-		if(!$hasSettings() && $I([0,6], now.getDay()) >= 0)
-			$E('l_include_crypto').checked = true;
-		for(let i=0; i < $S.length; i++) {
-			let input=$E($S.key(i));
-			if(!input || !input['type'])
+		if(!$hasSettings() && $I([0,6], now.getDay()) >= 0) {
+			$settings('l_show', false, true, 'l_stocks_ah');
+			$settings('l_show', true, true, 'l_crypto');
+		}
+		for(let key of Object.keys(_settings)) {
+			if($E(key) && _E.type == 'checkbox')
+				_E.checked = _settings[key];
+		}
+		for(let key of Object.keys(_settingsSelectedTab)) {
+			if(!$E(key) || !_E['type'])
 				continue;
-			if(input.type == 'checkbox')
-				input.checked = ($S.getItem(input.id) == 'true');
-			else if(input.type == 'range')
-				input.value = $S.getItem(input.id);
+			else if(_E.type == 'checkbox')
+				_E.checked = _settingsSelectedTab[key];
+			else if(_E.type == 'range')
+				_E.value = (typeof _settingsSelectedTab[key]=='number' ? _settingsSelectedTab[key] : 0);
 		}
 		for(let id of ['l_range_up','l_range_down','l_range_volume'])
 			$updateRangeDisplay(id);
 	},
 	updateRangeDisplay: idOrEvent => {
-		let id='', vpm=$S.getItem('vpm');
+		let id='';
 		if(typeof idOrEvent == 'string')
 			id = idOrEvent;
 		else if(typeof idOrEvent == 'object' && idOrEvent.target && idOrEvent.target.id)
@@ -666,13 +714,16 @@ const $L = {
 		const input=$E(id), display=$E(`${id}_display`);
 		if(!input || !display)
 			return;
-		switch(id) {
-			case 'l_range_up':     display.innerHTML = (input.value / 10).toFixed(1); break;
-			case 'l_range_down':   display.innerHTML = (-input.value / 10).toFixed(1); break;
-			case 'l_range_volume': display.innerHTML = (vpm=='true' ? (input.value/10).toFixed(1) : input.value); break;
+		if(id == 'l_range_volume') {
+			if(!(input.disabled=typeof _settingsSelectedTab['l_range_volume']!='number'))
+				display.innerHTML = (_settings['l_vpm'] ? $explicitMultiplier(input.value*_multipliers[_settingsSelectedTab['multiplier']] / _settingsSelectedTab['vpm_shift'],'K',_settingsSelectedTab['vpm_precision']) : (input.value + _settingsSelectedTab['multiplier']));
+			else
+				display.innerHTML = 'N/A';
 		}
-		if(vpm !== null)
-			$E('l_range_volume_type').innerHTML = (vpm=='true' ? 'vpm' : 'vol');
+		else
+			display.innerHTML = (input.value / _settingsSelectedTab['percent_shift'] * (id=='l_range_down'?-1:1)).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['percent_shift'])))
+		if(_settings['l_vpm'] !== null)
+			$E('l_range_volume_type').innerHTML = (_settings['l_vpm'] ? 'vpm' : 'vol');
 	},
 	marqueeInitiate: (seconds, html) => {
 		const m=$E('l_marquee'), mc=$E('l_marquee_content'), mcc=$E('l_marquee_content_clone');
@@ -692,18 +743,22 @@ const $L = {
 			$marqueeInitiate(seconds, _stageData['marquee']);
 			return;
 		}
-		let html='', rank=0, includeCrypto=$E('l_include_crypto').checked;
+		let html='', rank=0;
 		for(let i in _stageData['top']) {
 			let item=_stageData['top'][i], isMarketIndex=(item.length>2&&typeof item[2]=='string');
 			if(isMarketIndex) {
 				if(!html) html += '<i class="l_marquee_blink_wide">&#8226;</i>';
-				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_highlight_padded'>${$H(item[2])}</i>${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
+				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>${$H(item[2])}</i>`;
+				if(item.length > 3)
+					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[3]<0?'&#9660;':'&#9650;'} ${Math.abs(item[3]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
+				html += `${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
-			else if(!includeCrypto && item[0][0] == _charCrypto)
-				continue;
-			else {
+			else if(item[0][0] != _charCrypto || $isShowing('l_crypto')) {
 				if(!rank) html += '<i class="l_marquee_blink_wide">&#8226;</i>';
-				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_highlight_padded'>#${++rank}</i>${item[0]} &#177; ${item[1]}%</div> `;
+				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>#${++rank}</i>${item[0]} &#177; `;
+				if(item.length > 2)
+					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[2]<0?'&#9660;':'&#9650;'} ${Math.abs(item[2]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
+				html += `${item[1]}%</div> `;
 				if(rank >= 20) break;
 			}
 		}
@@ -735,12 +790,12 @@ const $L = {
 		_marqueeInterval = setInterval(() => { $marqueeUpdate(_marqueeLoopSeconds) }, _marqueeLoopSeconds * 1000);
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys and gestures are available: ${_marqueeBlinkHtml} Use the <i class="l_marquee_highlight">tab</i> key to alternate animation modes. ${_marqueeBlinkHtml} Alt-click rows or use the <i class="l_marquee_highlight">~</i> key to keep specific symbols on top. ${_marqueeBlinkHtml} Swipe or use <i class="l_marquee_highlight">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <i class="l_marquee_highlight">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
+		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys and gestures are available: ${_marqueeBlinkHtml} Use the <i class="l_marquee_alt">tab</i> key to alternate animation modes. ${_marqueeBlinkHtml} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_marqueeBlinkHtml} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in _keyMap) {
 			if((match=_keyMap[key][$KSTK].match(/([a-z]+)\.[a-z]+\//i)))
-				html += `<div class="l_marquee_info" data-ref="${key}"><i class='l_marquee_highlight_padded'>${key}</i>${$H(match[1])}</div> `
+				html += `<div class="l_marquee_info" data-ref="${key}"><i class='l_marquee_alt_padded'>${key}</i>${$H(match[1])}</div> `
 		}
-		html += `${_marqueeBlinkHtml} Hold down the <i class="l_marquee_highlight">shift</i> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <i class="l_marquee_highlight">1-7</i> can be used to sort by each column.`;
+		html += `${_marqueeBlinkHtml} Hold down the <i class="l_marquee_alt">shift</i> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <i class="l_marquee_alt">1-7</i> can be used to sort by each column.`;
 		$scrollToTop();
 		$marqueeIntervalReset();
 		$marqueeInitiate(_marqueeLoopSeconds, html);
@@ -788,7 +843,7 @@ const $L = {
 		}
 		else if($I(_notifyExceptions, symbol) >= 0)
 			_notifyExceptions.splice(_I, 1);
-		$S.setItem('l_exceptions', (new Date()).toLocaleDateString() + ' ' + _notifyExceptions.join(' '));
+		$settings('l_exceptions', (new Date()).toLocaleDateString() + ' ' + _notifyExceptions.join(' '));
 		$updateContentTable(false, true);
 	},
 	notifyVibrate: pattern => {
@@ -796,7 +851,7 @@ const $L = {
 			navigator.vibrate(pattern ? pattern : _vibrateAlert);
 	},
 	notifyPlayAudio: (audio, vibrateFallback) => {
-		if(typeof audio == 'object' && audio.play && $E('l_audible').checked)
+		if(typeof audio == 'object' && audio.play && _settings['l_audible'])
 			audio.play().catch(() => { if(vibrateFallback) $notifyVibrate(); });
 		else if(vibrateFallback)
 			$notifyVibrate();
@@ -824,7 +879,7 @@ const $L = {
 	},
 	notifySetup: disableFutureRequests => {
 		if(disableFutureRequests)
-			$blackhole('notifySetup');
+			$removeFunction('notifySetup');
 		if(typeof _audioTest == 'string')
 			_audioTest = new Audio(_audioTest);
 		if(typeof _audioAlert == 'string') {
@@ -846,14 +901,14 @@ const $L = {
 		_keyMapIndex = key;
 		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain&&domain.hostname?domain.hostname:url);
 		if(saveSettings) {
-			$S.setItem('l_keymap_index', _keyMapIndex);
-			$marqueeFlash(`Links will now permanently direct to <i class='l_marquee_highlight'>${display}</i> by default.`);
+			$settings('l_keymap_index', _keyMapIndex);
+			$marqueeFlash(`Links will now permanently direct to <i class='l_marquee_alt'>${display}</i> by default.`);
 		}
 		else
-			$marqueeFlash(`Links will now direct to <i class='l_marquee_highlight'>${display}</i> for this session, hold down <i class='l_marquee_highlight'>shift</i> to make it permanent.`);
+			$marqueeFlash(`Links will now direct to <i class='l_marquee_alt'>${display}</i> for this session, hold down <i class='l_marquee_alt'>shift</i> to make it permanent.`);
 	},
 	editSymbolsOnTop: () => {
-		let symbols=$S.getItem('l_symbols_on_top');
+		let symbols=_settings['l_symbols_on_top'];
 		if((symbols=prompt("Enter symbols you would like to have sticky on top: \n[NOTE: alt-click rows to individually add or remove]", symbols?symbols:'')) === null)
 			return;
 		$setSymbolsOnTop(null, true, false);
@@ -865,7 +920,7 @@ const $L = {
 		if(Object.keys(_symbolsOnTop).length)
 			return(_symbolsOnTop);
 		_symbolsOnTop = {};
-		let savedSymbols=$S.getItem('l_symbols_on_top');
+		let savedSymbols=_settings['l_symbols_on_top'];
 		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*\$]?[A-Z0-9]+/g)))
 			savedSymbols.forEach(sym => $addSymbolToTop(sym));
 		return(_symbolsOnTop);
@@ -879,7 +934,7 @@ const $L = {
 			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? $delSymbolFromTop(sym) : $addSymbolToTop(sym));
 		orderedTopList = $U(Object.values(_symbolsOnTop)).sort((a, b) => a.localeCompare(b));
 		orderedTopListStr = orderedTopList.join(', ').trim(', ');
-		$S.setItem('l_symbols_on_top', orderedTopListStr);
+		$settings('l_symbols_on_top', orderedTopListStr);
 		if(!updateView)
 			return;
 		onTopDiff -= orderedTopList.length;
@@ -888,11 +943,11 @@ const $L = {
 		else if((savedSymbols && savedSymbols.length > 1) || Math.abs(onTopDiff) != 1)
 			msg = 'Symbols on top: ';
 		else if(onTopDiff > 0)
-			msg = `<i class="l_marquee_highlight">${symbols}</i> removed from top: `;
+			msg = `<i class="l_marquee_alt">${symbols}</i> removed from top: `;
 		else
-			msg = `<i class="l_marquee_highlight">${symbols}</i> added to top: `;
+			msg = `<i class="l_marquee_alt">${symbols}</i> added to top: `;
 		if(orderedTopListStr)
-			msg += `<i class="l_marquee_highlight_padded">${orderedTopListStr}</i>`;
+			msg += `<i class="l_marquee_alt_padded">${orderedTopListStr}</i>`;
 		$marqueeFlash(msg);
 		$updateContentTable(false);
 	},
@@ -942,8 +997,9 @@ const $L = {
 		_contentTableRowCountThatAreInView = total;
 		return(total);
 	},
-	hasSettings: () => $S && $S.length > 1,
-	isMobile: () => 'ontouchstart' in $D.documentElement && $D.body.clientHeight > $D.body.clientWidth,
+	hasSettings: () => localStorage && localStorage.getItem('larval'),
+	isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
+	isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
 	cell: (row, type) => row[type] && _stageDataMap[type] ? _stageDataMap[type]({'val':row[type], 'row':row, 'type':type}) : _emptyCellHtml,
 	cellRollover: (row, primary, secondary, shrinkMode) => {
@@ -969,12 +1025,31 @@ const $L = {
 	},
 	rollContentTable: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
 	updateContentTable: (doNotify, doNotResetKeyRow) => {
-		if(!_stageData)
-			return;
-		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options'];
-		const rangeUp=parseFloat($E('l_range_up_display').innerHTML), rangeDown=parseFloat($E('l_range_down_display').innerHTML), rangeVolume=parseInt($E('l_range_volume_display').innerHTML)*1000, optionsOnly=$E('l_options_only').checked, includeCrypto=$E('l_include_crypto').checked, includeFutures=$E('l_include_futures').checked, includeCurrency=$E('l_include_currency').checked;
-		$E('l_menu').className = (!_animationsComplete||!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
-		let notifyRows=[], notify=false, visibleRows=0, onTop={}, optionClass='', rowClass='', htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
+		if(!_stageData) return;
+		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options'], stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
+		$E('l_menu').className = (!_animationsComplete||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
+		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
+		if(_assetTypes[0] != stockAssetType) {
+			if($E(_assetTypes[0]))
+				_E.id = stockAssetType;
+			if(_settingsSelectedTabName == _assetTypes[0])
+				_settingsSelectedTabName = stockAssetType;
+			_assetTypes[0] = stockAssetType;
+			$settingsTabSelect();
+		}
+		if(!_settingsSelectedTabName) {
+			if(!(_settingsSelectedTabName=_assetTypes.find(assetType => _settings[assetType]['l_show'])))
+				_settingsSelectedTabName = _assetTypes[0];
+			$settingsTabSelect();
+		}
+		for(let assetType of _assetTypes) {
+			const thisType=_settings[assetType];
+			rowRules[assetType] = {
+				'up': thisType['l_range_up'] / thisType['percent_shift'],
+				'down': -thisType['l_range_down'] / thisType['percent_shift'],
+				'volume': (thisType['l_range_volume']?thisType['l_range_volume']:0) * _multipliers[thisType['multiplier']] / (_stageData['vpm']?thisType['vpm_shift']:1)
+			}
+		}
 		for(let c=1,className=''; c <= columns.length; c++) {
 			className = 'l_content_table_header';
 			if(_stageDataSortByColumn == c)
@@ -987,12 +1062,12 @@ const $L = {
 		if(doNotify)
 			$notifyClear();
 		for(let i=0; i < _stageData['items'].length; i++) {
-			const row=_stageData['items'][i], notifyExcept=($I(_notifyExceptions,row[$SYM]) >= 0);
-			let isOnTop=!!_symbolsOnTop[row[$SYM]], notifyControl='';
+			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:0], notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
+			let rowClass=rowType, notifyControl='';
 			if($isHaltRow(row)) {
-				if(notifyExcept)
+				if(notifyExcept || !$isShowing(rowType))
 					continue;
-				notify=$E('l_notify_halts').checked && (!optionsOnly||row[$OPT]);
+				notify = _settings['l_notify_halts'] && (!_settings['l_options_only']||row[$OPT]);
 				rowClass = (notify ? 'l_notify_halt' : 'l_halt');
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>
@@ -1005,26 +1080,20 @@ const $L = {
 					</tr>`;
 			}
 			else {
-				notify=( !notifyExcept && ((((rangeUp&&row[$PCT5]>=rangeUp)||(rangeDown&&rangeDown>=row[$PCT5])) && (!row[$VOL]||row[$VOL]>=rangeVolume) && (!optionsOnly||row[$OPT])) || (row[$VOL]&&typeof row[$VOL]=='string') ));
-				if(!isOnTop && ((!includeCrypto && row[$OPT]=='crypto') || (!includeFutures && row[$OPT]=='futures') || (!includeCurrency && row[$OPT]=='currency')))
+				if(!isOnTop && !$isShowing(rowType))
 					continue;
+				notify=( !notifyExcept && ((((rowRules[rowType]['up']&&row[$PCT5]>=rowRules[rowType]['up'])||(rowRules[rowType]['down']&&rowRules[rowType]['down']>=row[$PCT5])) && (!row[$VOL]||typeof row[$VOL]=='string'||row[$VOL]>=rowRules[rowType]['volume']) && (!_settings['l_options_only']||row[$OPT])) ));
 				if(notify) {
-					rowClass = `l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
+					rowClass += ` l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
 					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for today">x</div>`;
 				}
 				else {
-					rowClass = isOnTop ? ' l_top' : '';
+					if(isOnTop)
+						rowClass += ' l_top';
 					if(notifyExcept)
 						notifyControl = `<div class="l_notify_enable" title="Re-enable ${$cell(row,$SYM)} notifications">&#10003;</div>`;
 					else if(isOnTop)
 						notifyControl = `<div class="l_notify_disable" title="Remove ${$cell(row,$SYM)} from top">x</div>`;
-				}
-				optionClass='';
-				if(row[$OPT]) {
-					if($I(['crypto','futures','currency'],row[$OPT]) >= 0)
-						rowClass += ` l_${row[$OPT]}`;
-					else
-						optionClass = 'l_options';
 				}
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
@@ -1033,7 +1102,7 @@ const $L = {
 					<td>${$cellRollover(row,$PCT,$PCTY)}</td>
 					<td>${$cellRollover(row,$PRC,$PRC5)}</td>
 					<td>${$cellRollover(row,$VOL,$VOL5)}</td>
-					<td class="${optionClass}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
+					<td class="${rowType=='l_stocks'&&row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			if(visibleRows >= 0 && _contentTableSoftLimit > 0 && ++visibleRows >= _contentTableSoftLimit)
@@ -1047,10 +1116,12 @@ const $L = {
 			else if(visibleRows >= 0)
 				htmlNormal += htmlRow;
 		}
-		if(visibleRows > 0 && _contentTableSoftLimit > 0)
+		if(visibleRows >= 0 && _contentTableSoftLimit > 0)
 			_contentTableSoftLimit = -_contentTableSoftLimit;
-		if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
-			html += '<tr><td colspan="7">No results found.</td></tr>';
+		if(_assetTypes.every(type => !_settings[type]['l_show']))
+			html += '<tr><td class="l_none" colspan="7">No asset types are set to show in your settings.</td></tr>';
+		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
+			html += '<tr><td class="l_none" colspan="7">No results found.</td></tr>';
 		else {
 			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
 				html += onTop[key];
