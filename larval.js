@@ -17,7 +17,8 @@ const $L = {
 	_nextStagePollLong: 300,
 	_nextStagePollShort: 30,
 	_nextStagePollCompleteEpoch: 0,
-	_marqueeLoopSeconds: 90,
+	_marqueeLoopSpeed: 6,
+	_marqueeFlashMessage: '',
 	_marqueeInterval: null,
 	_marqueeFlashTimeout: null,
 	_naId: 'l_na',
@@ -331,7 +332,7 @@ const $L = {
 		if(!_marqueeInterval)
 			return;
 		$marqueeIntervalReset();
-		$marqueeUpdate(_marqueeLoopSeconds);
+		$marqueeUpdate();
 		$animationsProgressReset();
 	},
 	onresize: e => {
@@ -385,9 +386,9 @@ const $L = {
 		$E('l_menu').className = (!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
 		if($hasSettings() && _stageData && _stageData['top'] && _stageData['top'].length > 1)
-			$marqueeUpdate(_marqueeLoopSeconds);
+			$marqueeUpdate();
 		else
-			$marqueeInitiate(_marqueeLoopSeconds);
+			$marqueeInitiate();
 		$marqueeIntervalReset();
 		$notifyPlayAudio(_audioTest);
 		$updateContentTable(true);
@@ -725,7 +726,7 @@ const $L = {
 		if(_settings['l_vpm'] !== null)
 			$E('l_range_volume_type').innerHTML = (_settings['l_vpm'] ? 'vpm' : 'vol');
 	},
-	marqueeInitiate: (seconds, html) => {
+	marqueeInitiate: (html, highlight) => {
 		const m=$E('l_marquee'), mc=$E('l_marquee_content'), mcc=$E('l_marquee_content_clone');
 		if(html) mc.innerHTML = html;
 		mcc.innerHTML = '';
@@ -734,46 +735,58 @@ const $L = {
 		mcc.innerHTML = mc.innerHTML;
 		$D.documentElement.style.setProperty('--marquee-start', `-${viewWidthPreClone}px`);
 		$D.documentElement.style.setProperty('--marquee-end', `-${fullWidthPreClone}px`);
-		$animationsReset(m, `l_marquee ${seconds}s linear infinite`);
+		$animationsReset(m, `l_marquee ${$marqueeLengthToSeconds()}s linear infinite`);
+		if(highlight && _animationsComplete && !_marqueeFlashMessage) {
+			$animationsReset('l_marquee_container', 'l_marquee_container_highlight 3s ease-in forwards 5');
+			$notifyPlayAudio(_audioTest);
+		}
 	},
-	marqueeUpdate: seconds => {
+	marqueeUpdate: () => {
 		if(!_stageData || !_stageData['top'] || _stageData['top'].length < 2)
 			return;
 		else if(_stageData['marquee']) {
-			$marqueeInitiate(seconds, _stageData['marquee']);
+			$marqueeInitiate(_stageData['marquee']);
 			return;
 		}
-		let html='', rank=0;
+		let html='', rank=0, maxRank=20, highlight=0;
 		for(let i in _stageData['top']) {
 			let item=_stageData['top'][i], isMarketIndex=(item.length>2&&typeof item[2]=='string');
 			if(isMarketIndex) {
 				if(!html) html += '<i class="l_marquee_blink_wide">&#8226;</i>';
 				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>${$H(item[2])}</i>`;
-				if(item.length > 3)
+				if(item.length > 3 && ++highlight)
 					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[3]<0?'&#9660;':'&#9650;'} ${Math.abs(item[3]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
 				html += `${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
 			else if(item[0][0] != _charCrypto || $isShowing('l_crypto')) {
-				if(!rank) html += '<i class="l_marquee_blink_wide">&#8226;</i>';
+				if(!rank) {
+					if(i >= 5)
+						maxRank /= 2;
+					html += '<i class="l_marquee_blink_wide">&#8226;</i>';
+				}
 				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>#${++rank}</i>${item[0]} &#177; `;
-				if(item.length > 2)
+				if(item.length > 2 && ++highlight)
 					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[2]<0?'&#9660;':'&#9650;'} ${Math.abs(item[2]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
 				html += `${item[1]}%</div> `;
-				if(rank >= 20) break;
+				if(rank >= maxRank) break;
 			}
 		}
-		$marqueeInitiate(seconds, html);
+		$marqueeInitiate(html, highlight);
 	},
+	marqueeLengthToSeconds: id => $E(id?id:'l_marquee_content') ? (_E.textContent.length/_marqueeLoopSpeed) : 100,
 	marqueeFlash: (message, priority, duration) => {
 		if(_marqueeFlashTimeout)
-			clearTimeout(_marqueeFlashTimeout);
+			_marqueeFlashTimeout = clearTimeout(_marqueeFlashTimeout);
 		if(_stageDataHistoryIndex >= 0 && (!message || !priority))
 			return;
+		_marqueeFlashMessage = message;
+		if($E('l_marquee_container').style.animationName == 'l_marquee_container_highlight')
+			$animationsReset('l_marquee_container', 'l_marquee_container_normal 0s linear forwards');
 		$E('l_marquee_container').classList[$E(_naId)?'add':'remove']('l_na_marquee_container_override');
-		$E('l_marquee_flash').innerHTML = message ? message : '';
-		$E('l_marquee').style.display = message ? 'none' : 'inline-block';
-		$E('l_marquee_flash').style.display = message ? 'inline-block' : 'none';
-		if(message) {
+		$E('l_marquee_flash').innerHTML = _marqueeFlashMessage ? _marqueeFlashMessage : '';
+		$E('l_marquee').style.display = _marqueeFlashMessage ? 'none' : 'inline-block';
+		$E('l_marquee_flash').style.display = _marqueeFlashMessage ? 'inline-block' : 'none';
+		if(_marqueeFlashMessage) {
 			$scrollToTop();
 			$marqueeIntervalReset();
 			_marqueeFlashTimeout = setTimeout($marqueeFlash, duration?duration:5000);
@@ -781,13 +794,13 @@ const $L = {
 		}
 		else {
 			$E('l_marquee_container').classList.remove('l_na_marquee_container_override');
-			$marqueeUpdate(_marqueeLoopSeconds);
+			$marqueeUpdate();
 		}
 	},
 	marqueeIntervalReset: () => {
 		if(_marqueeInterval)
 			clearInterval(_marqueeInterval);
-		_marqueeInterval = setInterval(() => { $marqueeUpdate(_marqueeLoopSeconds) }, _marqueeLoopSeconds * 1000);
+		_marqueeInterval = setInterval(() => { $marqueeUpdate() }, $marqueeLengthToSeconds() * 1000);
 	},
 	marqueeHotKeyHelp: () => {
 		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys and gestures are available: ${_marqueeBlinkHtml} Use the <i class="l_marquee_alt">tab</i> key to alternate animation modes. ${_marqueeBlinkHtml} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_marqueeBlinkHtml} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
@@ -798,7 +811,7 @@ const $L = {
 		html += `${_marqueeBlinkHtml} Hold down the <i class="l_marquee_alt">shift</i> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <i class="l_marquee_alt">1-7</i> can be used to sort by each column.`;
 		$scrollToTop();
 		$marqueeIntervalReset();
-		$marqueeInitiate(_marqueeLoopSeconds, html);
+		$marqueeInitiate(html);
 	},
 	notify: notifyRows => {
 		$notifyClear();
