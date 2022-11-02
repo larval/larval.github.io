@@ -3,6 +3,7 @@ const $L = {
 	/* [_] INTERNALS / DEFAULTS */
 	_stageURL: '//stage.larval.com/',
 	_stageData: null,
+	_stageDataLastUpdate: 0,
 	_stageDataSortByColumn: 0,
 	_stageDataHistoryIndex: -1,
 	_stageDataHistory: [],
@@ -17,6 +18,7 @@ const $L = {
 	_nextStagePollLong: 300,
 	_nextStagePollShort: 30,
 	_nextStagePollCompleteEpoch: 0,
+	_marqueeLastHighlight: 0,
 	_marqueeLoopSpeed: 6,
 	_marqueeFlashMessage: '',
 	_marqueeInterval: null,
@@ -529,7 +531,7 @@ const $L = {
 				$updateContentTable(true);
 			if(json['notify'] && $hasSettings())
 				$marqueeFlash(`${_marqueeBlinkHtml}<span id="l_marquee_notify">${json['notify']}</span>${_marqueeBlinkHtml}`, false, 8000);
-			$E('l_last_update').innerHTML = $epochToDate(json['ts']);
+			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=json['ts']);
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
 	},
@@ -736,9 +738,10 @@ const $L = {
 		$D.documentElement.style.setProperty('--marquee-start', `-${viewWidthPreClone}px`);
 		$D.documentElement.style.setProperty('--marquee-end', `-${fullWidthPreClone}px`);
 		$animationsReset(m, `l_marquee ${$marqueeLengthToSeconds()}s linear infinite`);
-		if(highlight && _animationsComplete && !_marqueeFlashMessage) {
-			$animationsReset('l_marquee_container', 'l_marquee_container_highlight 3s ease-in forwards 5');
+		if(highlight && _animationsComplete && !_marqueeFlashMessage && _stageDataLastUpdate > _marqueeLastHighlight) {
+			$animationsReset('l_marquee_container', 'l_marquee_container_highlight 3s ease-in forwards 10');
 			$notifyPlayAudio(_audioTest);
+			_marqueeLastHighlight = _stageDataLastUpdate;
 		}
 	},
 	marqueeUpdate: () => {
