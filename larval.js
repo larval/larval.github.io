@@ -19,7 +19,6 @@ const $L = {
 	_nextStagePollShort: 30,
 	_nextStagePollCompleteEpoch: 0,
 	_marqueeLastHighlight: 0,
-	_marqueeLoopSpeed: 6,
 	_marqueeFlashMessage: '',
 	_marqueeInterval: null,
 	_marqueeFlashTimeout: null,
@@ -776,7 +775,7 @@ const $L = {
 		}
 		$marqueeInitiate(html, highlight);
 	},
-	marqueeLengthToSeconds: id => $E(id?id:'l_marquee_content') ? (_E.textContent.length/_marqueeLoopSpeed) : 100,
+	marqueeLengthToSeconds: id => Math.round(($E(id?id:'l_marquee_content')&&_E.clientWidth) ? (_E.clientWidth/85) : ((_E.textContent.length||100)/6), 0),
 	marqueeFlash: (message, priority, duration) => {
 		if(_marqueeFlashTimeout)
 			_marqueeFlashTimeout = clearTimeout(_marqueeFlashTimeout);
@@ -813,8 +812,8 @@ const $L = {
 		}
 		html += `${_marqueeBlinkHtml} Hold down the <i class="l_marquee_alt">shift</i> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <i class="l_marquee_alt">1-7</i> can be used to sort by each column.`;
 		$scrollToTop();
-		$marqueeIntervalReset();
 		$marqueeInitiate(html);
+		$marqueeIntervalReset();
 	},
 	notify: notifyRows => {
 		$notifyClear();

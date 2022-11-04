@@ -345,7 +345,6 @@ i { font-style: normal !important; }
 	user-select: none;
 }
 #l_marquee { padding-bottom: 12px; }
-#l_marquee_about { padding-bottom: 2px; }
 #l_marquee_flash {
 	display: none;
 	margin: auto 0 0 auto;
@@ -358,7 +357,7 @@ i { font-style: normal !important; }
 	padding-left: 2px; 
 	padding-right: 2px;
 }
-.l_marquee_blink, .l_marquee_blink_wide, .l_marquee_highlight_wide {
+.l_marquee_blink, .l_marquee_blink_wide, .l_marquee_highlight_wide, .l_marquee_about i {
 	display: inline-block;
 	color: #FFDE96;
 	animation: l_fade_in 1s linear infinite; 
@@ -386,11 +385,12 @@ i { font-style: normal !important; }
 #l_marquee_content, #l_marquee_content_clone, .l_marquee_item, .l_marquee_link, .l_marquee_highlight, .l_marquee_info {
 	display: inline-block;
 }
-#l_marquee_about {
+.l_marquee_about {
 	display: inline-block;
 	line-height: 0;
 	font-weight: normal;
 	font-size: 16px;
+	padding-bottom: 2px; 
 }
 #l_settings_button {
 	position: relative;
@@ -685,6 +685,7 @@ i { font-style: normal !important; }
 input[type="checkbox"] {
 	background-color: #A6FDA4;
 }
+#l_hotkey_help {	text-decoration: none; }
 .l_none {
 	text-align: center !important;
 }
