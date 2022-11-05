@@ -25,12 +25,14 @@ const $L = {
 	_naId: 'l_na',
 	_charUp: "\u25bc ",
 	_charDown: "\u25b2 ",
+	_charUpDown: "\u21c5 ",
 	_charHalt: "\u25a0 ",
 	_charCrypto: '*',
 	_charFutures: '^',
 	_charCurrency: '$',
 	_contentTableSoftLimit: 100,
 	_contentTableRowCountThatAreInView: 10,
+	_titlePrefix: '',
 	_title:	document.title,
 	_frameData: null,
 	_swipeStartPosition: null,
@@ -325,8 +327,9 @@ const $L = {
 	onkeyup: e => $rollContentTable(e.shiftKey),
 	onvisibilitychange: e => {
 		_frameData = null;
-		if($D.visibilityState != 'visible')
+		if(!$isVisible())
 			return;
+		$updateTitleWithPrefix('');
 		$notifyRequestWakeLock();
 		while(_notifications.length > 0)
 			(_notifications.shift()).close();
@@ -516,14 +519,14 @@ const $L = {
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
 			retry = true;
 		else if(_stageDataHistoryIndex >= 0)
-			_stageDataHistory.push($clone(json));
+			_stageDataHistory.push($cloneObject(json));
 		else {
 			$setStageData(json);
 			if(!$hasSettings() && _stageData['afterhours']=='idle' && $I([0,6], now.getDay()) < 0 && _stageDataHistory.length==0) {
 				$settings('l_show', true, true, 'l_futures');
 				$settings('l_show', true, true, 'l_currency');
 			}
-			_stageDataHistory.push($clone(_stageData));
+			_stageDataHistory.push($cloneObject(_stageData));
 			$sortStageData(false);
 			_forceContentTableShrink = false;
 			if(args && args['updateView'])
@@ -593,7 +596,7 @@ const $L = {
 	},
 	updateStageDataHistory: () => {
 		const historyTotal=_stageDataHistory.length-1, historyIndex=_stageDataHistoryIndex<0?historyTotal:_stageDataHistoryIndex;
-		const stageData=$clone(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
+		const stageData=$cloneObject(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
 		$setStageData(stageData);
 		$sortStageData(true);
 		const minutesAgo=Math.round(($epochNow()-_stageData['ts'])/60,0);
@@ -628,7 +631,8 @@ const $L = {
 	forceNextStagePoll: () => $setNextStagePollComplete(),
 	epochNow: () => Math.floor(Date.now() / 1000),
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
-	clone: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
+	cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
+	updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
 	removeFunction: fn => $W['$'+fn] = $L[fn] = () => {},
 	explicitMultiplier: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
 	settingsTabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
@@ -728,16 +732,18 @@ const $L = {
 			$E('l_range_volume_type').innerHTML = (_settings['l_vpm'] ? 'vpm' : 'vol');
 	},
 	marqueeInitiate: (html, highlight) => {
-		const m=$E('l_marquee'), mc=$E('l_marquee_content'), mcc=$E('l_marquee_content_clone');
-		if(html) mc.innerHTML = html;
-		mcc.innerHTML = '';
-		void m.offsetWidth;
-		const fullWidthPreClone=m.scrollWidth, viewWidthPreClone=m.offsetWidth;
-		mcc.innerHTML = mc.innerHTML;
+		const marquee=$E('l_marquee'), marqueeContent=$E('l_marquee_content'), marqueeContentClone=$E('l_marquee_content_clone');
+		if(html) marqueeContent.innerHTML = html;
+		marqueeContentClone.innerHTML = '';
+		void marquee.offsetWidth;
+		const fullWidthPreClone=marquee.scrollWidth, viewWidthPreClone=marquee.offsetWidth;
+		marqueeContentClone.innerHTML = marqueeContent.innerHTML;
 		$D.documentElement.style.setProperty('--marquee-start', `-${viewWidthPreClone}px`);
 		$D.documentElement.style.setProperty('--marquee-end', `-${fullWidthPreClone}px`);
-		$animationsReset(m, `l_marquee ${$marqueeLengthToSeconds()}s linear infinite`);
+		$animationsReset(marquee, `l_marquee ${$marqueeLengthToSeconds()}s linear infinite`);
 		if(highlight && _animationsComplete && !_marqueeFlashMessage && _stageDataLastUpdate > _marqueeLastHighlight) {
+			if(!$isVisible())
+				$updateTitleWithPrefix(_charUpDown);
 			$animationsReset('l_marquee_container', 'l_marquee_container_highlight 3s ease-in forwards 10');
 			$notifyPlayAudio(_audioTest);
 			_marqueeLastHighlight = _stageDataLastUpdate;
@@ -819,7 +825,7 @@ const $L = {
 		$notifyClear();
 		if(_stageDataHistory.length < 2)
 			return;
-		if($D.visibilityState == 'hidden' && typeof Notification != 'undefined' && Notification.permission == 'granted') {
+		if(!$isVisible() && typeof Notification != 'undefined' && Notification.permission == 'granted') {
 			_notifications.push(new Notification('Larval - Market volatility found!', {
 				icon: 'icon-192x192.png',
 				body: notifyRows.length > 0 ? 'Volatile stock(s): ' + $U(notifyRows.map(a => (typeof a[$HLT]=='string'?_charHalt:(a[$PCT5]<0?_charUp:_charDown))+a[$SYM])).join(' ') : 'Larval - Market volatility found!'
@@ -832,7 +838,7 @@ const $L = {
 			if(!$D.hidden || !_notifyTitleInterval)
 				$notifyClear();
 			else if(!notifyRows[0] || !notifyRows[0][0])
-				$D.title = _title;
+				$updateTitleWithPrefix();
 			else if($isHaltRow(notifyRows[0]))
 				$D.title = notifyRows[0][$SYM] + ' | ' + (notifyRows[0][$HLT]?notifyRows[0][$HLT]:'HALTED');
 			else
@@ -847,7 +853,7 @@ const $L = {
 			clearInterval(_notifyTitleInterval);
 			_notifyTitleInterval = null;
 		}
-		$D.title = _title;
+		$updateTitleWithPrefix('');
 	},
 	notifyException: (symbol, disable) => {
 		if(disable) {
@@ -969,7 +975,7 @@ const $L = {
 	setSortStageData: column => {
 		if(_stageDataSortByColumn == -column || !column || column > $E('l_content_table').getElementsByTagName('th').length) {
 			if(_stageData.itemsImmutable)
-				_stageData.items = $clone(_stageData.itemsImmutable);
+				_stageData.items = $cloneObject(_stageData.itemsImmutable);
 			_stageDataSortByColumn = 0;
 		}
 		else if(_stageDataSortByColumn == column)
@@ -982,7 +988,7 @@ const $L = {
 	sortStageData: updateView => {
 		if(_stageData && _stageDataSortByColumn) {
 			if(!_stageData.itemsImmutable)
-				_stageData.itemsImmutable = $clone(_stageData.items);
+				_stageData.itemsImmutable = $cloneObject(_stageData.items);
 			_stageData.items = _stageData.items.sort((a, b) => {
 				const column = Math.abs(_stageDataSortByColumn) - 1;
 				if(a[column] === null || a[column] === false || a[column] === undefined)
@@ -1013,6 +1019,7 @@ const $L = {
 		return(total);
 	},
 	hasSettings: () => localStorage && localStorage.getItem('larval'),
+	isVisible: el => (el ? $W.getComputedStyle(el).visibility : $D.visibilityState) == 'visible',
 	isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
 	isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
