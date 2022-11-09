@@ -1098,7 +1098,7 @@ const $L = {
 		if(doNotify)
 			$notifyClear();
 		for(let i=0; i < _stageData['items'].length; i++) {
-			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_charETF?1:0)], notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
+			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_charETF?1:0)], isStock=(_I<0), notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
 			let rowClass=rowType, notifyControl='';
 			if($isHaltRow(row)) {
 				if(notifyExcept || !$isShowing(rowType))
@@ -1138,7 +1138,7 @@ const $L = {
 					<td>${$cellRollover(row,$PCT,$PCTY)}</td>
 					<td>${$cellRollover(row,$PRC,$PRC5)}</td>
 					<td>${$cellRollover(row,$VOL,$VOL5)}</td>
-					<td class="${rowType=='l_stocks'&&row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
+					<td class="${isStock&&row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			if(visibleRows >= 0 && _contentTableSoftLimit > 0 && ++visibleRows >= _contentTableSoftLimit)
