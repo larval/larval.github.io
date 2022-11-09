@@ -139,22 +139,23 @@
  <div id="l_settings_button">&#9650; settings &#9650;</div>
  <div id="l_control">
   <table id="l_control_table">
-   <tr><th colspan="6">~5 minute % change threshold to alert (<i>0.0% to disable</i>)</th></tr>
+   <tr><th colspan="7">~5 minute % change threshold to alert (<i>0.0% to disable</i>)</th></tr>
    <tr>
     <td class="l_tab" id="l_stocks"><i>&#10003;</i>Stocks<span>&nbsp;(AH)</span></td>
+    <td class="l_tab" id="l_etfs"><i>&#10003;</i>ETFs</td>
     <td class="l_tab" id="l_crypto"><i>&#10003;</i>Crypto</td>
     <td class="l_tab" id="l_futures"><i>&#10003;</i>Futures</td>
     <td class="l_tab" id="l_currency"><i>&#10003;</i>Currency</td>
-    <td id="l_tab_show">&nbsp;&nbsp;<input type="checkbox" class="l_checkbox" id="l_show" name="l_show" /><label for="l_show">Show</label>&nbsp;&nbsp;</td></tr>
-   <tr><td colspan="4"><input type="range" min="0" max="200" value="0" class="l_range" id="l_range_up" /></td><td style="width:1%">&gt;<i id="l_range_up_display">0.0</i>%</td></tr>
-   <tr><td colspan="4"><input type="range" min="0" max="200" value="0" class="l_range" id="l_range_down" /></td><td style="width:1%">&lt;<i id="l_range_down_display">0.0</i>%</td></tr>
-   <tr><td colspan="4"><input type="range" min="0" max="999" value="0" class="l_range" id="l_range_volume" /></td><td style="width:1%">&gt;<i id="l_range_volume_display">0</i>&nbsp;<i id="l_range_volume_type" title="Toggle volume per minute (VPM)">vol?</i></td></tr>
-   <tr><td colspan="6"><input type="checkbox" class="l_checkbox" id="l_audible" name="l_audible" />&nbsp;<label for="l_audible">Audible notifications</label> <input type="checkbox" class="l_checkbox" id="l_options_only" name="l_options_only" />&nbsp;<label for="l_options_only">Only notify if a stock has options</label> <input type="checkbox" class="l_checkbox" id="l_notify_halts" name="l_notify_halts" />&nbsp;<label for="l_notify_halts">Notify when halted</label></td></tr>
+    <td class="l_tab_info">&nbsp;&nbsp;<input type="checkbox" class="l_checkbox" id="l_show" name="l_show" /><label for="l_show">Show</label>&nbsp;&nbsp;</td></tr>
+   <tr><td colspan="5"><input type="range" min="0" max="200" value="0" class="l_range" id="l_range_up" /></td><td class="l_tab_info">&gt;<i id="l_range_up_display">0.0</i>%</td></tr>
+   <tr><td colspan="5"><input type="range" min="0" max="200" value="0" class="l_range" id="l_range_down" /></td><td class="l_tab_info">&lt;<i id="l_range_down_display">0.0</i>%</td></tr>
+   <tr><td colspan="5"><input type="range" min="0" max="999" value="0" class="l_range" id="l_range_volume" /></td><td class="l_tab_info">&gt;<i id="l_range_volume_display">0</i>&nbsp;<i id="l_range_volume_type" title="Toggle volume per minute (VPM)">vol?</i></td></tr>
+   <tr><td colspan="7"><input type="checkbox" class="l_checkbox" id="l_audible" name="l_audible" />&nbsp;<label for="l_audible">Audible notifications</label> <input type="checkbox" class="l_checkbox" id="l_options_only" name="l_options_only" />&nbsp;<label for="l_options_only">Only notify if a stock has options</label> <input type="checkbox" class="l_checkbox" id="l_notify_halts" name="l_notify_halts" />&nbsp;<label for="l_notify_halts">Notify when halted</label></td></tr>
   </table>
  </div>
  <div id="l_content">
   <table id="l_content_table">
-   <tr><th id="l_awaiting_data">Larval is awaiting market data, please wait. This page will automatically update as soon as market data becomes available.</th></tr>
+   <tr><th id="l_awaiting_data" title="Larval is awaiting market data, please wait. This page will automatically update as soon as market data becomes available.">This site requires javascript.</th></tr>
   </table>
  </div>
  <div id="l_more">...</div>

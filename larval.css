@@ -351,6 +351,7 @@ i { font-style: normal !important; }
 	text-align: center;
 	animation: l_content_fade_in 1s ease forwards;
 }
+#l_marquee_flash i { color: #A6FDA4; }
 #l_marquee_notify { color: #FFDE96; }
 #l_marquee_notify i {
 	color: #E1FDE4; 
@@ -576,9 +577,10 @@ i { font-style: normal !important; }
 	user-select: none;
 }
 #l_stocks span { display: none; }
-.l_stocks_ah span { display: inline !important; }
-#l_tab_show {
+#l_stocks_ah span { display: inline; }
+.l_tab_info {
 	width: 1%;
+	padding: 10px 20px 10px 20px !important;
 	white-space: nowrap;
 }
 .l_show i {
@@ -587,6 +589,7 @@ i { font-style: normal !important; }
 }
 .l_tab i { display: none; }
 .l_tab {
+	width: 20% !important;
 	cursor: pointer;
 	background-color: #f8f8f8;
 	border-left: none !important;
@@ -870,9 +873,7 @@ input[type=checkbox]:checked:disabled + label:before {
 		cursor: pointer;
 		border-bottom-color: #E1FDE4 !important;
 	}
-	#l_settings_button:hover {
-		background: linear-gradient(180deg, #8fde8c 75%, #333 90%);
-	}
+	#l_settings_button:hover { background: linear-gradient(180deg, #8fde8c 75%, #333 90%); }
 	#l_content_table tr:hover:not(:first-child), #l_content_table .l_tr_keyrow_selected:not(:first-child) {
 		outline: none;
 		border-color: #666;
@@ -913,9 +914,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	}
 }
 @media only screen and (max-width: 1300px) {
-	.l_notify_popout i {
-		display: none;
-	}
+	.l_notify_popout i { display: none; }
 }
 @media only screen and (max-width: 1500px) {
 	#l_content, #l_marquee_container { width: 75%; }
@@ -927,6 +926,7 @@ input[type=checkbox]:checked:disabled + label:before {
 		width: 60%;
 		font-size: 13px;
 	}
+	.l_tab_info { padding: 10px 15px 10px 15px !important; }
 }
 @media only screen and (max-width: 1000px) {
 	#l_marquee_flash {
@@ -937,15 +937,14 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_content { font-size: 12px; }
 	#l_footer { font-size: 15px; }
 	#l_last_update { font-size: 12px; }
+	.l_tab_info { padding: 10px !important; }
 }
 @media only screen and (max-width: 600px) {
 	#l_logo {
 		height: 121px !important;
 		width: 275px !important;
 	}
-	#l_logo_tag {
-		font-size: 12px !important;
-	}
+	#l_logo_tag { font-size: 12px !important; }
 	#l_logo_tag_type {
 		width: 40px !important;
 		border-bottom: 1px dotted #fff !important;
@@ -964,9 +963,7 @@ input[type=checkbox]:checked:disabled + label:before {
 		bottom: 0;
 		background: #88cf86 !important;
 	}
-	#l_settings_button:active {
-		background: #A6FDA4 !important;
-	}
+	#l_settings_button:active { background: #A6FDA4 !important; }
 	#l_content { font-size: 9px; }
 	#l_content_table tr td {
 		padding-left: 3px;
@@ -974,19 +971,16 @@ input[type=checkbox]:checked:disabled + label:before {
 	}
 	#l_control { font-size: 11px; }
 	.l_up, .l_down { padding-left: 2px; }
-	#l_footer {
-		font-size: 12px;
-	}
+	#l_footer { font-size: 12px; }
 	#l_footer a {
 		padding-left: 5px;
 		padding-right: 5px;
 	}
-	#l_last_update {
-		font-size: 10px;
-	}
-	.l_notify_popout, .l_notify_disable, .l_notify_enable, .l_content_table_header i {
-		display: none;
-	}
+	#l_last_update { font-size: 10px; }
+	.l_notify_popout, .l_notify_disable, .l_notify_enable, .l_content_table_header i { display: none; }
+	#l_stocks_ah span { font-size: 5px !important; }
+	.l_tab { font-size: 9px !important; }
+	.l_tab_info { padding: 10px 3px 10px 3px !important; }
 }
 @media only screen and (max-height: 500px) {
 	#l_logo {

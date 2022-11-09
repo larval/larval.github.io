@@ -27,6 +27,7 @@ const $L = {
 	_charDown: "\u25b2 ",
 	_charUpDown: "\u21c5 ",
 	_charHalt: "\u25a0 ",
+	_charETF: '~',
 	_charCrypto: '*',
 	_charFutures: '^',
 	_charCurrency: '$',
@@ -41,7 +42,7 @@ const $L = {
 	_marqueeBlinkHtml: '<i class="l_marquee_blink">&#8226;</i>',
 	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
-	_assetTypes: ['l_stocks', 'l_crypto', 'l_futures', 'l_currency'],
+	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
 	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_keyMap: {
 		'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@/options', 'https://www.seekingalpha.com/symbol/@-USD'],
@@ -127,6 +128,7 @@ const $L = {
 		'Backspace':e               => $vpmToggle(),
 		'Backquote':e               => $editSymbolsOnTop(),
 		'Slash':e                   => $marqueeHotKeyHelp(),
+		'F5':e                      => $settingsClear('User requested.'),
 		'Home':e                    => _keyRow = 1,
 		'End':e                     => _keyRow = e.parentElement.childElementCount - 1,
 		'PageUp':e                  => _keyRow-=_contentTableRowCountThatAreInView,
@@ -157,16 +159,11 @@ const $L = {
 		'NWS':_  => $H(_.val),
 		'LNK':_  => _.val,
 		'TAN':_  => $H(_.val),
-		'HLT':   2,
-		'TAN':   8,
-		'KSTK':  0,
-		'KOPT':  1,
-		'KCRP':  2,
-		'KFTR':  3,
-		'KCUR':  4
+		'HLT':2, 'TAN':8,
+		'KSTK':0, 'KETF':0, 'KOPT':1, 'KCRP':2, 'KFTR':3, 'KCUR':4
 	},
 	_settings: {
-		'l_version':          1,
+		'l_version':          2,
 		'l_audible':          false,
 		'l_notify_halts':     true,
 		'l_options_only':     false,
@@ -174,12 +171,13 @@ const $L = {
 		'l_symbols_on_top':   '',
 		'l_exceptions':       '',
 		'l_vpm':              null,
-		'l_stocks':           { 'l_show':true,  'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'K', 'vpm_precision':1, 'vpm_shift':10,   'percent_shift':10 },
-		'l_stocks_ah':        { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':null, 'multiplier':'K', 'vpm_precision':0, 'vpm_shift':1,    'percent_shift':10 },
-		'l_crypto':           { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'M', 'vpm_precision':0, 'vpm_shift':1000, 'percent_shift':10 },
-		'l_futures':          { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':null, 'multiplier':'K', 'vpm_precision':0, 'vpm_shift':1,    'percent_shift':100 },
-		'l_currency':         { 'l_show':false, 'l_range_up':25,  'l_range_down':25,  'l_range_volume':null, 'multiplier':'K', 'vpm_precision':0, 'vpm_shift':1,    'percent_shift':100 }
-	}, _settingsSelectedTab: {}, _settingsSelectedTabName: '',
+		'l_stocks':           { 'l_show':true,  'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':10,   'vpm_precision':1 },
+		'l_stocks_ah':        { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':null, 'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
+		'l_etfs':             { 'l_show':true,  'l_range_up':75,  'l_range_down':75,  'l_range_volume':50,   'multiplier':'M', 'percent_shift':100, 'volume_shift':100, 'vpm_shift':1000, 'vpm_precision':0 },
+		'l_crypto':           { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'M', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1000, 'vpm_precision':0 },
+		'l_futures':          { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':null, 'multiplier':'K', 'percent_shift':100, 'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
+		'l_currency':         { 'l_show':false, 'l_range_up':25,  'l_range_down':25,  'l_range_volume':null, 'multiplier':'K', 'percent_shift':100, 'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 }
+	}, _settingsBase: {}, _settingsSelectedTab: {}, _settingsSelectedTabName: '',
 	_vibrateAlert: [250,250,500,250,750,250,1000], _audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
 	/* [$] SHORTHAND / COMMON */
@@ -231,6 +229,7 @@ const $L = {
 				for(let e of Object.keys(_eventMap[ids]))
 					$E(id).addEventListener(e, _eventMap[ids][e]);
 		}
+		if($E('l_awaiting_data')) _E.innerText = _E.title;
 		$settingsLoad();
 		$notifySetup(false);
 		$keyMapSetup();
@@ -271,6 +270,7 @@ const $L = {
 			return;
 		const raw=sym;
 		if($I(_symbolsStatic,sym) >= 0)  { type = $KSTK; sym = _symbolsStatic[_I]; }
+		else if(sym[0] == _charETF)      { type = $KETF; sym = sym.substr(1); }
 		else if(sym[0] == _charCrypto)   { type = $KCRP; sym = sym.substr(1); }
 		else if(sym[0] == _charFutures)  { type = $KFTR; sym = sym.substr(1); }
 		else if(sym[0] == _charCurrency) { type = $KCUR; sym = ((sym.substr(-1)=='-'?'USD':sym)+(sym.substr(-1)=='+'?'USD':sym)).replace(/[^A-Z]+/g,''); }
@@ -305,7 +305,7 @@ const $L = {
 				$onclick(rows[_keyRow]);
 			}
 			else if(e.code)
-				$marqueeFlash(`The &quot;<i class='l_marquee_alt'>${e.code}</i>&quot; key is not mapped, type &quot;<i class='l_marquee_alt'>?</i>&quot; to see the supported hotkeys.`);
+				$marqueeFlash(`The &quot;<i>${e.code}</i>&quot; key is not mapped, type &quot;<i>?</i>&quot; to see the supported hotkeys.`);
 		}
 		if(_keyRow < 0)
 			_keyRow = 0;
@@ -439,7 +439,7 @@ const $L = {
 			$W.requestAnimationFrame($animationsDisableIfUnderFPS);
 		else if(_frameData.duration > 0 && (_frameData.frames/_frameData.duration) < _frameData.fps) {
 			$animationsToggle(false, null);
-			$marqueeFlash('Slow graphics detected, disabling most animations.  Use the <i class="l_marquee_alt">tab</i> key to re-enable.');
+			$marqueeFlash('Slow graphics detected, disabling most animations.  Use the <i>tab</i> key to re-enable.');
 			$removeFunction('animationsDisableIfUnderFPS');
 		}
 		else if(--_frameData.attempt > 0) {
@@ -515,16 +515,18 @@ const $L = {
 	setStageData: stageData => (_stageData=$vpmStageData(stageData)) && (_contentTableSoftLimit=Math.abs(_contentTableSoftLimit)),
 	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
 	parseStageData: (json, args) => {
-		let retry=false, now=new Date();
+		let retry=false;
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
 			retry = true;
 		else if(_stageDataHistoryIndex >= 0)
 			_stageDataHistory.push($cloneObject(json));
 		else {
+			const stageTime=new Date(json['ts']*1000);
 			$setStageData(json);
-			if(!$hasSettings() && _stageData['afterhours']=='idle' && $I([0,6], now.getDay()) < 0 && _stageDataHistory.length==0) {
+			if(!$hasSettings() && _stageData['afterhours']=='idle' && $I([0,6], stageTime.getDay()) < 0 && _stageDataHistory.length==0) {
 				$settings('l_show', true, true, 'l_futures');
 				$settings('l_show', true, true, 'l_currency');
+				$settingsTabUpdateUI();
 			}
 			_stageDataHistory.push($cloneObject(_stageData));
 			$sortStageData(false);
@@ -570,7 +572,7 @@ const $L = {
 		}
 		else if(direction > 0) {
 			if(_stageDataHistory.length < 2 || _stageDataHistoryIndex < 0)
-				$marqueeFlash('You are already viewing live data, use the <i class="l_marquee_alt">&#8656;</i> key to rewind.');
+				$marqueeFlash('You are already viewing live data, use the <i>&#8656;</i> key to rewind.');
 			else if( _stageDataHistoryIndex + 2 >= _stageDataHistory.length)
 				_stageDataHistoryIndex = -1;
 			else
@@ -586,7 +588,7 @@ const $L = {
 			else if(_stageDataHistoryIndex > 0)
 				_stageDataHistoryIndex--;
 			else
-				$marqueeFlash('End of history, use <i class="l_marquee_alt">&#8658;</i> to move forward or <i class="l_marquee_alt">escape</i> to exit.', true);
+				$marqueeFlash('End of history, use <i>&#8658;</i> to move forward or <i>escape</i> to exit.', true);
 		}
 		if(lastIndex !== _stageDataHistoryIndex) {
 			$updateStageDataHistory();
@@ -681,11 +683,13 @@ const $L = {
 	settingsLoad: passive => {
 		_naId = $isMobile(true) ? 'l_nam' : 'l_na';
 		let now=new Date(), exs=_settings['l_exceptions'], settings=null;
+		if(!Object.keys(_settingsBase).length)
+			_settingsBase = $cloneObject(_settings);
 		if(!passive && localStorage.getItem('larval') && (settings=JSON.parse(localStorage.getItem('larval')))) {
 			if(settings['l_version'] == _settings['l_version'])
 				_settings = settings;
 			else 
-				localStorage.removeItem('larval');
+				$settingsClear('Version change.');
 		}
 		if(exs && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
 			_notifyExceptions = exs.filter(e => e);
@@ -694,7 +698,9 @@ const $L = {
 		$getSymbolsOnTop();
 		if(!$hasSettings() && $I([0,6], now.getDay()) >= 0) {
 			$settings('l_show', false, true, 'l_stocks_ah');
+			$settings('l_show', false, true, 'l_etfs');
 			$settings('l_show', true, true, 'l_crypto');
+			$settingsTabUpdateUI();
 		}
 		for(let key of Object.keys(_settings)) {
 			if($E(key) && _E.type == 'checkbox')
@@ -711,6 +717,14 @@ const $L = {
 		for(let id of ['l_range_up','l_range_down','l_range_volume'])
 			$updateRangeDisplay(id);
 	},
+	settingsClear: message => {
+		$marqueeFlash('Clearing local settings'+(message?`: <i class="l_marquee_alt_padded">${message}</i>`:'...'));
+		localStorage.clear();
+		_settings = $cloneObject(_settingsBase);
+		$settingsLoad(true);
+		$settingsTabUpdateUI();
+		$updateContentTable(false);
+	},
 	updateRangeDisplay: idOrEvent => {
 		let id='';
 		if(typeof idOrEvent == 'string')
@@ -722,7 +736,7 @@ const $L = {
 			return;
 		if(id == 'l_range_volume') {
 			if(!(input.disabled=typeof _settingsSelectedTab['l_range_volume']!='number'))
-				display.innerHTML = (_settings['l_vpm'] ? $explicitMultiplier(input.value*_multipliers[_settingsSelectedTab['multiplier']] / _settingsSelectedTab['vpm_shift'],'K',_settingsSelectedTab['vpm_precision']) : (input.value + _settingsSelectedTab['multiplier']));
+				display.innerHTML = (_settings['l_vpm'] ? $explicitMultiplier(input.value*_multipliers[_settingsSelectedTab['multiplier']] / _settingsSelectedTab['vpm_shift'],'K',_settingsSelectedTab['vpm_precision']) : ((input.value / _settingsSelectedTab['volume_shift']).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['volume_shift']))) + _settingsSelectedTab['multiplier']));
 			else
 				display.innerHTML = 'N/A';
 		}
@@ -781,7 +795,7 @@ const $L = {
 		}
 		$marqueeInitiate(html, highlight);
 	},
-	marqueeLengthToSeconds: id => Math.round(($E(id?id:'l_marquee_content')&&_E.clientWidth) ? (_E.clientWidth/85) : ((_E.textContent.length||100)/6), 0),
+	marqueeLengthToSeconds: id => ($E(id?id:'l_marquee_content')&&_E.clientWidth) ? (_E.clientWidth/85) : ((_E.textContent.length||100)/6),
 	marqueeFlash: (message, priority, duration) => {
 		if(_marqueeFlashTimeout)
 			_marqueeFlashTimeout = clearTimeout(_marqueeFlashTimeout);
@@ -923,10 +937,10 @@ const $L = {
 		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain&&domain.hostname?domain.hostname:url);
 		if(saveSettings) {
 			$settings('l_keymap_index', _keyMapIndex);
-			$marqueeFlash(`Links will now permanently direct to <i class='l_marquee_alt'>${display}</i> by default.`);
+			$marqueeFlash(`Links will now permanently direct to <i>${display}</i> by default.`);
 		}
 		else
-			$marqueeFlash(`Links will now direct to <i class='l_marquee_alt'>${display}</i> for this session, hold down <i class='l_marquee_alt'>shift</i> to make it permanent.`);
+			$marqueeFlash(`Links will now direct to <i>${display}</i> for this session, hold down <i>shift</i> to make it permanent.`);
 	},
 	editSymbolsOnTop: () => {
 		let symbols=_settings['l_symbols_on_top'];
@@ -942,7 +956,7 @@ const $L = {
 			return(_symbolsOnTop);
 		_symbolsOnTop = {};
 		let savedSymbols=_settings['l_symbols_on_top'];
-		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*\$]?[A-Z0-9]+/g)))
+		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*\$\~]?[A-Z0-9]+/g)))
 			savedSymbols.forEach(sym => $addSymbolToTop(sym));
 		return(_symbolsOnTop);
 	},
@@ -951,7 +965,7 @@ const $L = {
 		let msg='', orderedTopListStr='', orderedTopList, savedSymbols, onTopDiff=$U(Object.values(_symbolsOnTop)).length;
 		if(!symbols && remove)
 			_symbolsOnTop = {};
-		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*\$]?[A-Z0-9]+/g)))
+		else if(symbols && (savedSymbols=symbols.toUpperCase().match(/[\^\*\$\~]?[A-Z0-9]+/g)))
 			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? $delSymbolFromTop(sym) : $addSymbolToTop(sym));
 		orderedTopList = $U(Object.values(_symbolsOnTop)).sort((a, b) => a.localeCompare(b));
 		orderedTopListStr = orderedTopList.join(', ').trim(', ');
@@ -964,9 +978,9 @@ const $L = {
 		else if((savedSymbols && savedSymbols.length > 1) || Math.abs(onTopDiff) != 1)
 			msg = 'Symbols on top: ';
 		else if(onTopDiff > 0)
-			msg = `<i class="l_marquee_alt">${symbols}</i> removed from top: `;
+			msg = `<i>${symbols}</i> removed from top: `;
 		else
-			msg = `<i class="l_marquee_alt">${symbols}</i> added to top: `;
+			msg = `<i>${symbols}</i> added to top: `;
 		if(orderedTopListStr)
 			msg += `<i class="l_marquee_alt_padded">${orderedTopListStr}</i>`;
 		$marqueeFlash(msg);
@@ -1069,7 +1083,7 @@ const $L = {
 			rowRules[assetType] = {
 				'up': thisType['l_range_up'] / thisType['percent_shift'],
 				'down': -thisType['l_range_down'] / thisType['percent_shift'],
-				'volume': (thisType['l_range_volume']?thisType['l_range_volume']:0) * _multipliers[thisType['multiplier']] / (_stageData['vpm']?thisType['vpm_shift']:1)
+				'volume': (thisType['l_range_volume']?thisType['l_range_volume']:0) * _multipliers[thisType['multiplier']] / thisType[_stageData['vpm']?'vpm_shift':'volume_shift']
 			}
 		}
 		for(let c=1,className=''; c <= columns.length; c++) {
@@ -1084,7 +1098,7 @@ const $L = {
 		if(doNotify)
 			$notifyClear();
 		for(let i=0; i < _stageData['items'].length; i++) {
-			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:0], notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
+			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_charETF?1:0)], notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
 			let rowClass=rowType, notifyControl='';
 			if($isHaltRow(row)) {
 				if(notifyExcept || !$isShowing(rowType))
