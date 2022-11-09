@@ -173,7 +173,7 @@ const $L = {
 		'l_vpm':              null,
 		'l_stocks':           { 'l_show':true,  'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':10,   'vpm_precision':1 },
 		'l_stocks_ah':        { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':null, 'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
-		'l_etfs':             { 'l_show':true,  'l_range_up':75,  'l_range_down':75,  'l_range_volume':50,   'multiplier':'M', 'percent_shift':100, 'volume_shift':100, 'vpm_shift':1000, 'vpm_precision':0 },
+		'l_etfs':             { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':50,   'multiplier':'M', 'percent_shift':100, 'volume_shift':100, 'vpm_shift':1000, 'vpm_precision':0 },
 		'l_crypto':           { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'M', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1000, 'vpm_precision':0 },
 		'l_futures':          { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':null, 'multiplier':'K', 'percent_shift':100, 'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
 		'l_currency':         { 'l_show':false, 'l_range_up':25,  'l_range_down':25,  'l_range_volume':null, 'multiplier':'K', 'percent_shift':100, 'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 }
