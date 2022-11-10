@@ -163,6 +163,7 @@ i { font-style: normal !important; }
 	max-width: 100%;
 	overflow-x: hidden;
 }
+#l_fragments { display: none; }
 #l_fixed_bg1, #l_fixed_bg2, #l_fixed_bg3 {
 	position: absolute;
 	animation: l_fixed_bg 60s ease-in-out infinite alternate;

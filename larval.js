@@ -22,28 +22,20 @@ const $L = {
 	_marqueeFlashMessage: '',
 	_marqueeInterval: null,
 	_marqueeFlashTimeout: null,
-	_naId: 'l_na',
-	_charUp: "\u25bc ",
-	_charDown: "\u25b2 ",
-	_charUpDown: "\u21c5 ",
-	_charHalt: "\u25a0 ",
-	_charETF: '~',
-	_charCrypto: '*',
-	_charFutures: '^',
-	_charCurrency: '$',
 	_contentTableSoftLimit: 100,
 	_contentTableRowCountThatAreInView: 10,
 	_titlePrefix: '',
-	_title:	document.title,
+	_title:	'',
 	_frameData: null,
 	_swipeStartPosition: null,
 	_wakeLock: null,
 	_symbolsOnTop: {},
-	_marqueeBlinkHtml: '<i class="l_marquee_blink">&#8226;</i>',
-	_emptyCellHtml: '<div class="l_none">&#8226;</div>',
+	_fragmentCache: {},
+	_naId: 'l_na',
+	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
-	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
+	_char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$" },
 	_keyMap: {
 		'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@/options', 'https://www.seekingalpha.com/symbol/@-USD'],
 		'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/stocks/quotes/@/options', 'https://www.barchart.com/crypto/coins/@'],
@@ -144,16 +136,16 @@ const $L = {
 	},
 	_enumMap: {
 		'SYM':_  => $H(_.val),
-		'NAM':_  => _forceContentTableShrink ? _emptyCellHtml : $H(_.val),
+		'NAM':_  => _forceContentTableShrink ? $F('f_empty_cell') : $H(_.val),
 		'PCT5':_ => $isHaltRow(_.row) ? $H(_.val?_.val:'HALTED') : $htmlPercent(_.val,2),
 		'PCT':_  => $htmlPercent(_.val,2),
 		'PRC':_  => '$' + $N(_.val,_.row[$OPT]=='currency'&&_.val<10?4:2),
-		'VOL':_  => $F(_.val,1,true),
+		'VOL':_  => $multiplierFormat(_.val,1,true),
 		'OPT':_  => $H(_.val),
-		'OIV':_  => _.row[$SYM][0]==_charCrypto ? ('MC#'+_.val) : ($H(_.val>0?_.val:('~'+Math.abs(_.val))))+'%IV',
+		'OIV':_  => _.row[$SYM][0]==_char['crypto'] ? ('MC#'+_.val) : ($H(_.val>0?_.val:('~'+Math.abs(_.val))))+'%IV',
 		'ERN':_  => $H(_.val),
 		'PRC5':_ => (_.val<0?'-$':'+$') + $N(Math.abs(_.val),_.row[$OPT]=='currency'?4:2),
-		'VOL5':_ => '+' + $F(_.val,1),
+		'VOL5':_ => '+' + $multiplierFormat(_.val,1),
 		'PCTM':_ => 'M=' + $htmlPercent(_.val,0),
 		'PCTY':_ => 'Y=' + $htmlPercent(_.val,0),
 		'NWS':_  => $H(_.val),
@@ -183,20 +175,8 @@ const $L = {
 	/* [$] SHORTHAND / COMMON */
 	D: document,
 	E: id => (_E = $D.getElementById(id)), _E: null,
-	F: (number, digits, approx) => {
-		if(typeof number != 'number')
-			return (number);
-		for(let prefix in _multipliers) {
-			if(number >= _multipliers[prefix])
-				return((number/_multipliers[prefix]).toFixed(digits) + prefix);
-		}
-		return (approx ? '~'+(Math.ceil(number/100)*100).toString() : number.toString());
-	},
-	H: string => {
-		const p=$D.createElement('p');
-		p.textContent = string;
-		return(p.innerHTML);
-	},
+	F: id => (_F = _fragmentCache[id] ? _fragmentCache[id] : (_fragmentCache[id]=($E(id)?_E.innerHTML:id))), _F: null,
+	H: string => (_H = (_H=$D.createElement('p'))&&((_H.textContent=string)) ? _H.innerHTML : ''), _H: null,
 	I: (array, item) => (_I = array.indexOf(item)), _I: -1,
 	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
@@ -230,6 +210,7 @@ const $L = {
 					$E(id).addEventListener(e, _eventMap[ids][e]);
 		}
 		if($E('l_awaiting_data')) _E.innerText = _E.title;
+		_title = document.title;
 		$settingsLoad();
 		$notifySetup(false);
 		$keyMapSetup();
@@ -269,11 +250,11 @@ const $L = {
 		else if(!ref)
 			return;
 		const raw=sym;
-		if($I(_symbolsStatic,sym) >= 0)  { type = $KSTK; sym = _symbolsStatic[_I]; }
-		else if(sym[0] == _charETF)      { type = $KETF; sym = sym.substr(1); }
-		else if(sym[0] == _charCrypto)   { type = $KCRP; sym = sym.substr(1); }
-		else if(sym[0] == _charFutures)  { type = $KFTR; sym = sym.substr(1); }
-		else if(sym[0] == _charCurrency) { type = $KCUR; sym = ((sym.substr(-1)=='-'?'USD':sym)+(sym.substr(-1)=='+'?'USD':sym)).replace(/[^A-Z]+/g,''); }
+		if($I(_symbolsStatic,sym) >= 0)      { type = $KSTK; sym = _symbolsStatic[_I]; }
+		else if(sym[0] == _char['etf'])      { type = $KETF; sym = sym.substr(1); }
+		else if(sym[0] == _char['crypto'])   { type = $KCRP; sym = sym.substr(1); }
+		else if(sym[0] == _char['futures'])  { type = $KFTR; sym = sym.substr(1); }
+		else if(sym[0] == _char['currency']) { type = $KCUR; sym = ((sym.substr(-1)=='-'?'USD':sym)+(sym.substr(-1)=='+'?'USD':sym)).replace(/[^A-Z]+/g,''); }
 		_clickMap[ref]({'raw':raw, 'sym':sym, 'idx':idx, 'type':type, 'el':el});
 	},
 	onkeydown: e => {
@@ -493,7 +474,7 @@ const $L = {
 		if((minutesSinceOpen=(stageTime.getHours()-args.hourOffset)*60+stageTime.getMinutes()) > args.maxMinutes)
 			minutesSinceOpen = args.maxMinutes;
 		for(let i=0; i < stageData['items'].length; i++) { 
-			let minutes = (stageData['items'][i][$SYM][0]==_charCrypto ? minutesInADay : minutesSinceOpen);
+			let minutes = (stageData['items'][i][$SYM][0]==_char['crypto'] ? minutesInADay : minutesSinceOpen);
 			if(typeof stageData['items'][i][$VOL] != 'number')
 				continue;
 			else if(minutes < 1 || stageData['items'][i][$VOL] < 1)
@@ -534,7 +515,7 @@ const $L = {
 			if(args && args['updateView'])
 				$updateContentTable(true);
 			if(json['notify'] && $hasSettings())
-				$marqueeFlash(`${_marqueeBlinkHtml}<span id="l_marquee_notify">${json['notify']}</span>${_marqueeBlinkHtml}`, false, 8000);
+				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${json['notify']}</span>${_F}`, false, 8000);
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=json['ts']);
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
@@ -627,8 +608,18 @@ const $L = {
 		else if(number < 0)
 			return($N(Math.abs(number), precision) + '%<i class="l_down">&#9660;</i>');
 		else
-			return(_emptyCellHtml);
+			return($F('f_empty_cell'));
 	},
+	multiplierFormat: (number, digits, approx) => {
+		if(typeof number != 'number')
+			return(number);
+		for(let prefix in _multipliers) {
+			if(number >= _multipliers[prefix])
+				return((number/_multipliers[prefix]).toFixed(digits) + prefix);
+		}
+		return(approx ? '~'+(Math.ceil(number/100)*100).toString() : number.toString());
+	},
+	multiplierExplicit: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
 	scrollToTop: () => $W.scrollTo({top: 0, behavior: 'auto'}),
 	forceNextStagePoll: () => $setNextStagePollComplete(),
 	epochNow: () => Math.floor(Date.now() / 1000),
@@ -636,7 +627,6 @@ const $L = {
 	cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
 	updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
 	removeFunction: fn => $W['$'+fn] = $L[fn] = () => {},
-	explicitMultiplier: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
 	settingsTabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
 	settingsTabSelect: el => {
 		const id=(el?el.id:_settingsSelectedTabName);
@@ -736,7 +726,7 @@ const $L = {
 			return;
 		if(id == 'l_range_volume') {
 			if(!(input.disabled=typeof _settingsSelectedTab['l_range_volume']!='number'))
-				display.innerHTML = (_settings['l_vpm'] ? $explicitMultiplier(input.value*_multipliers[_settingsSelectedTab['multiplier']] / _settingsSelectedTab['vpm_shift'],'K',_settingsSelectedTab['vpm_precision']) : ((input.value / _settingsSelectedTab['volume_shift']).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['volume_shift']))) + _settingsSelectedTab['multiplier']));
+				display.innerHTML = (_settings['l_vpm'] ? $multiplierExplicit(input.value*_multipliers[_settingsSelectedTab['multiplier']] / _settingsSelectedTab['vpm_shift'],'K',_settingsSelectedTab['vpm_precision']) : ((input.value / _settingsSelectedTab['volume_shift']).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['volume_shift']))) + _settingsSelectedTab['multiplier']));
 			else
 				display.innerHTML = 'N/A';
 		}
@@ -757,7 +747,7 @@ const $L = {
 		$animationsReset(marquee, `l_marquee ${$marqueeLengthToSeconds()}s linear infinite`);
 		if(highlight && _animationsComplete && !_marqueeFlashMessage && _stageDataLastUpdate > _marqueeLastHighlight) {
 			if(!$isVisible())
-				$updateTitleWithPrefix(_charUpDown);
+				$updateTitleWithPrefix(_char['updown']);
 			$animationsReset('l_marquee_container', 'l_marquee_container_highlight 3s ease-in forwards 10');
 			$notifyPlayAudio(_audioTest);
 			_marqueeLastHighlight = _stageDataLastUpdate;
@@ -774,17 +764,17 @@ const $L = {
 		for(let i in _stageData['top']) {
 			let item=_stageData['top'][i], isMarketIndex=(item.length>2&&typeof item[2]=='string');
 			if(isMarketIndex) {
-				if(!html) html += '<i class="l_marquee_blink_wide">&#8226;</i>';
+				if(!html) html += $F('f_marquee_blink_wide');
 				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>${$H(item[2])}</i>`;
 				if(item.length > 3 && ++highlight)
 					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[3]<0?'&#9660;':'&#9650;'} ${Math.abs(item[3]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
 				html += `${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
-			else if(item[0][0] != _charCrypto || $isShowing('l_crypto')) {
+			else if(item[0][0] != _char['crypto'] || $isShowing('l_crypto')) {
 				if(!rank) {
 					if(i >= 5)
 						maxRank /= 2;
-					html += '<i class="l_marquee_blink_wide">&#8226;</i>';
+					html += $F('f_marquee_blink_wide');
 				}
 				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>#${++rank}</i>${item[0]} &#177; `;
 				if(item.length > 2 && ++highlight)
@@ -825,12 +815,12 @@ const $L = {
 		_marqueeInterval = setInterval(() => { $marqueeUpdate() }, $marqueeLengthToSeconds() * 1000);
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html=`${_marqueeBlinkHtml} The following hotkeys and gestures are available: ${_marqueeBlinkHtml} Use the <i class="l_marquee_alt">tab</i> key to alternate animation modes. ${_marqueeBlinkHtml} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_marqueeBlinkHtml} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_marqueeBlinkHtml} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
+		let key, match, html=`${$F('f_marquee_blink')} The following hotkeys and gestures are available: ${_F} Use the <i class="l_marquee_alt">tab</i> key to alternate animation modes. ${_F} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_F} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_F} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in _keyMap) {
 			if((match=_keyMap[key][$KSTK].match(/([a-z]+)\.[a-z]+\//i)))
 				html += `<div class="l_marquee_info" data-ref="${key}"><i class='l_marquee_alt_padded'>${key}</i>${$H(match[1])}</div> `
 		}
-		html += `${_marqueeBlinkHtml} Hold down the <i class="l_marquee_alt">shift</i> key to make your selection permanent. ${_marqueeBlinkHtml} The keys <i class="l_marquee_alt">1-7</i> can be used to sort by each column.`;
+		html += `${_F} Hold down the <i class="l_marquee_alt">shift</i> key to make your selection permanent. ${_F} The keys <i class="l_marquee_alt">1-7</i> can be used to sort by each column.`;
 		$scrollToTop();
 		$marqueeInitiate(html);
 		$marqueeIntervalReset();
@@ -842,7 +832,7 @@ const $L = {
 		if(!$isVisible() && typeof Notification != 'undefined' && Notification.permission == 'granted') {
 			_notifications.push(new Notification('Larval - Market volatility found!', {
 				icon: 'icon-192x192.png',
-				body: notifyRows.length > 0 ? 'Volatile stock(s): ' + $U(notifyRows.map(a => (typeof a[$HLT]=='string'?_charHalt:(a[$PCT5]<0?_charUp:_charDown))+a[$SYM])).join(' ') : 'Larval - Market volatility found!'
+				body: notifyRows.length > 0 ? 'Volatile stock(s): ' + $U(notifyRows.map(a => (typeof a[$HLT]=='string'?_char['halt']:_char[a[$PCT5]<0?'down':'up'])+a[$SYM])).join(' ') : 'Larval - Market volatility found!'
 			}));
 		}
 		else 
@@ -856,7 +846,7 @@ const $L = {
 			else if($isHaltRow(notifyRows[0]))
 				$D.title = notifyRows[0][$SYM] + ' | ' + (notifyRows[0][$HLT]?notifyRows[0][$HLT]:'HALTED');
 			else
-				$D.title = notifyRows[0][$SYM] + ' | ' + (notifyRows[0][$PCT5]<0?_charUp:_charDown) + $N(Math.abs(notifyRows[0][$PCT5]),2) + '% | ' + (notifyRows[0][$PCT]<0?_charUp:_charDown) + $N(Math.abs(notifyRows[0][$PCT]),2) + '%';
+				$D.title = notifyRows[0][$SYM] + ' | ' + _char[notifyRows[0][$PCT5]<0?'up':'down'] + $N(Math.abs(notifyRows[0][$PCT5]),2) + '% | ' + _char[notifyRows[0][$PCT]<0?'down':'up'] + $N(Math.abs(notifyRows[0][$PCT]),2) + '%';
 			notifyRows.push(notifyRows.shift());
 		}, 1000);
 		$notifyPlayAudio(_audioAlert, true);
@@ -950,7 +940,7 @@ const $L = {
 		$setSymbolsOnTop(symbols, false, true);
 	},
 	delSymbolFromTop: sym => [sym,sym+'+',sym+'-'].forEach(sym => delete _symbolsOnTop[sym]),
-	addSymbolToTop: sym => sym[0]==_charCurrency ? (_symbolsOnTop[sym]=_symbolsOnTop[sym+'+']=_symbolsOnTop[sym+'-']=sym) : _symbolsOnTop[sym]=sym,
+	addSymbolToTop: sym => sym[0]==_char['currency'] ? (_symbolsOnTop[sym]=_symbolsOnTop[sym+'+']=_symbolsOnTop[sym+'-']=sym) : _symbolsOnTop[sym]=sym,
 	getSymbolsOnTop: () => {
 		if(Object.keys(_symbolsOnTop).length)
 			return(_symbolsOnTop);
@@ -1037,7 +1027,7 @@ const $L = {
 	isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
 	isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
-	cell: (row, type) => row[type] && _stageDataMap[type] ? _stageDataMap[type]({'val':row[type], 'row':row, 'type':type}) : _emptyCellHtml,
+	cell: (row, type) => row[type] && _stageDataMap[type] ? _stageDataMap[type]({'val':row[type], 'row':row, 'type':type}) : $F('f_empty_cell'),
 	cellRollover: (row, primary, secondary, shrinkMode) => {
 		let cell='<div class="l_hover_container">', left=(secondary==$NWS);
 		if(row[secondary] && !shrinkMode)
@@ -1062,7 +1052,7 @@ const $L = {
 	rollContentTable: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
 	updateContentTable: (doNotify, doNotResetKeyRow) => {
 		if(!_stageData) return;
-		const columns=['symbol',_forceContentTableShrink?_emptyCellHtml:'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options'], stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
+		const columns=['symbol',_forceContentTableShrink?$F('f_empty_cell'):'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options'], stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
 		$E('l_menu').className = (!_animationsComplete||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
 		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		if(_assetTypes[0] != stockAssetType) {
@@ -1098,7 +1088,7 @@ const $L = {
 		if(doNotify)
 			$notifyClear();
 		for(let i=0; i < _stageData['items'].length; i++) {
-			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_charETF?1:0)], isStock=(_I<0), notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
+			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_char['etf']?1:0)], isStock=(_I<0), notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
 			let rowClass=rowType, notifyControl='';
 			if($isHaltRow(row)) {
 				if(notifyExcept || !$isShowing(rowType))
