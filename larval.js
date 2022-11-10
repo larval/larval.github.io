@@ -846,7 +846,7 @@ const $L = {
 			else if($isHaltRow(notifyRows[0]))
 				$D.title = notifyRows[0][$SYM] + ' | ' + (notifyRows[0][$HLT]?notifyRows[0][$HLT]:'HALTED');
 			else
-				$D.title = notifyRows[0][$SYM] + ' | ' + _char[notifyRows[0][$PCT5]<0?'up':'down'] + $N(Math.abs(notifyRows[0][$PCT5]),2) + '% | ' + _char[notifyRows[0][$PCT]<0?'down':'up'] + $N(Math.abs(notifyRows[0][$PCT]),2) + '%';
+				$D.title = notifyRows[0][$SYM] + ' | ' + _char[notifyRows[0][$PCT5]<0?'down':'up'] + $N(Math.abs(notifyRows[0][$PCT5]),2) + '% | ' + _char[notifyRows[0][$PCT]<0?'down':'up'] + $N(Math.abs(notifyRows[0][$PCT]),2) + '%';
 			notifyRows.push(notifyRows.shift());
 		}, 1000);
 		$notifyPlayAudio(_audioAlert, true);
