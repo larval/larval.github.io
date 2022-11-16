@@ -118,12 +118,12 @@
 @viewport { width: device-width; }
 :root {
 	--l-marquee-start: 0px;	--l-marquee-end: 0px;
-	--l-color-0: #A6FDA4; --l-color-1: #E1FDE4; --l-color-2: #88cf86;
-	--l-color-3: #7dff7a; --l-color-4: #A6FDA4; --l-color-5: #FF4444;
-	--l-color-6: #2a302a; --l-color-7: #303630; --l-color-8: #363c36;
+	--l-color-0: #A6FDA4; --l-color-1: #E1FDE4; --l-color-2: #88CF86;
+	--l-color-3: #7DFF7A; --l-color-4: #A6FDA4; --l-color-5: #FF4444;
+	--l-color-6: #2A302A; --l-color-7: #303630; --l-color-8: #363C36;
 	--l-color-9: #825900; --l-color-10: #FFDE96; --l-color-11: #FAEED4;
-	--l-color-12: #A6FDA4; --l-color-13: #00AA00; --l-color-14: #85ff92;
-	--l-color-15: #FF0000; --l-color-16: #FDA4A4; --l-color-17: #8fde8c;
+	--l-color-12: #A6FDA4; --l-color-13: #00AA00; --l-color-14: #85FF92;
+	--l-color-15: #FF0000; --l-color-16: #FDA4A4; --l-color-17: #8FDE8C;
 }
 html, body {
 	color: #333;
@@ -253,7 +253,7 @@ i { font-style: normal !important; }
 }
 #l_logo_tag {
 	color: var(--l-color-1);
-	text-shadow: 4px 3px 0 #171a17;
+	text-shadow: 4px 3px 0 #171A17;
 	font-size: 22px;
 	text-align: center;
 	text-anchor: middle;
@@ -429,7 +429,7 @@ i { font-style: normal !important; }
 	border-bottom: none;
 	border-radius: 20px 20px 0 0;
 	text-align: center;
-	text-shadow: 2px 2px 0 #5c8c5b;
+	text-shadow: 2px 2px 0 #5C8C5B;
 	margin: auto;
 	transition: 0.25s;
 	user-select: none; 
@@ -468,7 +468,7 @@ i { font-style: normal !important; }
 }
 #l_control_table tr:nth-child(6) {
 	border-top: 1px solid #333;
-	background-color: #f8f8f8;
+	background-color: #F8F8F8;
 }
 #l_control_table tr th {
 	background-color: #333 !important;
@@ -616,7 +616,7 @@ i { font-style: normal !important; }
 .l_tab {
 	width: 20% !important;
 	cursor: pointer;
-	background-color: #f8f8f8;
+	background-color: #F8F8F8;
 	border-left: none !important;
 	border-right: none !important;
 	border-bottom: 1px solid #333;
@@ -637,7 +637,7 @@ i { font-style: normal !important; }
 	width: 100%;
 	height: 15px;
 	border-radius: 5px;  
-	background: #f8f8f8;
+	background: #F8F8F8;
 	outline: none;
 	opacity: 1;
 	transition: opacity 0.2s;
