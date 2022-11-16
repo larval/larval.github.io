@@ -30,12 +30,17 @@ const $L = {
 	_swipeStartPosition: null,
 	_wakeLock: null,
 	_symbolsOnTop: {},
-	_fragmentCache: {},
+	_fragments: {},
 	_naId: 'l_na',
 	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
 	_char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$" },
+	_themes: {
+		'default':    ['#A6FDA4', '#E1FDE4', '#88cf86', '#7dff7a', '#A6FDA4', '#FF4444', '#2a302a', '#303630', '#363c36', '#825900', '#FFDE96', '#FAEED4', '#A6FDA4', '#00AA00', '#85ff92', '#FF0000', '#FDA4A4', '#8fde8c'],
+		'afterhours': ['#95abfc', '#cddfff', '#8ba4ff', '#7492ff', '#d274ff', '#FF4444', '#2a2a30', '#303034', '#36363c', '#660303', '#ff73bb', '#d4dcfa', '#a0faca', '#00aaaa', '#85ffd6', '#ff0080', '#fda4cf', '#a6b7f7'],
+		'bloodbath':  ['#fc656f', '#fab6b6', '#f77272', '#ff4747', '#ffae74', '#ffcc54', '#361010', '#4b1818', '#602121', '#825900', '#ffec73', '#f2d088', '#d4f0a3', '#91ad03', '#fab143', '#FF0000', '#fcc0c0', '#fc868e']
+	}, _theme: 'default', _themeBGColorIndex: 7,
 	_keyMap: {
 		'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@/options', 'https://www.seekingalpha.com/symbol/@-USD'],
 		'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/stocks/quotes/@/options', 'https://www.barchart.com/crypto/coins/@'],
@@ -121,6 +126,7 @@ const $L = {
 		'Backquote':e               => $editSymbolsOnTop(),
 		'Slash':e                   => $marqueeHotKeyHelp(),
 		'F5':e                      => $settingsClear('User requested.'),
+		'F12':e                     => $setThemeRandom('<i>Going under the hood?</i> Let\'s make the outside look as hideous as the inside first.'),
 		'Home':e                    => _keyRow = 1,
 		'End':e                     => _keyRow = e.parentElement.childElementCount - 1,
 		'PageUp':e                  => _keyRow-=_contentTableRowCountThatAreInView,
@@ -173,13 +179,15 @@ const $L = {
 	_vibrateAlert: [250,250,500,250,750,250,1000], _audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
 	/* [$] SHORTHAND / COMMON */
+	C: className => (_C = $D.getElementsByClassName(className)), _C: null,
 	D: document,
 	E: id => (_E = $D.getElementById(id)), _E: null,
-	F: id => (_F = _fragmentCache[id] ? _fragmentCache[id] : (_fragmentCache[id]=($E(id)?_E.innerHTML:id))), _F: null,
+	F: (id, a) => (_F = (_fragments[id]?_fragments[id]:(_fragments[id]=($E(id)?_E.innerHTML:id).split('@'))).forEach((x,i)=>a&&a.splice(i*2,0,_fragments[id][i]))||(a?a:_fragments[id]).join('')), _F: null,
 	H: string => (_H = (_H=$D.createElement('p'))&&((_H.textContent=string)) ? _H.innerHTML : ''), _H: null,
 	I: (array, item) => (_I = array.indexOf(item)), _I: -1,
 	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
+	Q: query => (_Q = $D.querySelector(query)), _Q: null,
 	T: tag => $D.getElementsByTagName(tag),
 	U: array => array.filter((x,i,a) => array.indexOf(x)==i),
 	W: window,
@@ -368,7 +376,7 @@ const $L = {
 		if(!fastSplash && $E(_naId))
 			_E.className = _naId;
 		$E('l_root').className = 'l_animations_complete';
-		$E('l_menu').className = (!_stageData||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
+		$E('l_menu').className = (_stageData ? $getMode('l_') : 'l_default');
 		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
 		if($hasSettings() && _stageData && _stageData['top'] && _stageData['top'].length > 1)
 			$marqueeUpdate();
@@ -406,6 +414,7 @@ const $L = {
 		void el.offsetHeight;
 		el.style.animation = animation;
 	},
+	animationsResetByClass: (className, animation) => $C(className) ? Array.from(_C).forEach(el => $animationsReset(el, animation)) : null,
 	animationsDisableIfUnderFPS: (ms, fps, attempt) => {
 		if(!_frameData) {
 			if(!fps || $E(_naId) || _settings[_naId] || $isMobile(true) || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
@@ -504,6 +513,8 @@ const $L = {
 		else {
 			const stageTime=new Date(json['ts']*1000);
 			$setStageData(json);
+			if($setTheme($getMode()) !== false && $Q('meta[name="theme-color"]'))
+				_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
 			if(!$hasSettings() && _stageData['afterhours']=='idle' && $I([0,6], stageTime.getDay()) < 0 && _stageDataHistory.length==0) {
 				$settings('l_show', true, true, 'l_futures');
 				$settings('l_show', true, true, 'l_currency');
@@ -602,14 +613,6 @@ const $L = {
 		_nextStagePollTimeout = null;
 		$getStageData(true);
 	},
-	htmlPercent: (number, precision) => {
-		if(number > 0)
-			return($N(Math.abs(number), precision) + '%<i class="l_up">&#9650;</i>');
-		else if(number < 0)
-			return($N(Math.abs(number), precision) + '%<i class="l_down">&#9660;</i>');
-		else
-			return($F('f_empty_cell'));
-	},
 	multiplierFormat: (number, digits, approx) => {
 		if(typeof number != 'number')
 			return(number);
@@ -620,6 +623,7 @@ const $L = {
 		return(approx ? '~'+(Math.ceil(number/100)*100).toString() : number.toString());
 	},
 	multiplierExplicit: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
+	htmlPercent: (number, precision) => number ? ($N(Math.abs(number), precision) + $F(number>0?'f_l_up':'f_l_down')) : $F('f_empty_cell'),
 	scrollToTop: () => $W.scrollTo({top: 0, behavior: 'auto'}),
 	forceNextStagePoll: () => $setNextStagePollComplete(),
 	epochNow: () => Math.floor(Date.now() / 1000),
@@ -627,6 +631,13 @@ const $L = {
 	cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
 	updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
 	removeFunction: fn => $W['$'+fn] = $L[fn] = () => {},
+	getMode: prefix => (prefix?prefix:'') + (['afterhours', 'bloodbath'].find(key => _stageData[key]) || 'default'),
+	setTheme: name => (_theme!=name && _themes[name] && _themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color))),
+	setThemeRandom: message => {
+		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
+		$setTheme('random');
+		$marqueeFlash(message, false, 15000);
+	},
 	settingsTabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
 	settingsTabSelect: el => {
 		const id=(el?el.id:_settingsSelectedTabName);
@@ -742,8 +753,8 @@ const $L = {
 		void marquee.offsetWidth;
 		const fullWidthPreClone=marquee.scrollWidth, viewWidthPreClone=marquee.offsetWidth;
 		marqueeContentClone.innerHTML = marqueeContent.innerHTML;
-		$D.documentElement.style.setProperty('--marquee-start', `-${viewWidthPreClone}px`);
-		$D.documentElement.style.setProperty('--marquee-end', `-${fullWidthPreClone}px`);
+		$D.documentElement.style.setProperty('--l-marquee-start', `-${viewWidthPreClone}px`);
+		$D.documentElement.style.setProperty('--l-marquee-end', `-${fullWidthPreClone}px`);
 		$animationsReset(marquee, `l_marquee ${$marqueeLengthToSeconds()}s linear infinite`);
 		if(highlight && _animationsComplete && !_marqueeFlashMessage && _stageDataLastUpdate > _marqueeLastHighlight) {
 			if(!$isVisible())
@@ -1040,20 +1051,22 @@ const $L = {
 	},
 	popoutContentTableRow: row => {
 		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
-			return(`<div class="l_notify_popout l_ta" title="${_taMap[row[$TAN]][0]}" data-keymap="${_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:_keyMapIndexDefault}">&#128200;&nbsp;${_taMap[row[$TAN]][1]}</div>`);
+			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:_keyMapIndexDefault), `&#128200;&nbsp;${_taMap[row[$TAN]][1]}`]);
 		else if(row[$ERN] && row[$NWS])
-			return(`<div class="l_notify_popout l_news" title="News and earnings on ${$cell(row,$ERN)}">&#128197;&nbsp;${$cell(row,$ERN)}<i>&nbsp;+&nbsp;news</i></div>`);
+			$F('f_class_title_display', ['l_notify_popout l_news', `News and earnings on ${$cell(row,$ERN)}`, `&#128197;&nbsp;${$cell(row,$ERN)}<i>&nbsp;+&nbsp;news</i>`]);
 		else if(row[$ERN])
-			return(`<div class="l_notify_popout" title="Earnings on ${$cell(row,$ERN)}">&#128198;&nbsp;${$cell(row,$ERN)}<i>&nbsp;earnings</i></div>`);
+			$F('f_class_title_display', ['l_notify_popout', `Earnings on ${$cell(row,$ERN)}`, `&#128198;&nbsp;${$cell(row,$ERN)}<i>&nbsp;earnings</i>`]);
 		else if(row[$NWS])
-			return(`<div class="l_notify_popout l_news" title="Company news">&#128197;&nbsp;<i>recent </i>news</div>`);
-		return('');
+			$F('f_class_title_display', ['l_notify_popout l_news', 'Company news', '&#128197;&nbsp;<i>recent </i>news']);
+		else
+			$F('');
+		return(_F);
 	},
 	rollContentTable: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
 	updateContentTable: (doNotify, doNotResetKeyRow) => {
 		if(!_stageData) return;
 		const columns=['symbol',_forceContentTableShrink?$F('f_empty_cell'):'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options'], stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
-		$E('l_menu').className = (!_animationsComplete||!_stageData['afterhours']) ? 'l_not_afterhours' : 'l_afterhours';
+		$E('l_menu').className = (_animationsComplete ? $getMode('l_') : 'l_default');
 		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		if(_assetTypes[0] != stockAssetType) {
 			if($E(_assetTypes[0]))
@@ -1097,7 +1110,7 @@ const $L = {
 				rowClass = (notify ? 'l_notify_halt' : 'l_halt');
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>
-					 <div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for today">x</div>
+					 ${$F('f_class_title_display', ['l_notify_disable', `Disable ${$cell(row,$SYM)} notifications for today`, 'x'])}
 					 ${$cell(row,$SYM)}
 					</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
@@ -1111,15 +1124,15 @@ const $L = {
 				notify=( !notifyExcept && ((((rowRules[rowType]['up']&&row[$PCT5]>=rowRules[rowType]['up'])||(rowRules[rowType]['down']&&rowRules[rowType]['down']>=row[$PCT5])) && (!row[$VOL]||typeof row[$VOL]=='string'||row[$VOL]>=rowRules[rowType]['volume']) && (!_settings['l_options_only']||row[$OPT])) ));
 				if(notify) {
 					rowClass += ` l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
-					notifyControl = `<div class="l_notify_disable" title="Disable ${$cell(row,$SYM)} notifications for today">x</div>`;
+					notifyControl = $F('f_class_title_display', ['l_notify_disable', `Disable ${$cell(row,$SYM)} notifications for today`, 'x']);
 				}
 				else {
 					if(isOnTop)
 						rowClass += ' l_top';
 					if(notifyExcept)
-						notifyControl = `<div class="l_notify_enable" title="Re-enable ${$cell(row,$SYM)} notifications">&#10003;</div>`;
+						notifyControl = $F('f_class_title_display', ['l_notify_enable', `Re-enable ${$cell(row,$SYM)} notifications`, '&#10003;']);
 					else if(isOnTop)
-						notifyControl = `<div class="l_notify_disable" title="Remove ${$cell(row,$SYM)} from top">x</div>`;
+						notifyControl = $F('f_class_title_display', ['l_notify_disable', `Remove ${$cell(row,$SYM)} from top`, 'x']);
 				}
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
@@ -1145,9 +1158,9 @@ const $L = {
 		if(visibleRows >= 0 && _contentTableSoftLimit > 0)
 			_contentTableSoftLimit = -_contentTableSoftLimit;
 		if(_assetTypes.every(type => !_settings[type]['l_show']))
-			html += '<tr><td class="l_none" colspan="7">No asset types are set to show in your settings.</td></tr>';
+			html += $F('f_no_results_row', ['No asset types are set to show in your settings.']);
 		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
-			html += '<tr><td class="l_none" colspan="7">No results found.</td></tr>';
+			html += $F('f_no_results_row', ['No results found.']);
 		else {
 			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
 				html += onTop[key];
