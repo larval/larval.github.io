@@ -683,7 +683,7 @@ const $L = {
 	},
 	settingsLoad: passive => {
 		_naId = $isMobile(true) ? 'l_nam' : 'l_na';
-		let now=new Date(), exs=_settings['l_exceptions'], settings=null;
+		let now=new Date(), exs=null, settings=null;
 		if(!Object.keys(_settingsBase).length)
 			_settingsBase = $cloneObject(_settings);
 		if(!passive && localStorage.getItem('larval') && (settings=JSON.parse(localStorage.getItem('larval')))) {
@@ -692,7 +692,7 @@ const $L = {
 			else 
 				$settingsClear('Version change.');
 		}
-		if(exs && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
+		if((exs=_settings['l_exceptions']) && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
 			_notifyExceptions = exs.filter(e => e);
 		else
 			$settings('l_exceptions', '', true);
