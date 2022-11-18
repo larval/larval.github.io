@@ -113,7 +113,7 @@
 }
 @keyframes l_afterhours {
 	from { color: var(--l-color-0); }
-	to { color: var(--l-color-4); }
+	to { color: var(--l-color-3); }
 }
 @viewport { width: device-width; }
 :root {

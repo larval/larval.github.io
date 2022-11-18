@@ -376,7 +376,7 @@ const $L = {
 		if(!fastSplash && $E(_naId))
 			_E.className = _naId;
 		$E('l_root').className = 'l_animations_complete';
-		$E('l_menu').className = (_stageData ? $getMode('l_') : 'l_default');
+		$E('l_menu').className = (_stageData && !$isWeekend() ? $getMode('l_') : 'l_default');
 		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
 		if($hasSettings() && _stageData && _stageData['top'] && _stageData['top'].length > 1)
 			$marqueeUpdate();
@@ -515,7 +515,7 @@ const $L = {
 			$setStageData(json);
 			if($setTheme($getMode()) !== false && $Q('meta[name="theme-color"]'))
 				_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
-			if(!$hasSettings() && _stageData['afterhours']=='idle' && $I([0,6], stageTime.getDay()) < 0 && _stageDataHistory.length==0) {
+			if(!$hasSettings() && _stageData['afterhours']=='idle' && !$isWeekend(stageTime) && _stageDataHistory.length==0) {
 				$settings('l_show', true, true, 'l_futures');
 				$settings('l_show', true, true, 'l_currency');
 				$settingsTabUpdateUI();
@@ -697,7 +697,7 @@ const $L = {
 		else
 			$settings('l_exceptions', '', true);
 		$getSymbolsOnTop();
-		if(!$hasSettings() && $I([0,6], now.getDay()) >= 0) {
+		if(!$hasSettings() && $isWeekend(now)) {
 			$settings('l_show', false, true, 'l_stocks_ah');
 			$settings('l_show', false, true, 'l_etfs');
 			$settings('l_show', true, true, 'l_crypto');
@@ -1037,6 +1037,7 @@ const $L = {
 	isVisible: el => (el ? $W.getComputedStyle(el).visibility : $D.visibilityState) == 'visible',
 	isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
 	isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
+	isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
 	cell: (row, type) => row[type] && _stageDataMap[type] ? _stageDataMap[type]({'val':row[type], 'row':row, 'type':type}) : $F('f_empty_cell'),
 	cellRollover: (row, primary, secondary, shrinkMode) => {
