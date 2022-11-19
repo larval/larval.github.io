@@ -369,6 +369,16 @@ const $L = {
 		$animationsReset('l_marquee_container', 'l_marquee_container 0.5s ease forwards');
 		$animationsComplete(true);
 	},
+	animationsUpdateFlash: () => {
+		if(!_animationsComplete || !$C('l_logo_worm_body'))
+			return;
+		for(let i=0; i < _C.length; i++) {
+			const path=_C[i], animate=path.lastElementChild;
+			animate.setAttribute('values', '1;' + animate.getAttribute('values').replace(/^.+;([0-9\.]+)$/, '$1')); 
+			path.appendChild(animate);
+			animate.beginElementAt(i * 0.1);
+		}
+	},
 	animationsComplete: fastSplash => {
 		if(_animationsComplete)
 			return;
@@ -527,6 +537,7 @@ const $L = {
 				$updateContentTable(true);
 			if(json['notify'] && $hasSettings())
 				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${json['notify']}</span>${_F}`, false, 8000);
+			$animationsUpdateFlash();
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=json['ts']);
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
@@ -636,7 +647,7 @@ const $L = {
 	setThemeRandom: message => {
 		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
 		$setTheme('random');
-		$marqueeFlash(message, false, 15000);
+		$marqueeFlash(message, false, 20000);
 	},
 	settingsTabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
 	settingsTabSelect: el => {

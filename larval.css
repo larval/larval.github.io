@@ -39,16 +39,6 @@
 	from { stroke-dashoffset: 5000; }
 	to { stroke-dashoffset: 0; }
 }
-@keyframes l_worm {
-	from { stroke-dashoffset: 50; fill: var(--l-color-1); }
-	to { stroke-dashoffset: 0; fill: var(--l-color-0); }
-}
-@keyframes l_worm_blink {
-	0% { opacity: 1; }
-	98% { opacity: 1; }
-	99% { opacity: 0; }
-	100% { opacity: 1; }
-}
 @keyframes l_fade_in {
 	from { opacity: 0; }
 	to { opacity: 1; }
@@ -273,7 +263,7 @@ i { font-style: normal !important; }
 	display: inline-block;
 	width: 80px;
 	transition: 0.5s;
-	border-bottom: 2px dotted #fff;
+	border-bottom: 2px dotted #FFF;
 }
 #l_logo_tag_type i {
 	opacity: 0;
@@ -299,20 +289,19 @@ i { font-style: normal !important; }
 	fill: var(--l-color-1) !important;
 	stroke: var(--l-color-1) !important;
 }
-.l_logo_worm, .l_logo_worm_in, .l_logo_worm_out {
+.l_logo_worm_eye, .l_logo_worm_eyelid, .l_logo_worm_body {
 	stroke-dasharray: 20;
 	stroke-dashoffset: 50;
 	filter: drop-shadow( 75px -75px 0px rgba(0, 0, 0, 1));
 }
-.l_logo_worm  {
+.l_logo_worm_eye  {
 	fill: var(--l-color-1) !important;
 	stroke: var(--l-color-1) !important;
 }
-.l_logo_worm_in, .l_logo_worm_out {
+.l_logo_worm_body, .l_logo_worm_eyelid {
 	fill: var(--l-color-2) !important;
 	stroke: var(--l-color-2) !important;
 }
-.l_logo_worm_blink { animation: l_worm_blink 10s ease 10s alternate infinite; }
 .l_animations_complete #l_logo_tag { display: none !important; }
 .l_animations_complete #l_progress { display: block !important; }
 .l_animations_complete #l_fixed { cursor: default !important; }
@@ -421,7 +410,7 @@ i { font-style: normal !important; }
 #l_settings_button {
 	position: relative;
 	bottom: -12px;
-	color: #fff;
+	color: #FFF;
 	background-color: var(--l-color-2);
 	width: 120px;
 	padding: 8px 30px 15px 30px;
@@ -445,7 +434,7 @@ i { font-style: normal !important; }
 	box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.75);
 	margin: auto;
 	color: var(--l-color-7);
-	background-color: #fff;
+	background-color: #FFF;
 	font-family: Futura,Trebuchet MS,Arial,sans-serif;
 }
 #l_content {
@@ -520,8 +509,8 @@ i { font-style: normal !important; }
 	padding-right: 20px;
 	border-left: 1px solid #333;
 	border-right: 1px solid #333;
-	border-bottom: 1px solid #ccc;
-	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #CCC;
+	border-top: 1px solid #CCC;
 	text-align: right;
 }
 #l_content_table tr td .l_hover_container {
@@ -622,9 +611,7 @@ i { font-style: normal !important; }
 	border-bottom: 1px solid #333;
 	padding: 5px 0px 5px 0px !important;
 }
-.l_tab:hover {
-	background-color: #ddd;
-}
+.l_tab:hover { background-color: #DDD; }
 .l_tab_selected {
 	cursor: default !important;
 	background-color: #fff !important;
@@ -755,7 +742,7 @@ input[type="checkbox"] {
 	width: 20px;
 	height: 16px;
 	z-index: 0;
-	color: #fff;
+	color: #FFF;
 	font-size: 12px;
 	padding-left: 5px;
 	user-select: none;
@@ -832,7 +819,7 @@ input[type="checkbox"] {
 #l_na #l_marquee_flash, #l_na .l_content_tr_fade_in tr td { animation: l_fade_in 1s ease forwards !important; }
 #l_na #l_progress_display { width: 100% !important; }
 #l_na #l_progress_cap_left, #l_na #l_progress_cap_right { display: none !important; }
-#l_na, #l_na:after, #l_na:before, #l_na tr, #l_na td, #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3, #l_na #l_progress_display , #l_na #l_marquee_container, #l_na #l_afterhours_left, #l_na #l_afterhours_right, #l_na .l_logo_worm_in, #l_na .l_logo_worm_out, #l_na .l_logo_worm_blink, #l_na .l_marquee_highlight i { animation: none !important; }
+#l_na, #l_na:after, #l_na:before, #l_na tr, #l_na td, #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3, #l_na #l_progress_display , #l_na #l_marquee_container, #l_na #l_afterhours_left, #l_na #l_afterhours_right, #l_na .l_logo_worm_eyelid, #l_na .l_logo_worm_body, #l_na .l_logo_worm_eye, #l_na .l_marquee_highlight i { animation: none !important; }
 #l_na, #l_na:after, #l_na:before { background: #222 !important; }
 #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3 { background: none !important; }
 #l_na #l_marquee_container { height: 75px; margin-bottom: 25px; }
@@ -844,7 +831,7 @@ input[type="checkbox"] {
 #l_nam * { transition: 0s !important; }
 .l_nam #l_logo * { animation-play-state: paused !important; }
 #l_nam #l_marquee_flash, #l_nam .l_content_tr_fade_in tr td { animation: l_fade_in 1s ease forwards !important; }
-#l_nam, #l_nam:after, #l_nam:before, #l_na tr, #l_na td, #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3, #l_nam #l_marquee_container, #l_nam #l_afterhours_left, #l_nam #l_afterhours_right, #l_nam .l_logo_worm_in, #l_nam .l_logo_worm_out, #l_nam .l_logo_worm_blink, #l_nam .l_marquee_highlight i { animation: none !important; }
+#l_nam, #l_nam:after, #l_nam:before, #l_na tr, #l_na td, #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3, #l_nam #l_marquee_container, #l_nam #l_afterhours_left, #l_nam #l_afterhours_right, #l_nam .l_logo_worm_eyelid, #l_nam .l_logo_worm_body, #l_nam .l_logo_worm_eye, #l_nam .l_marquee_highlight i { animation: none !important; }
 #l_nam, #l_nam:after, #l_nam:before { background: #222 !important; }
 #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3 { background: none !important; }
 #l_nam #l_marquee_container { height: 125px !important; }
@@ -886,12 +873,12 @@ input[type=checkbox]:checked + label:before {
 }
 input[type=checkbox]:disabled + label:before {
 	transform: scale(1);
-	border-color: #aaa;
+	border-color: #AAA;
 }
 input[type=checkbox]:checked:disabled + label:before {
 	transform: scale(1);
-	background-color: #bfb;
-	border-color: #bfb;
+	background-color: #BFB;
+	border-color: #BFB;
 }
 @media (hover: hover) and (pointer: fine) {
 	.l_marquee_link:hover, .l_marquee_info:hover {
