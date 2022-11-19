@@ -1078,7 +1078,7 @@ const $L = {
 	updateContentTable: (doNotify, doNotResetKeyRow) => {
 		if(!_stageData) return;
 		const columns=['symbol',_forceContentTableShrink?$F('f_empty_cell'):'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options'], stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
-		$E('l_menu').className = (_animationsComplete ? $getMode('l_') : 'l_default');
+		$E('l_menu').className = (_animationsComplete && !$isWeekend() ? $getMode('l_') : 'l_default');
 		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>';
 		if(_assetTypes[0] != stockAssetType) {
 			if($E(_assetTypes[0]))
