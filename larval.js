@@ -370,13 +370,13 @@ const $L = {
 		$animationsComplete(true);
 	},
 	animationsUpdateFlash: () => {
-		if(!_animationsComplete || !$C('l_logo_worm_body'))
+		if(!_animationsComplete || !$C('l_logo_worm_flashable'))
 			return;
 		for(let i=0; i < _C.length; i++) {
 			const path=_C[i], animate=path.lastElementChild;
 			animate.setAttribute('values', '1;' + animate.getAttribute('values').replace(/^.+;([0-9\.]+)$/, '$1')); 
 			path.appendChild(animate);
-			animate.beginElementAt(i * 0.1);
+			animate.beginElementAt(i * 0.12);
 		}
 	},
 	animationsComplete: fastSplash => {
@@ -537,7 +537,6 @@ const $L = {
 				$updateContentTable(true);
 			if(json['notify'] && $hasSettings())
 				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${json['notify']}</span>${_F}`, false, 8000);
-			$animationsUpdateFlash();
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=json['ts']);
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
@@ -1192,7 +1191,10 @@ const $L = {
 			_forceContentTableShrink = true;
 			$updateContentTable(doNotify, doNotResetKeyRow);
 		}
-		else if(notifyRows.length > 0 && doNotify)
-			$notify(notifyRows);
+		else if(doNotify) {
+			if(notifyRows.length > 0)
+				$notify(notifyRows);
+			$animationsUpdateFlash();
+		}
 	}
 }
