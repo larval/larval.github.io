@@ -376,7 +376,7 @@ const $L = {
 			const path=_C[i], animate=path.lastElementChild;
 			animate.setAttribute('values', '1;' + animate.getAttribute('values').replace(/^.+;([0-9\.]+)$/, '$1')); 
 			path.appendChild(animate);
-			animate.beginElementAt(i * 0.12);
+			animate.beginElementAt(i * 0.1);
 		}
 	},
 	animationsComplete: fastSplash => {
