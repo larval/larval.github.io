@@ -91,13 +91,15 @@ const $L = {
 		'WU': ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
 	},
 	_eventMap: {
-		   'l_audible, l_options_only, l_notify_halts, l_show': {
+		   '#l_audible, #l_options_only, #l_notify_halts, #l_show': {
 				change:e    => $settingsChange(e)
-		}, 'l_range_up, l_range_down, l_range_volume': {
+		}, '#l_range_up, #l_range_down, #l_range_volume': {
 				input:e     => $updateRangeDisplay(e),
 				change:e    => $settingsChange(e)
-		}, 'l_content_table': {
+		}, '#l_content_table': {
 				mousemove:e => $keyModeReset()
+		}, 'animate': {
+				endEvent:e  => e && e.target && e.target.setAttribute('begin', '')
 		}
 	},
 	_clickMap: {
@@ -179,6 +181,7 @@ const $L = {
 	_vibrateAlert: [250,250,500,250,750,250,1000], _audioAlert: 'larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
 	/* [$] SHORTHAND / COMMON */
+	A: query => (_A = $D.querySelectorAll(query)), _A: null,
 	C: className => (_C = $D.getElementsByClassName(className)), _C: null,
 	D: document,
 	E: id => (_E = $D.getElementById(id)), _E: null,
@@ -188,7 +191,7 @@ const $L = {
 	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 	P: (count, total) => Math.round(count / total * 100),
 	Q: query => (_Q = $D.querySelector(query)), _Q: null,
-	T: tag => $D.getElementsByTagName(tag),
+	T: tagName => (_T = $D.getElementsByTagName(tagName)), _T: null,
 	U: array => array.filter((x,i,a) => array.indexOf(x)==i),
 	W: window,
 
@@ -212,10 +215,13 @@ const $L = {
 			else if(typeof document[k] != 'undefined')
 				document.addEventListener(k.substr(2), $L[k]);
 		}
-		for(let ids of Object.keys(_eventMap)) {
-			for(let id of ids.split(/[^A-Z0-9_]+/i))
-				for(let e of Object.keys(_eventMap[ids]))
-					$E(id).addEventListener(e, _eventMap[ids][e]);
+		for(let query of Object.keys(_eventMap)) {
+			if(!$A(query))
+				continue;
+			for(let a=0; a < _A.length; a++) {
+				for(let e of Object.keys(_eventMap[query]))
+					_A[a].addEventListener(e, _eventMap[query][e]);
+			}
 		}
 		if($E('l_awaiting_data')) _E.innerText = _E.title;
 		_title = document.title;
@@ -361,24 +367,6 @@ const $L = {
 	},
 
 	/* [$] FUNCTIONS */
-	animationsFastSplash: () => {
-		if(_animationsComplete || !_stageData)
-			return;
-		$animationsReset('l_logo', 'l_logo 0.5s ease 1 normal 0.5s forwards');
-		$animationsReset('l_fixed', 'l_fixed 0.5s ease 1 normal forwards');
-		$animationsReset('l_marquee_container', 'l_marquee_container 0.5s ease forwards');
-		$animationsComplete(true);
-	},
-	animationsUpdateFlash: () => {
-		if(!_animationsComplete || !$C('l_logo_worm_flashable'))
-			return;
-		for(let i=0; i < _C.length; i++) {
-			const path=_C[i], animate=path.lastElementChild;
-			animate.setAttribute('values', '1;' + animate.getAttribute('values').replace(/^.+;([0-9\.]+)$/, '$1')); 
-			path.appendChild(animate);
-			animate.beginElementAt(i * 0.1);
-		}
-	},
 	animationsComplete: fastSplash => {
 		if(_animationsComplete)
 			return;
@@ -397,6 +385,32 @@ const $L = {
 		$updateContentTable(true);
 		if($isMobile(true) || _settings[_naId])
 			$animationsToggle(false, null);
+	},
+	animationsFastSplash: () => {
+		if(_animationsComplete || !_stageData)
+			return;
+		$animationsReset('l_logo', 'l_logo 0.5s ease 1 normal 0.5s forwards');
+		$animationsReset('l_fixed', 'l_fixed 0.5s ease 1 normal forwards');
+		$animationsReset('l_marquee_container', 'l_marquee_container 0.5s ease forwards');
+		$animationsComplete(true);
+		$animationsUpdateFlash();
+	},
+	animationsUpdateFlash: () => {
+		if(!_animationsComplete || !$T('path'))
+			return;
+		for(let t=0,i=0; t < _T.length; t++) {
+			const path=_T[t], animate=path.lastElementChild, flashable=path.classList.contains('l_logo_worm_flashable');
+			if(animate.getAttribute('begin')) {
+				animate.setAttribute('begin', '');
+				animate.beginElement();
+				continue;
+			}
+			animate.setAttribute('values', (flashable?'1;':'0;') + animate.getAttribute('values').replace(/^.+;([0-9\.]+)$/, '$1')); 
+			path.appendChild(animate);
+			if(flashable)
+				i += 0.1;
+			animate.beginElementAt(i);
+		}
 	},
 	animationsToggle: (explicit, saveSettings) => {
 		const animations = (typeof explicit == 'boolean' ? explicit : !!$E(_naId));
@@ -525,9 +539,13 @@ const $L = {
 			$setStageData(json);
 			if($setTheme($getMode()) !== false && $Q('meta[name="theme-color"]'))
 				_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
-			if(!$hasSettings() && _stageData['afterhours']=='idle' && !$isWeekend(stageTime) && _stageDataHistory.length==0) {
-				$settings('l_show', true, true, 'l_futures');
-				$settings('l_show', true, true, 'l_currency');
+			if(!$hasSettings() && _stageDataHistory.length==0) {
+				if(_stageData['afterhours']=='idle')
+					$settings('l_show', true, true, 'l_crypto');
+				else if(_stageData['afterhours']=='futures') {
+					$settings('l_show', true, true, 'l_futures');
+					$settings('l_show', true, true, 'l_currency');
+				}
 				$settingsTabUpdateUI();
 			}
 			_stageDataHistory.push($cloneObject(_stageData));
@@ -538,6 +556,7 @@ const $L = {
 			if(json['notify'] && $hasSettings())
 				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${json['notify']}</span>${_F}`, false, 8000);
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=json['ts']);
+			$animationsUpdateFlash();
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
 	},
@@ -1191,10 +1210,7 @@ const $L = {
 			_forceContentTableShrink = true;
 			$updateContentTable(doNotify, doNotResetKeyRow);
 		}
-		else if(doNotify) {
-			if(notifyRows.length > 0)
-				$notify(notifyRows);
-			$animationsUpdateFlash();
-		}
+		else if(doNotify && notifyRows.length > 0)
+			$notify(notifyRows);
 	}
 }
