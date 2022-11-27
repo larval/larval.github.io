@@ -436,6 +436,7 @@ i { font-style: normal !important; }
 	color: var(--l-color-7);
 	background-color: #FFF;
 	font-family: Futura,Trebuchet MS,Arial,sans-serif;
+	border: none;
 }
 #l_content {
 	width: 60%;
