@@ -240,6 +240,7 @@ i { font-style: normal !important; }
 	margin: auto;
 	display: block;
 	animation: l_logo 0.5s ease 6s 1 normal forwards;
+	visibility: hidden;
 }
 #l_logo_tag {
 	color: var(--l-color-1);
@@ -815,6 +816,7 @@ input[type="checkbox"] {
 }
 .l_not_scrolled #l_logo { transform: scale(1) !important; }
 .l_not_scrolled #l_afterhours_left, .l_not_scrolled #l_afterhours_right { height: none !important; }
+#l_n #l_logo, #l_na #l_logo, #l_nam #l_logo { visibility: visible !important; }
 #l_na * { transition: 0s !important; }
 .l_na #l_logo * { animation-play-state: paused !important; }
 #l_na #l_marquee_flash, #l_na .l_content_tr_fade_in tr td { animation: l_fade_in 1s ease forwards !important; }

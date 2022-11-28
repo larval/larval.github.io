@@ -223,6 +223,7 @@ const $L = {
 					_A[a].addEventListener(e, _eventMap[query][e]);
 			}
 		}
+		$D.body.id = $D.body.className = 'l_n';
 		if($E('l_awaiting_data')) _E.innerText = _E.title;
 		_title = document.title;
 		$settingsLoad();
