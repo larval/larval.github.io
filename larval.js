@@ -417,7 +417,7 @@ const $L = {
 		const animations = (typeof explicit == 'boolean' ? explicit : !!$E(_naId));
 		if(saveSettings)
 			$settings(_naId, !animations);
-		$D.body.id = animations ? '' : _naId;
+		$D.body.id = animations ? 'l_n' : _naId;
 		if(_animationsComplete)
 			$D.body.className = $D.body.id;
 		if(_stageDataHistoryIndex >= 0)
