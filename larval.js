@@ -331,8 +331,7 @@ const $L = {
 			(_notifications.shift()).close();
 		if(!_marqueeInterval)
 			return;
-		$marqueeIntervalReset();
-		$marqueeUpdate();
+		$marqueeUpdate(true);
 		$animationsProgressReset();
 	},
 	onresize: e => {
@@ -552,8 +551,11 @@ const $L = {
 			_stageDataHistory.push($cloneObject(_stageData));
 			$sortStageData(false);
 			_forceContentTableShrink = false;
-			if(args && args['updateView'])
+			if(args && args['updateView']) {
 				$updateContentTable(true);
+				if(!$E('l_marquee_about'))
+					$marqueeUpdate(true);
+			}
 			if(json['notify'] && $hasSettings())
 				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${json['notify']}</span>${_F}`, false, 8000);
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=json['ts']);
@@ -794,7 +796,7 @@ const $L = {
 			_marqueeLastHighlight = _stageDataLastUpdate;
 		}
 	},
-	marqueeUpdate: () => {
+	marqueeUpdate: resetInterval => {
 		if(!_stageData || !_stageData['top'] || _stageData['top'].length < 2)
 			return;
 		else if(_stageData['marquee']) {
@@ -825,8 +827,10 @@ const $L = {
 			}
 		}
 		$marqueeInitiate(html, highlight);
+		if(resetInterval)
+			$marqueeIntervalReset();
 	},
-	marqueeLengthToSeconds: id => ($E(id?id:'l_marquee_content')&&_E.clientWidth) ? (_E.clientWidth/85) : ((_E.textContent.length||100)/6),
+	marqueeLengthToSeconds: useMS => ((($E('l_marquee_content')&&_E.clientWidth) ? (_E.clientWidth/85) : ((_E.textContent.length||100)/6)) * (useMS?1000:1)),
 	marqueeFlash: (message, priority, duration) => {
 		if(_marqueeFlashTimeout)
 			_marqueeFlashTimeout = clearTimeout(_marqueeFlashTimeout);
@@ -853,7 +857,7 @@ const $L = {
 	marqueeIntervalReset: () => {
 		if(_marqueeInterval)
 			clearInterval(_marqueeInterval);
-		_marqueeInterval = setInterval(() => { $marqueeUpdate() }, $marqueeLengthToSeconds() * 1000);
+		_marqueeInterval = setInterval($marqueeUpdate, $marqueeLengthToSeconds(true));
 	},
 	marqueeHotKeyHelp: () => {
 		let key, match, html=`${$F('f_marquee_blink')} The following hotkeys and gestures are available: ${_F} Use the <i class="l_marquee_alt">tab</i> key to alternate animation modes. ${_F} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_F} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_F} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
