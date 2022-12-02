@@ -534,9 +534,8 @@ const $L = {
 			retry = true;
 		else if(_stageDataHistoryIndex >= 0)
 			_stageDataHistory.push($cloneObject(json));
-		else {
-			const stageTime=new Date(json['ts']*1000);
-			$setStageData(json);
+		else if($setStageData(json)) {
+			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=_stageData['ts']);
 			if($setTheme($getMode()) !== false && $Q('meta[name="theme-color"]'))
 				_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
 			if(!$hasSettings() && _stageDataHistory.length==0) {
@@ -556,9 +555,8 @@ const $L = {
 				if(!$E('l_marquee_about'))
 					$marqueeUpdate(true);
 			}
-			if(json['notify'] && $hasSettings())
-				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${json['notify']}</span>${_F}`, false, 8000);
-			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=json['ts']);
+			if(_stageData['notify'] && $hasSettings())
+				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${_stageData['notify']}</span>${_F}`, false, 8000);
 			$animationsUpdateFlash();
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
