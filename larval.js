@@ -31,11 +31,12 @@ const $L = {
 	_wakeLock: null,
 	_symbolsOnTop: {},
 	_fragments: {},
+	_warnings: [],
 	_naId: 'l_na',
 	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
-	_char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$" },
+	_char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'warning':"\u26a0 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$" },
 	_themes: {
 		'default':    ['#A6FDA4', '#E1FDE4', '#88CF86', '#7DFF7A', '#A6FDA4', '#FF4444', '#2A302A', '#303630', '#363C36', '#825900', '#FFDE96', '#FAEED4', '#A6FDA4', '#00AA00', '#85FF92', '#FF0000', '#FDA4A4', '#8FDE8C'],
 		'afterhours': ['#95ABFC', '#CDDFFF', '#8BA4FF', '#7492FF', '#D274FF', '#FF4444', '#2A2A30', '#303034', '#36363C', '#660303', '#FF73BB', '#D4DCFA', '#A0FACA', '#00AAAA', '#85FFD6', '#FF0080', '#FDA4CF', '#A6B7F7'],
@@ -105,6 +106,7 @@ const $L = {
 	_clickMap: {
 		'l_hotkey_help':_           => $marqueeHotKeyHelp(),
 		'l_marquee_flash':_         => $gotoStageDataHistory(0),
+		'l_marquee_warning':_       => $notifyPlayAudio(_audioTest, false, true),
 		'l_fixed':_                 => $animationsFastSplash(),
 		'l_last_update':_           => $forceNextStagePoll(),
 		'l_range_volume_type':_     => $vpmToggle(),
@@ -160,7 +162,7 @@ const $L = {
 		'LNK':_  => _.val,
 		'TAN':_  => $H(_.val),
 		'HLT':2, 'TAN':8,
-		'KSTK':0, 'KETF':0, 'KOPT':1, 'KCRP':2, 'KFTR':3, 'KCUR':4
+		'WAUD':0, 'KSTK':0, 'KETF':0, 'KOPT':1, 'KCRP':2, 'KFTR':3, 'KCUR':4
 	},
 	_settings: {
 		'l_version':          2,
@@ -552,8 +554,7 @@ const $L = {
 			_forceContentTableShrink = false;
 			if(args && args['updateView']) {
 				$updateContentTable(true);
-				if(!$E('l_marquee_about'))
-					$marqueeUpdate(true);
+				$marqueeUpdate(true, true);
 			}
 			if(_stageData['notify'] && $hasSettings())
 				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${_stageData['notify']}</span>${_F}`, false, 8000);
@@ -723,7 +724,7 @@ const $L = {
 				$settingsClear('Version change.');
 		}
 		if((exs=_settings['l_exceptions']) && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
-			_notifyExceptions = exs.filter(e => e);
+			_notifyExceptions = exs.filter(Boolean);
 		else
 			$settings('l_exceptions', '', true);
 		$getSymbolsOnTop();
@@ -794,14 +795,17 @@ const $L = {
 			_marqueeLastHighlight = _stageDataLastUpdate;
 		}
 	},
-	marqueeUpdate: resetInterval => {
-		if(!_stageData || !_stageData['top'] || _stageData['top'].length < 2)
+	marqueeUpdate: (resetInterval, passive) => {
+		if(!_stageData || !_stageData['top'] || _stageData['top'].length < 2 || (passive && $E('l_marquee_about')))
 			return;
 		else if(_stageData['marquee']) {
 			$marqueeInitiate(_stageData['marquee']);
 			return;
 		}
 		let html='', rank=0, maxRank=20, highlight=0;
+		_warnings.filter(Boolean).forEach(msg => html += `<div class="l_marquee_warning"><i>${_char['warning']} WARNING ${_char['warning']}</i>${msg}</div> `);
+		if(html)
+			html = $F('f_marquee_blink_wide') + html + _F;
 		for(let i in _stageData['top']) {
 			let item=_stageData['top'][i], isMarketIndex=(item.length>2&&typeof item[2]=='string');
 			if(isMarketIndex) {
@@ -918,10 +922,23 @@ const $L = {
 		if(navigator.vibrate)
 			navigator.vibrate(pattern ? pattern : _vibrateAlert);
 	},
-	notifyPlayAudio: (audio, vibrateFallback) => {
+	notifyPlayAudio: (audio, vibrateFallback, disableWarning) => {
 		if(typeof audio == 'object' && audio.play && _settings['l_audible'])
-			audio.play().catch(() => { if(vibrateFallback) $notifyVibrate(); });
+			audio.play()
+			.then(() => $notifyPlayAudioCallback(null, vibrateFallback, disableWarning))
+			.catch(err => $notifyPlayAudioCallback(err, vibrateFallback, disableWarning));
 		else if(vibrateFallback)
+			$notifyVibrate();
+	},
+	notifyPlayAudioCallback: (error, vibrateFallback, disableWarning) => {
+		if(disableWarning)
+			_warnings[$WAUD] = error = false;
+		else if((error ^ _warnings[$WAUD]) || _warnings[$WAUD] === false)
+			return;
+		$updateTitleWithPrefix(error ? _char['warning'] : '');
+		_warnings[$WAUD] = (error ? 'Audible notifcations are enabled but your browser failed to play, interaction may be required: <span>click here to attempt to resolve it automatically</span>.' : false);
+		$marqueeUpdate(true, true);	
+		if(vibrateFallback)
 			$notifyVibrate();
 	},
 	notifyRequestPermission: () => {
