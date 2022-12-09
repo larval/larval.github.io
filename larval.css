@@ -392,10 +392,11 @@ i { font-style: normal !important; }
 	color: var(--l-color-10);
 }
 .l_marquee_warning span {
-	border-bottom: 2px solid var(--l-color-0);
+	color: var(--l-color-10);
+	border-bottom: 2px solid var(--l-color-10);
 	margin-left: 5px;
 }
-.l_marquee_alt, .l_marquee_alt_padded, .l_marquee_alt_padded_right, .l_marquee_warning span, #l_marquee_about span  { color: var(--l-color-0); }
+.l_marquee_alt, .l_marquee_alt_padded, .l_marquee_alt_padded_right, #l_marquee_about span  { color: var(--l-color-0); }
 .l_marquee_alt_padded_right { padding-right: 10px; }
 .l_marquee_alt_padded {
 	padding-left: 10px;
