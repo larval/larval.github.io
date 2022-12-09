@@ -402,10 +402,6 @@ i { font-style: normal !important; }
 	padding-left: 10px;
 	padding-right: 10px;
 }
-.l_marquee_alt_padded {
-	padding-left: 10px;
-	padding-right: 10px;
-}
 #l_marquee_content { padding-left: 100%; }
 .l_marquee_item, .l_marquee_link, .l_marquee_warning {
 	margin-left: 10px;
