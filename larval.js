@@ -799,7 +799,7 @@ const $L = {
 		}
 	},
 	marqueeUpdate: (resetInterval, passive) => {
-		if(!_stageData || !_stageData['top'] || _stageData['top'].length < 2 || (passive && $E('l_marquee_about')))
+		if(!_animationsComplete || !_stageData || !_stageData['top'] || _stageData['top'].length < 2 || (passive && $E('l_marquee_about')))
 			return;
 		else if(_stageData['marquee']) {
 			$marqueeInitiate(_stageData['marquee']);
