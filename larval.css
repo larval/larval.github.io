@@ -389,7 +389,7 @@ i { font-style: normal !important; }
 .l_marquee_blink_wide { padding-left: 15px !important; }
 .l_marquee_warning i {
 	padding-right: 10px;
-	color: var(--l-color-10);
+	color: var(--l-color-0);
 }
 .l_marquee_warning span {
 	color: var(--l-color-10);
@@ -893,10 +893,11 @@ input[type=checkbox]:checked:disabled + label:before {
 	border-color: #BFB;
 }
 @media (hover: hover) and (pointer: fine) {
-	.l_marquee_link:hover, .l_marquee_info:hover, .l_marquee_warning:hover {
+	.l_marquee_link:hover, .l_marquee_info:hover {
 		cursor: pointer;
 		border-bottom-color: var(--l-color-1) !important;
 	}
+	.l_marquee_warning span { cursor: pointer; }
 	#l_settings_button:hover { background: linear-gradient(180deg, var(--l-color-17) 75%, #333 90%); }
 	#l_content_table tr:hover:not(:first-child), #l_content_table .l_tr_keyrow_selected:not(:first-child) {
 		outline: none;

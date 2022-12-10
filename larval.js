@@ -106,7 +106,8 @@ const $L = {
 	_clickMap: {
 		'l_hotkey_help':_           => $marqueeHotKeyHelp(),
 		'l_marquee_flash':_         => $gotoStageDataHistory(0),
-		'l_marquee_warning':_       => $notifyPlayAudio(_audioTest, false, true),
+		'l_warning_audio':_         => $notifyPlayAudio(_audioTest, false, true),
+		'l_warning_never_notify':_  => $notifyRequestPermission(true),
 		'l_fixed':_                 => $animationsFastSplash(),
 		'l_last_update':_           => $forceNextStagePoll(),
 		'l_range_volume_type':_     => $vpmToggle(),
@@ -162,7 +163,8 @@ const $L = {
 		'LNK':_  => _.val,
 		'TAN':_  => $H(_.val),
 		'HLT':2, 'TAN':8,
-		'WAUD':0, 'KSTK':0, 'KETF':0, 'KOPT':1, 'KCRP':2, 'KFTR':3, 'KCUR':4
+		'KSTK':0, 'KETF':0, 'KOPT':1, 'KCRP':2, 'KFTR':3, 'KCUR':4,
+		'WAUD':0, 'WNOT':1
 	},
 	_settings: {
 		'l_version':          2,
@@ -173,6 +175,7 @@ const $L = {
 		'l_symbols_on_top':   '',
 		'l_exceptions':       '',
 		'l_vpm':              null,
+		'l_no_notifications': false,
 		'l_stocks':           { 'l_show':true,  'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':10,   'vpm_precision':1 },
 		'l_stocks_ah':        { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':null, 'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
 		'l_etfs':             { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':50,   'multiplier':'M', 'percent_shift':100, 'volume_shift':100, 'vpm_shift':1000, 'vpm_precision':0 },
@@ -936,18 +939,28 @@ const $L = {
 		else if((error ^ _warnings[$WAUD]) || _warnings[$WAUD] === false)
 			return;
 		$updateTitleWithPrefix(error ? _char['warning'] : '');
-		_warnings[$WAUD] = (error ? 'Audible notifcations are enabled but your browser failed to play, interaction may be required: <span>click here to attempt to resolve it automatically</span>.' : false);
+		_warnings[$WAUD] = (error ? 'Audible notifications are enabled but your browser failed to play, interaction may be required: <span class="l_warning_audio">click here to attempt to resolve this automatically</span>.' : false);
 		$marqueeUpdate(true, true);	
-		if(vibrateFallback)
+		if(error === false && disableWarning === true)
+			$marqueeFlash('If you did not hear a sound you likely need to manually resolve this.');
+		else if(vibrateFallback)
 			$notifyVibrate();
 	},
-	notifyRequestPermission: () => {
-		if(_notifyAllowed || typeof Notification == 'undefined')
+	notifyRequestPermission: neverAskAgain => {
+		if(_notifyAllowed || typeof Notification == 'undefined' || _settings['l_no_notifications'] || _warnings[$WNOT] === false)
 			return;
+		else if(neverAskAgain) {
+			$settings('l_no_notifications', true);
+			_warnings[$WNOT] = false;
+			$marqueeFlash('Updated settings to no longer mention your notification status.');
+			return;
+		}
 		Notification.requestPermission().then(status => {
-			if (status === 'denied')
+			if (status == 'denied') {
+				_warnings[$WNOT] = 'Browser notifications appear to be disabled, permissions must be manually changed to resolve this: <span class="l_warning_never_notify">click here to never mention this again</span>.';
 				_notifyAllowed = false;
-			else if (status === 'granted')
+			}
+			else if (status == 'granted')
 				_notifyAllowed = true;
 		}).catch(() => _notifyAllowed = null);
 	},
