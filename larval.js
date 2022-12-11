@@ -92,7 +92,9 @@ const $L = {
 		'WU': ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
 	},
 	_eventMap: {
-		   '#l_audible, #l_options_only, #l_notify_halts, #l_show': {
+		   '#l_root': {
+				click:e     => void(0),
+		}, '#l_audible, #l_options_only, #l_notify_halts, #l_show': {
 				change:e    => $settingsChange(e)
 		}, '#l_range_up, #l_range_down, #l_range_volume': {
 				input:e     => $updateRangeDisplay(e),
