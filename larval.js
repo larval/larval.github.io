@@ -957,7 +957,7 @@ const $L = {
 		}
 		Notification.requestPermission().then(status => {
 			if (status == 'denied') {
-				_warnings[$WNOT] = 'Browser notifications appear to be disabled, permissions must be manually changed to resolve this: <span class="l_warning_never_notify">click here to never mention this again</span>.';
+				_warnings[$WNOT] = 'Browser notifications appear to be disabled, permissions may need to be manually added to resolve this: <span class="l_warning_never_notify">click here to never mention this again</span>.';
 				_notifyAllowed = false;
 			}
 			else if (status == 'granted')
