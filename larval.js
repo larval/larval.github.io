@@ -110,7 +110,7 @@ const $L = {
 		'l_marquee_flash':_         => $gotoStageDataHistory(0),
 		'l_warning_audio':_         => $notifyPlayAudio(_audioTest, false, true),
 		'l_warning_never_notify':_  => $notifyRequestPermission(true),
-		'l_fixed':_                 => $animationsFastSplash(),
+		'l_fixed':_                 => _animationsComplete ? $animationsUpdateFlash(0.75) : $animationsFastSplash(true),
 		'l_last_update':_           => $forceNextStagePoll(),
 		'l_range_volume_type':_     => $vpmToggle(),
 		'l_settings_button':_       => $settingsButtonToggle(),
@@ -402,9 +402,11 @@ const $L = {
 		$animationsComplete(true);
 		$animationsUpdateFlash();
 	},
-	animationsUpdateFlash: () => {
+	animationsUpdateFlash: nextPollMS => {
 		if(!_animationsComplete || !$T('path'))
 			return;
+		if(nextPollMS && nextPollMS > 0)
+			$setNextStagePoll(nextPollMS, true);
 		for(let t=0,i=0; t < _T.length; t++) {
 			const path=_T[t], animate=path.lastElementChild, flashable=path.classList.contains('l_logo_worm_flashable');
 			if(animate.getAttribute('begin')) {
@@ -445,7 +447,6 @@ const $L = {
 		void el.offsetHeight;
 		el.style.animation = animation;
 	},
-	animationsResetByClass: (className, animation) => $C(className) ? Array.from(_C).forEach(el => $animationsReset(el, animation)) : null,
 	animationsDisableIfUnderFPS: (ms, fps, attempt) => {
 		if(!_frameData) {
 			if(!fps || $E(_naId) || _settings[_naId] || $isMobile(true) || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
@@ -635,9 +636,12 @@ const $L = {
 		else
 			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
 	},
-	setNextStagePoll: seconds => {
-		if(_animationsComplete)
+	setNextStagePoll: (seconds, marqueeInitiate) => {
+		if(_animationsComplete) {
 			$animationsReset('l_progress_display', `l_progress ${seconds}s linear forwards`);
+			if(marqueeInitiate)
+				setTimeout($marqueeInitiate, seconds * 1000);
+		}
 		if(_nextStagePollTimeout)
 			clearTimeout(_nextStagePollTimeout);
 		_nextStagePollTimeout = setTimeout($setNextStagePollComplete, seconds * 1000);

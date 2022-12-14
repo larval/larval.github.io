@@ -305,7 +305,6 @@ i { font-style: normal !important; }
 }
 .l_animations_complete #l_logo_tag { display: none !important; }
 .l_animations_complete #l_progress { display: block !important; }
-.l_animations_complete #l_fixed { cursor: default !important; }
 .l_animations_complete #l_logo * { animation-play-state: paused !important; }
 #l_progress {
 	display: none;
