@@ -405,8 +405,6 @@ const $L = {
 	animationsUpdateFlash: nextPollMS => {
 		if(!_animationsComplete || !$T('path'))
 			return;
-		if(nextPollMS && nextPollMS > 0)
-			$setNextStagePoll(nextPollMS, true);
 		for(let t=0,i=0; t < _T.length; t++) {
 			const path=_T[t], animate=path.lastElementChild, flashable=path.classList.contains('l_logo_worm_flashable');
 			if(animate.getAttribute('begin')) {
@@ -419,6 +417,10 @@ const $L = {
 			if(flashable)
 				i += 0.1;
 			animate.beginElementAt(i);
+		}
+		if(nextPollMS && nextPollMS > 0) {
+			$setNextStagePoll(nextPollMS, true);
+			$scrollToTop();
 		}
 	},
 	animationsToggle: (explicit, saveSettings) => {
@@ -664,7 +666,7 @@ const $L = {
 	},
 	multiplierExplicit: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
 	htmlPercent: (number, precision) => number ? ($N(Math.abs(number), precision) + $F(number>0?'f_l_up':'f_l_down')) : $F('f_empty_cell'),
-	scrollToTop: () => $W.scrollTo({top: 0, behavior: 'auto'}),
+	scrollToTop: smooth => $W.scrollTo({top: 0, behavior: smooth ? 'smooth' : 'auto'}),
 	forceNextStagePoll: () => $animationsUpdateFlash(0.75),
 	epochNow: () => Math.floor(Date.now() / 1000),
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
