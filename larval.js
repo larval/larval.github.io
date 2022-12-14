@@ -639,20 +639,19 @@ const $L = {
 			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
 	},
 	setNextStagePoll: (seconds, marqueeInitiate) => {
-		if(_animationsComplete) {
+		if(_animationsComplete)
 			$animationsReset('l_progress_display', `l_progress ${seconds}s linear forwards`);
-			if(marqueeInitiate)
-				setTimeout($marqueeInitiate, seconds * 1000);
-		}
 		if(_nextStagePollTimeout)
 			clearTimeout(_nextStagePollTimeout);
-		_nextStagePollTimeout = setTimeout($setNextStagePollComplete, seconds * 1000);
+		_nextStagePollTimeout = setTimeout(() => $setNextStagePollComplete(marqueeInitiate), seconds * 1000);
 		_nextStagePollCompleteEpoch = $epochNow() + seconds;
 	},
-	setNextStagePollComplete: () => {
+	setNextStagePollComplete: marqueeInitiate => {
 		if(_nextStagePollTimeout)
 			clearTimeout(_nextStagePollTimeout);
 		_nextStagePollTimeout = null;
+		if(marqueeInitiate)
+			$marqueeInitiate();
 		$getStageData(true);
 	},
 	multiplierFormat: (number, digits, approx) => {
