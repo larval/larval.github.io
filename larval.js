@@ -388,7 +388,8 @@ const $L = {
 		else
 			$marqueeInitiate();
 		$marqueeIntervalReset();
-		$notifyPlayAudio(_audioTest);
+		if($isVisible())
+			$notifyPlayAudio(_audioTest);
 		$updateContentTable(true);
 		if($isMobile(true) || _settings[_naId])
 			$animationsToggle(false, null);
@@ -787,7 +788,7 @@ const $L = {
 		if(_settings['l_vpm'] !== null)
 			$E('l_range_volume_type').innerHTML = (_settings['l_vpm'] ? 'vpm' : 'vol');
 	},
-	marqueeInitiate: (html, highlight) => {
+	marqueeInitiate: html => {
 		const marquee=$E('l_marquee'), marqueeContent=$E('l_marquee_content'), marqueeContentClone=$E('l_marquee_content_clone');
 		if(html) marqueeContent.innerHTML = html;
 		marqueeContentClone.innerHTML = '';
@@ -797,12 +798,15 @@ const $L = {
 		$D.documentElement.style.setProperty('--l-marquee-start', `-${viewWidthPreClone}px`);
 		$D.documentElement.style.setProperty('--l-marquee-end', `-${fullWidthPreClone}px`);
 		$animationsReset(marquee, `l_marquee ${$marqueeLengthToSeconds()}s linear infinite`);
-		if(highlight && _animationsComplete && !_marqueeFlashMessage && _stageDataLastUpdate > _marqueeLastHighlight) {
+		const secsToHighlight = $marqueeSecondsToLastHighlight();
+		if(secsToHighlight > 0 && _animationsComplete && !_marqueeFlashMessage && _stageDataLastUpdate > _marqueeLastHighlight) {
 			if(!$isVisible())
 				$updateTitleWithPrefix(_char['updown']);
-			$animationsReset('l_marquee_container', 'l_marquee_container_highlight 3s ease-in forwards 10');
-			$notifyPlayAudio(_audioTest);
-			_marqueeLastHighlight = _stageDataLastUpdate;
+			else {
+				const repeatCount=Math.floor(secsToHighlight/3), highlightElement=($isMobile()?'l_menu':'l_marquee_container');
+				$animationsReset(highlightElement, `${highlightElement}_highlight 3s ease-in forwards ${repeatCount<3?3:repeatCount}`);
+				_marqueeLastHighlight = _stageDataLastUpdate;
+			}
 		}
 	},
 	marqueeUpdate: (resetInterval, passive) => {
@@ -812,16 +816,16 @@ const $L = {
 			$marqueeInitiate(_stageData['marquee']);
 			return;
 		}
-		let html='', rank=0, maxRank=20, highlight=0;
+		let html='', rank=0, maxRank=20;
 		_warnings.filter(Boolean).forEach(msg => html += `<div class="l_marquee_warning"><i>${_char['warning']} WARNING ${_char['warning']}</i>${msg}</div> `);
 		if(html)
 			html = $F('f_marquee_blink_wide') + html + _F;
-		for(let i in _stageData['top']) {
+		for(let i=0; i < _stageData['top'].length; i++) {
 			let item=_stageData['top'][i], isMarketIndex=(item.length>2&&typeof item[2]=='string');
 			if(isMarketIndex) {
 				if(!html) html += $F('f_marquee_blink_wide');
 				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>${$H(item[2])}</i>`;
-				if(item.length > 3 && ++highlight)
+				if(item.length > 3)
 					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[3]<0?'&#9660;':'&#9650;'} ${Math.abs(item[3]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
 				html += `${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
@@ -832,17 +836,26 @@ const $L = {
 					html += $F('f_marquee_blink_wide');
 				}
 				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>#${++rank}</i>${item[0]} &#177; `;
-				if(item.length > 2 && ++highlight)
+				if(item.length > 2)
 					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[2]<0?'&#9660;':'&#9650;'} ${Math.abs(item[2]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
 				html += `${item[1]}%</div> `;
 				if(rank >= maxRank) break;
 			}
 		}
-		$marqueeInitiate(html, highlight);
+		$marqueeInitiate(html);
 		if(resetInterval)
 			$marqueeIntervalReset();
 	},
 	marqueeLengthToSeconds: useMS => ((($E('l_marquee_content')&&_E.clientWidth) ? (_E.clientWidth/85) : ((_E.textContent.length||100)/6)) * (useMS?1000:1)),
+	marqueeSecondsToLastHighlight: useMS => {
+		if(!$A('#l_marquee_content .l_marquee_highlight') || _A.length < 1)
+			return(0);
+		else {
+			const marquee=$E('l_marquee'), lastHighlightedElement=_A[_A.length-1], pixelsToLastHighlight=Math.round(lastHighlightedElement.getBoundingClientRect().x - marquee.offsetLeft + (marquee.clientWidth/2), 0);
+			const pixelsPerSeconds=$E('l_marquee_content').clientWidth/$marqueeLengthToSeconds(), secondsToLastHighlight=Math.round(pixelsToLastHighlight/pixelsPerSeconds,0);
+			return(secondsToLastHighlight * (useMS?1000:1));
+		}
+	},
 	marqueeFlash: (message, priority, duration) => {
 		if(_marqueeFlashTimeout)
 			_marqueeFlashTimeout = clearTimeout(_marqueeFlashTimeout);
