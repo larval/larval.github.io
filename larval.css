@@ -107,6 +107,10 @@
 	from { opacity: 0; left: 20px; }
 	to { opacity: 1; left: 0; }
 }
+@keyframes l_history_active {
+	from { max-height: 0; }
+	to { max-height: 9999px; }
+}
 @keyframes l_afterhours {
 	from { color: var(--l-color-0); }
 	to { color: var(--l-color-3); }
@@ -492,20 +496,16 @@ i { font-style: normal !important; }
 	border-left: 1px solid #333;
 	border-right: 1px solid #333;
 }
-#l_control_table tr:nth-child(6) td {
-	padding: 5px 5px 8px 5px !important;
-}
+#l_control_table tr:nth-child(6) td { padding: 5px 5px 8px 5px !important; }
 #l_content_table {
 	width: 100%;
 	border-collapse: collapse;
 	font-weight: bold;
 	border: 1px solid #444;
+	user-select: none;
 }
 #l_content_table tbody tr:nth-child(odd){
 	background-color: rgba(0, 0, 0, 0.05);
-}
-#l_content_table .l_tr_keyrow {
-	pointer-events: none;
 }
 #l_content_table tr th {
 	background-color: #333 !important;
@@ -530,10 +530,7 @@ i { font-style: normal !important; }
 	border-top: 1px solid #CCC;
 	text-align: right;
 }
-#l_content_table tr td .l_hover_container {
-	pointer-events: none;
-	position: relative;
-}
+#l_content_table tr td .l_hover_container  { position: relative; }
 #l_content_table tr td .l_hover_active {
 	font-style: italic;
 	text-decoration: underline;
@@ -559,9 +556,7 @@ i { font-style: normal !important; }
 	text-overflow: ellipsis;
 	word-break: keep-all;
 }
-#l_content_table tr td .l_hover_inactive {
-	visibility: visible;
-}
+#l_content_table tr td .l_hover_inactive { visibility: visible; }
 .l_content_table_header, .l_content_table_header_selected, .l_content_table_header_selected_reverse {
 	width: 1%;
 	user-select: none;
@@ -588,6 +583,21 @@ i { font-style: normal !important; }
 .l_content_table_notify_5 tr td:nth-child(5),
 .l_content_table_notify_6 tr td:nth-child(6),
 .l_content_table_notify_7 tr td:nth-child(7) { animation: l_content_table_notify 1s linear forwards; }
+.l_history_active {
+	overflow: hidden;
+	white-space: nowrap;
+	animation: l_history_active 1s ease-in-out forwards alternate;
+}
+.l_history_active div { line-height: 16px; }
+.l_history  > .l_hover_container, .l_history_active { display: none; }
+.l_history .l_history_active { display: block !important; }
+.l_history  { background-color: var(--l-color-11) !important; }
+#l_content_table tr.l_notify_up td.l_history, #l_content_table tr.l_notify_up:has(.l_history), #l_content_table tr.l_notify_top_up td.l_history, #l_content_table tr.l_notify_top_up:has(.l_history) {
+	background-color: var(--l-color-12) !important;
+}
+#l_content_table tr.l_notify_down td.l_history, #l_content_table tr.l_notify_down:has(.l_history), #l_content_table tr.l_notify_top_down td.l_history, #l_content_table tr.l_notify_top_down:has(.l_history) {
+	background-color: var(--l-color-16) !important;
+}
 #l_content_table tr td:nth-child(7), .l_notify_halt td:nth-child(4) {
 	text-align: center;
 	position: relative;
@@ -796,6 +806,11 @@ input[type="checkbox"] {
 }
 .l_more { display: block !important; }
 .l_no_more { display: none !important; }
+.l_hr {
+	margin-top: 5px;
+	height: 5px;
+	border-top: 2px dotted var(--l-color-9);
+}
 #l_footer {
 	padding-top: 25px;
 	padding-bottom: 25px;
@@ -837,7 +852,7 @@ input[type="checkbox"] {
 #l_na #l_marquee_flash, #l_na .l_content_tr_fade_in tr td { animation: l_fade_in 1s ease forwards !important; }
 #l_na #l_progress_display { width: 100% !important; }
 #l_na #l_progress_cap_left, #l_na #l_progress_cap_right { display: none !important; }
-#l_na, #l_na:after, #l_na:before, #l_na tr, #l_na td, #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3, #l_na #l_progress_display , #l_na #l_marquee_container, #l_na #l_afterhours_left, #l_na #l_afterhours_right, #l_na #l_logo_worm_eyelid, #l_na .l_logo_worm_body, #l_na #l_logo_worm_eye, #l_na .l_marquee_highlight i, #l_na #l_menu { animation: none !important; }
+#l_na, #l_na:after, #l_na:before, #l_na tr, #l_na td, #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3, #l_na #l_progress_display , #l_na #l_marquee_container, #l_na #l_afterhours_left, #l_na #l_afterhours_right, #l_na #l_logo_worm_eyelid, #l_na .l_logo_worm_body, #l_na #l_logo_worm_eye, #l_na .l_marquee_highlight i, #l_na #l_menu, #l_na .l_history_active { animation: none !important; }
 #l_na, #l_na:after, #l_na:before { background: #222 !important; }
 #l_na #l_fixed_bg1, #l_na #l_fixed_bg2, #l_na #l_fixed_bg3 { background: none !important; }
 #l_na #l_marquee_container { height: 75px; margin-bottom: 25px; }
@@ -910,18 +925,32 @@ input[type=checkbox]:checked:disabled + label:before {
 		border-color: #666;
 		box-shadow: 0 0 10px #666;
 		cursor: pointer;
+	}
+	#l_content_table tr:hover:not(:first-child) td:not(.l_history), #l_content_table .l_tr_keyrow_selected:not(:first-child) td:not(.l_history) {
 		text-decoration: underline;
+	}
+	#l_content_table tr:hover .l_history_toggle, td.l_news:hover  {
+		background-color: var(--l-color-11) !important;
+	}
+	#l_content_table tr.l_notify_up:hover .l_history_toggle, #l_content_table tr.l_notify_up td.l_news:hover, #l_content_table tr.l_notify_top_up:hover .l_history_toggle, #l_content_table tr.l_notify_top_up td.l_news:hover {
+		background-color: var(--l-color-12) !important;
+	}
+	#l_content_table tr.l_notify_down:hover .l_history_toggle, #l_content_table tr.l_notify_down td.l_news:hover, #l_content_table tr.l_notify_top_down:hover .l_history_toggle, #l_content_table tr.l_notify_top_down td.l_news:hover {
+		background-color: var(--l-color-16) !important;
+	}
+	#l_content_table tr td:nth-child(1):hover ~ .l_history_toggle:not(.l_history), #l_content_table tr td:nth-child(2):hover ~ .l_history_toggle:not(.l_history)  { 
+		background-color: initial !important;
 	}
 	#l_content_table tr:hover td .l_hover_inactive, #l_content_table .l_tr_keyrow_selected td .l_hover_inactive, .l_content_table_alt_display tr td .l_hover_inactive {
 		visibility: hidden !important;
 	}
 	#l_content_table tr:hover td .l_hover_active, #l_content_table .l_tr_keyrow_selected td .l_hover_active {
 		display: block !important;
-		animation: l_hover_active 0.5s ease 0s 1 normal forwards !important;
+		animation: l_hover_active 0.5s ease 0s 1 normal forwards;
 	}
 	#l_content_table tr:hover td .l_hover_active_left,#l_content_table .l_tr_keyrow_selected td .l_hover_active_left {
 		display: block !important;
-		animation: l_hover_active_left 0.5s ease 0s 1 normal forwards !important;
+		animation: l_hover_active_left 0.5s ease 0s 1 normal forwards;
 	}
 	.l_content_table_alt_display tr td .l_hover_active {
 		display: block !important;

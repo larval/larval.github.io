@@ -3,8 +3,8 @@ const $L = {
 	/* [_] INTERNALS / DEFAULTS */
 	_stageURL: '//stage.larval.com/',
 	_stageData: null,
+	_stageDataSortByColumn: null,
 	_stageDataLastUpdate: 0,
-	_stageDataSortByColumn: 0,
 	_stageDataHistoryIndex: -1,
 	_stageDataHistory: [],
 	_stageDataMap: [],
@@ -121,6 +121,7 @@ const $L = {
 		'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`).focus(),
 		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`).focus(),
 		'l_marquee_info':_          => $setURLFormat(_.sym, false),
+		'l_history_toggle':_        => $historyDropDownToggle(_.idx, [$PCT5,$PCT,$PRC,$VOL,$AGE]),
 		'l_options':_               => $W.open($createURL(_.sym, $KOPT), `l_${_.type}_${$KOPT}`).focus(),
 		'alt_default':_             => _.raw ? $setSymbolsOnTop(_.raw, null, true) : $editSymbolsOnTop(),
 		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`).focus()
@@ -164,7 +165,7 @@ const $L = {
 		'NWS':_  => $H(_.val),
 		'LNK':_  => _.val,
 		'TAN':_  => $H(_.val),
-		'HLT':2, 'TAN':8,
+		'HLT':2, 'TAN':8, 'AGE': 6,
 		'KSTK':0, 'KETF':0, 'KOPT':1, 'KCRP':2, 'KFTR':3, 'KCUR':4,
 		'WAUD':0, 'WNOT':1
 	},
@@ -571,9 +572,9 @@ const $L = {
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
 	},
-	getHistoryData: () => $getData('history.json', $parseHistoryData),
-	parseHistoryData: json => {
-		let error = false;
+	getHistoryData: args => $getData('history.json', $parseHistoryData, args),
+	parseHistoryData: (json, args) => {
+		let error=false;
 		if(!json || json.length < 2)
 			error = true;
 		else {
@@ -585,15 +586,60 @@ const $L = {
 			if(h > 0) {
 				json.length = h;
 				_stageDataHistory = json.concat(_stageDataHistory);
-				_stageDataHistoryIndex = h - 1;
-				$updateStageDataHistory();
+				if(args && args['dropDownTypes'])
+					$historyDropDown(args['dropDownIndex'], args['dropDownTypes'])
+				else {
+					_stageDataHistoryIndex = h - 1;
+					$updateStageDataHistory();
+				}
 			}
 			else
 				error = true;
 		}
+		$getHistoryData = null;
 		if(error)
 			$marqueeFlash('Sorry, no additional history is available to rewind to at this time.');
-		$getHistoryData = null;
+	},
+	getHistoryForSymbol: (sym, ts) => {
+		return _stageDataHistory.filter(stageData => stageData['ts'] <= ts).map(history => {
+			const epoch=$epochNow();
+			for(row of history['items']) {
+				if(row[$SYM]==sym && !$isHaltRow(row))
+					return([...row, null, `~${Math.round((epoch-history['ts'])/60,0)}m&nbsp;ago`]);
+			}
+		}).reverse();
+	},
+	historyDropDownToggle: (idx, types) => $getHistoryData ? $getHistoryData({'dropDownIndex':idx,'dropDownTypes':types}) : $historyDropDown(idx,types),
+	historyDropDown: (idx, types) => {
+		let stageRow=_stageData['items'][idx], stageDataForSymbols=$getHistoryForSymbol(stageRow[$SYM], _stageData['ts']), hadHistoryDisplays=[];
+		if(!stageDataForSymbols)
+			return;
+		if($A('.l_history_active'))
+			hadHistoryDisplays = Array.from(_A).map(e => e.remove() || e.id);
+		if($A('.l_history'))
+			_A.forEach(e => e.classList.remove('l_history'));
+		for(type of types) {
+			const historyId=`l_history_${idx}_${type}`, hadHistoryDisplay=($I(hadHistoryDisplays,historyId)>=0), isAge=(type==$AGE);
+			if(!$Q(`[data-ref='${idx}'] td:nth-of-type(${type+1})`))
+				continue;
+			let htmlItems=[], lastItem=null;
+			stageDataForSymbols.forEach((row, idx) => {
+				const isLast=(idx>=stageDataForSymbols.length-1);
+				if(lastItem == $F('f_blank_line') && isLast)
+					htmlItems.pop();
+				else if(row && row[$PCT5])
+					htmlItems.push(lastItem=`<div class="l_hover_container">${isAge?row.slice(-1)[0]:$cell(row,type)}</div>`);
+				else if(lastItem != _F && !isLast)
+					htmlItems.push(lastItem=_F);
+			});
+			if(htmlItems.length == 0)
+				htmlItems.push(`<div class="l_hover_container">${$cell(stageRow,type)}</div>`);
+			_Q.classList[hadHistoryDisplay?'remove':'add']('l_history');
+			if(!hadHistoryDisplay)
+				_Q.insertAdjacentHTML('beforeend', `<div id="${historyId}" class="l_history_active">${htmlItems.join('')}</div>`);
+		}
+		if($isSafari())
+			$forceRedraw($E('l_content_table'));
 	},
 	gotoStageDataHistory: direction => {
 		const lastIndex=_stageDataHistoryIndex;
@@ -673,6 +719,7 @@ const $L = {
 	cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
 	updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
 	removeFunction: fn => $W['$'+fn] = $L[fn] = () => {},
+	forceRedraw: el => el && (el.style.transform='translateZ(0)') && void el.offsetHeight,
 	getMode: prefix => (prefix?prefix:'') + (['afterhours', 'bloodbath'].find(key => _stageData[key]) || 'default'),
 	setTheme: name => (_theme!=name && _themes[name] && _themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color))),
 	setThemeRandom: message => {
@@ -973,11 +1020,11 @@ const $L = {
 			$settings('l_no_notifications', true);
 			_warnings[$WNOT] = false;
 			$marqueeFlash('Updated settings to no longer mention your notification status.');
-			return;
 		}
-		Notification.requestPermission().then(status => {
-			if (status == 'denied') {
-				_warnings[$WNOT] = 'Browser notifications appear to be disabled, permissions may need to be manually added to resolve this: <span class="l_warning_never_notify">click here to never mention this again</span>.';
+		Promise.resolve(Notification.requestPermission()).then(status => {
+			if(status == 'denied') {
+				if(!_settings['l_no_notifications'])
+					_warnings[$WNOT] = 'Browser notifications appear to be disabled, permissions may need to be manually added to resolve this: <span class="l_warning_never_notify">click here to never mention this again</span>.';
 				_notifyAllowed = false;
 			}
 			else if (status == 'granted')
@@ -1116,8 +1163,9 @@ const $L = {
 		return(total);
 	},
 	hasSettings: () => localStorage && localStorage.getItem('larval'),
-	isVisible: el => (el ? $W.getComputedStyle(el).visibility : $D.visibilityState) == 'visible',
+	isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
 	isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
+	isVisible: el => (el ? $W.getComputedStyle(el).visibility : $D.visibilityState) == 'visible',
 	isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
 	isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
@@ -1220,11 +1268,11 @@ const $L = {
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
-					<td>${$cellRollover(row,$PCT5,$PCTM)}</td>
-					<td>${$cellRollover(row,$PCT,$PCTY)}</td>
-					<td>${$cellRollover(row,$PRC,$PRC5)}</td>
-					<td>${$cellRollover(row,$VOL,$VOL5)}</td>
-					<td class="${isStock&&row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
+					<td class="l_history_toggle">${$cellRollover(row,$PCT5,$PCTM)}</td>
+					<td class="l_history_toggle">${$cellRollover(row,$PCT,$PCTY)}</td>
+					<td class="l_history_toggle">${$cellRollover(row,$PRC,$PRC5)}</td>
+					<td class="l_history_toggle">${$cellRollover(row,$VOL,$VOL5)}</td>
+					<td class="l_history_toggle">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			if(visibleRows >= 0 && _contentTableSoftLimit > 0 && ++visibleRows >= _contentTableSoftLimit)
@@ -1263,6 +1311,8 @@ const $L = {
 			_forceContentTableShrink = true;
 			$updateContentTable(doNotify, doNotResetKeyRow);
 		}
+		else if(_stageDataSortByColumn === null) 
+			_stageDataSortByColumn = parseInt($isSafari()?$setSortStageData(0):0)||0;
 		else if(doNotify && notifyRows.length > 0)
 			$notify(notifyRows);
 	}
