@@ -3,7 +3,7 @@ const $L = {
 	/* [_] INTERNALS / DEFAULTS */
 	_stageURL: '//stage.larval.com/',
 	_stageData: null,
-	_stageDataSortByColumn: null,
+	_stageDataSortByColumn: 0,
 	_stageDataLastUpdate: 0,
 	_stageDataHistoryIndex: -1,
 	_stageDataHistory: [],
@@ -574,7 +574,8 @@ const $L = {
 	},
 	getHistoryData: args => $getData('history.json', $parseHistoryData, args),
 	parseHistoryData: (json, args) => {
-		let error=false;
+		let error=false, dropDownMode=(args&&args['dropDownTypes']);
+		$getHistoryData = null;
 		if(!json || json.length < 2)
 			error = true;
 		else {
@@ -586,7 +587,7 @@ const $L = {
 			if(h > 0) {
 				json.length = h;
 				_stageDataHistory = json.concat(_stageDataHistory);
-				if(args && args['dropDownTypes'])
+				if(dropDownMode)
 					$historyDropDown(args['dropDownIndex'], args['dropDownTypes'])
 				else {
 					_stageDataHistoryIndex = h - 1;
@@ -596,8 +597,11 @@ const $L = {
 			else
 				error = true;
 		}
-		$getHistoryData = null;
-		if(error)
+		if(!error)
+			return;
+		else if(dropDownMode)
+			$historyDropDown(args['dropDownIndex'], args['dropDownTypes'])
+		else
 			$marqueeFlash('Sorry, no additional history is available to rewind to at this time.');
 	},
 	getHistoryForSymbol: (sym, ts) => {
@@ -1312,8 +1316,6 @@ const $L = {
 			_forceContentTableShrink = true;
 			$updateContentTable(doNotify, doNotResetKeyRow);
 		}
-		else if(_stageDataSortByColumn === null) 
-			_stageDataSortByColumn = parseInt($isSafari()?$setSortStageData(0):0)||0;
 		else if(doNotify && notifyRows.length > 0)
 			$notify(notifyRows);
 	}
