@@ -1127,7 +1127,8 @@ const $L = {
 		else
 			_stageDataSortByColumn = column;
 		$sortStageData(true);
-		$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
+		if(!$isSafari())
+			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
 	},
 	sortStageData: updateView => {
 		if(_stageData && _stageDataSortByColumn) {
@@ -1299,7 +1300,7 @@ const $L = {
 		}
 		$E('l_more').className = _contentTableSoftLimit > 0 ? 'l_more' : 'l_no_more';
 		$E('l_content_table').className = $E('l_awaiting_data') ? '' : 'l_content_tr_fade_in';
-		if(doNotify)
+		if(doNotify && !$isSafari())
 			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
 		$E('l_content_table').innerHTML = html;
 		$updateContentTableRowCountThatAreInView();
