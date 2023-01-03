@@ -131,7 +131,7 @@ html, body {
 	margin: 0;
 	height: 100%;
 	width: 100%;
-	font-family: Larval,Futura,Trebuchet MS,Arial,sans-serif;
+	font-family: Larval,'Trebuchet MS',Arial,sans-serif;
 	font-size: 16px;
 	max-width: 100%;
 }
@@ -455,7 +455,7 @@ i { font-style: normal !important; }
 	margin: auto;
 	color: var(--l-color-7);
 	background-color: #FFF;
-	font-family: Futura,Trebuchet MS,Arial,sans-serif;
+	font-family: 'Trebuchet MS',Tahoma,Arial,Verdana !important;
 	border: none;
 }
 #l_content {
