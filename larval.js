@@ -363,7 +363,7 @@ const $L = {
 	ontouchstart: e => { _swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY, -1]; },
 	ontouchmove: e => {
 		const height=$W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight, yDiff=e.changedTouches[0].clientY-_swipeStartPosition[2];
-		if(!_swipeStartPosition || $W.pageYOffset || height < 1)
+		if($W.pageYOffset || !_animationsComplete || !_swipeStartPosition || height < 1)
 			return;
 		else if(_swipeStartPosition[2] < 0)
 			_swipeStartPosition[2] = e.changedTouches[0].clientY;
@@ -667,7 +667,7 @@ const $L = {
 		else if(direction < 0) {
 			if(_stageDataHistory.length < 2 || _stageDataHistoryIndex < 0)
 				$marqueeFlash('You are already viewing live data, use the <i>&#8656;</i> key to rewind.');
-			else if( _stageDataHistoryIndex + 2 >= _stageDataHistory.length)
+			else if(_stageDataHistoryIndex + 2 >= _stageDataHistory.length)
 				_stageDataHistoryIndex = -1;
 			else
 				_stageDataHistoryIndex++;
