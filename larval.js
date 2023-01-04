@@ -367,12 +367,13 @@ const $L = {
 			return;
 		else if(_swipeStartPosition[2] < 0)
 			_swipeStartPosition[2] = e.changedTouches[0].clientY;
-		else
-			$E('l_fixed_highlight').style.opacity = String(yDiff / height);
+		else if($E('l_fixed_highlight'))
+			_E.style.opacity = String(Math.min(1, yDiff*2/height));
 	},
 	ontouchend: e => {
-		$E('l_fixed_highlight').style.opacity = 0;
-		if(!_swipeStartPosition)
+		if($E('l_fixed_highlight') && _E.style.opacity)
+			_E.style.opacity = 0;
+		else if(!_swipeStartPosition)
 			return;
 		const swipeMovement = [e.changedTouches[0].clientX-_swipeStartPosition[0], e.changedTouches[0].clientY-_swipeStartPosition[1], e.changedTouches[0].clientY-_swipeStartPosition[2]],
 			width = $W.innerWidth||$D.documentElement.clientWidth||$D.body.clientWidth,

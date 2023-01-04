@@ -137,7 +137,7 @@ html, body {
 }
 body {
 	animation: l_body 120s linear infinite;
-	overscroll-behavior: contain;
+	overscroll-behavior: none;
 	position: relative;
 	overflow-x: hidden;
 	-webkit-text-size-adjust: none;
@@ -195,7 +195,7 @@ i { font-style: normal !important; }
 	right: -50%;
 	opacity: 0;
 	height: 100%;
-	background: linear-gradient(0deg, var(--l-color-1) 0%, rgba(0,0,0,0) 50%);
+	background: radial-gradient(ellipse at bottom, var(--l-color-1) 0%, transparent 45%);
 }
 #l_fixed {
 	position: fixed;
