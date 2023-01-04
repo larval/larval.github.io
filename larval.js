@@ -360,17 +360,29 @@ const $L = {
 		e.preventDefault();
 		$onclick(e);
 	},
-	ontouchstart: e => { _swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY]; },
+	ontouchstart: e => { _swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY, -1]; },
+	ontouchmove: e => {
+		const height=$W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight, yDiff=e.changedTouches[0].clientY-_swipeStartPosition[2];
+		if(!_swipeStartPosition || $W.pageYOffset || height < 1)
+			return;
+		else if(_swipeStartPosition[2] < 0)
+			_swipeStartPosition[2] = e.changedTouches[0].clientY;
+		else
+			$E('l_fixed_highlight').style.opacity = String(yDiff / height);
+	},
 	ontouchend: e => {
+		$E('l_fixed_highlight').style.opacity = 0;
 		if(!_swipeStartPosition)
 			return;
-		const swipeMovement = [_swipeStartPosition[0]-e.changedTouches[0].clientX, _swipeStartPosition[1]-e.changedTouches[0].clientY],
+		const swipeMovement = [e.changedTouches[0].clientX-_swipeStartPosition[0], e.changedTouches[0].clientY-_swipeStartPosition[1], e.changedTouches[0].clientY-_swipeStartPosition[2]],
 			width = $W.innerWidth||$D.documentElement.clientWidth||$D.body.clientWidth,
 			height = $W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight,
-			movementPercent = [Math.abs(swipeMovement[0])/width*100, Math.abs(swipeMovement[1])/height*100],
+			movementPercent = [Math.abs(swipeMovement[0])/width*100, Math.abs(swipeMovement[1])/height*100, swipeMovement[2]/height*100],
 			movementWeighting = (movementPercent[0]+1) / (movementPercent[1]+1);
 		if(movementPercent[0] > 25 && movementWeighting >= 1)
 			$gotoStageDataHistory(swipeMovement[0]);
+		else if(movementPercent[2] > 25 && movementWeighting <= 1 && _swipeStartPosition[2] > 0)
+			$forceNextStagePoll();
 		_swipeStartPosition = null;
 	},
 
@@ -600,7 +612,7 @@ const $L = {
 		if(!error)
 			return;
 		else if(dropDownMode)
-			$historyDropDown(args['dropDownIndex'], args['dropDownTypes'])
+			$historyDropDown(args['dropDownIndex'], args['dropDownTypes']);
 		else
 			$marqueeFlash('Sorry, no additional history is available to rewind to at this time.');
 	},
@@ -652,7 +664,7 @@ const $L = {
 			if(_stageDataHistoryIndex >= 0)
 				_stageDataHistoryIndex = -1;
 		}
-		else if(direction > 0) {
+		else if(direction < 0) {
 			if(_stageDataHistory.length < 2 || _stageDataHistoryIndex < 0)
 				$marqueeFlash('You are already viewing live data, use the <i>&#8656;</i> key to rewind.');
 			else if( _stageDataHistoryIndex + 2 >= _stageDataHistory.length)
@@ -660,7 +672,7 @@ const $L = {
 			else
 				_stageDataHistoryIndex++;
 		}
-		else if(direction < 0) {
+		else if(direction > 0) {
 			if($getHistoryData && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
 				$marqueeFlash('Attempting to gather recent history from the server...');
 				$getHistoryData();
