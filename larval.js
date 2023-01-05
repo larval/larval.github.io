@@ -373,7 +373,7 @@ const $L = {
 	ontouchend: e => {
 		if($E('l_fixed_highlight') && _E.style.opacity)
 			_E.style.opacity = 0;
-		else if(!_swipeStartPosition)
+		if(!_swipeStartPosition)
 			return;
 		const swipeMovement = [e.changedTouches[0].clientX-_swipeStartPosition[0], e.changedTouches[0].clientY-_swipeStartPosition[1], e.changedTouches[0].clientY-_swipeStartPosition[2]],
 			width = $W.innerWidth||$D.documentElement.clientWidth||$D.body.clientWidth,
