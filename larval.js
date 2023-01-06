@@ -532,15 +532,17 @@ const $L = {
 		if((minutesSinceOpen=(stageTime.getHours()-args.hourOffset)*60+stageTime.getMinutes()) > args.maxMinutes)
 			minutesSinceOpen = args.maxMinutes;
 		for(let i=0; i < stageData['items'].length; i++) { 
-			let minutes = (stageData['items'][i][$SYM][0]==_char['crypto'] ? minutesInADay : minutesSinceOpen);
-			if(typeof stageData['items'][i][$VOL] != 'number')
-				continue;
-			else if(minutes < 1 || stageData['items'][i][$VOL] < 1)
-				stageData['items'][i][$VOL] = 0;
-			else if(vpm)
-				stageData['items'][i][$VOL] /= minutes;
-			else
-				stageData['items'][i][$VOL] *= minutes;
+			const minutes = (stageData['items'][i][$SYM][0]==_char['crypto'] ? minutesInADay : minutesSinceOpen);
+			[$VOL,$VOL5].forEach(column => {
+				if(typeof stageData['items'][i][column] != 'number')
+					return;
+				else if(minutes < 1 || stageData['items'][i][column] < 1)
+					stageData['items'][i][column] = 0;
+				else if(vpm)
+					stageData['items'][i][column] = Math.round(stageData['items'][i][column] / minutes);
+				else
+					stageData['items'][i][column] *= minutes;
+			});
 		}
 		stageData['vpm'] = vpm;
 		return(stageData);
