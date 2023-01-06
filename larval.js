@@ -141,8 +141,8 @@ const $L = {
 		'PageDown':e                => _keyRow+=_contentTableRowCountThatAreInView,
 		'ArrowUp':e                 => _keyRow--,
 		'ArrowDown':e               => _keyRow++,
-		'ArrowLeft':e               => $gotoStageDataHistory(-1),
-		'ArrowRight':e              => $gotoStageDataHistory(1),
+		'ArrowLeft':e               => $gotoStageDataHistory(1),
+		'ArrowRight':e              => $gotoStageDataHistory(-1),
 		'Escape':e                  => $gotoStageDataHistory(0) || $settingsButtonToggle(true) || $scrollToTop(),
 		'Space':e                   => $onclick(e),
 		'Enter':e                   => $onclick(e),
@@ -665,7 +665,7 @@ const $L = {
 			if(_stageDataHistoryIndex >= 0)
 				_stageDataHistoryIndex = -1;
 		}
-		else if(direction > 0) {
+		else if(direction < 0) {
 			if(_stageDataHistory.length < 2 || _stageDataHistoryIndex < 0)
 				$marqueeFlash('You are already viewing live data, use the <i>&#8656;</i> key to rewind.');
 			else if(_stageDataHistoryIndex + 2 >= _stageDataHistory.length)
@@ -673,7 +673,7 @@ const $L = {
 			else
 				_stageDataHistoryIndex++;
 		}
-		else if(direction < 0) {
+		else if(direction > 0) {
 			if($getHistoryData && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
 				$marqueeFlash('Attempting to gather recent history from the server...');
 				$getHistoryData();
