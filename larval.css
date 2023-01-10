@@ -56,10 +56,10 @@
 	to { height: 175px; }
 }
 @keyframes l_marquee_container_highlight {
-	5% { height: 178px; box-shadow: 0 0 17px 3px var(--l-color-10), 0 0 4px 2px var(--l-color-10); }
-	10% { height: 175px; box-shadow: 0 0 5px 3px rgba(0,0,0,0.75); }
-	15% { height: 178px; box-shadow: 0 0 17px 3px var(--l-color-10), 0 0 4px 2px var(--l-color-10); }
-	20% { height: 175px; box-shadow: 0 0 5px 3px rgba(0,0,0,0.75); }
+	5% { box-shadow: 0 0 17px 3px var(--l-color-10), 0 0 4px 2px var(--l-color-10); }
+	10% { box-shadow: 0 0 5px 3px rgba(0,0,0,0.75); }
+	15% { box-shadow: 0 0 17px 3px var(--l-color-10), 0 0 4px 2px var(--l-color-10); }
+	20% { box-shadow: 0 0 5px 3px rgba(0,0,0,0.75); }
 }
 @keyframes l_menu_highlight {
 	5% { box-shadow: 0 10px 5px var(--l-color-10); }
