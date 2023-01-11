@@ -553,7 +553,12 @@ const $L = {
 		.then(json => jsonCallback(json, args))
 		.catch(err => jsonCallback(null, args));
 	},
-	setStageData: stageData => (_stageData=$vpmStageData(stageData)) && (_contentTableSoftLimit=Math.abs(_contentTableSoftLimit)),
+	setStageData: stageData => { 
+		_stageData = $vpmStageData(stageData);
+		_contentTableSoftLimit = Math.abs(_contentTableSoftLimit);
+		if($setTheme($getMode()) !== false && $Q('meta[name="theme-color"]'))
+			_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
+	},
 	getStageData: updateView => $getData('stage.json', $parseStageData, {'updateView':updateView}),
 	parseStageData: (json, args) => {
 		let retry=false;
@@ -561,10 +566,9 @@ const $L = {
 			retry = true;
 		else if(_stageDataHistoryIndex >= 0)
 			_stageDataHistory.push($cloneObject(json));
-		else if($setStageData(json)) {
+		else {
+			$setStageData(json);
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=_stageData['ts']);
-			if($setTheme($getMode()) !== false && $Q('meta[name="theme-color"]'))
-				_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
 			if(!$hasSettings() && _stageDataHistory.length==0) {
 				if(_stageData['afterhours']=='idle')
 					$settings('l_show', true, true, 'l_crypto');
