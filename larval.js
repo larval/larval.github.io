@@ -108,6 +108,7 @@ const $L = {
 	_clickMap: {
 		'l_hotkey_help':_           => $marqueeHotKeyHelp(),
 		'l_marquee_flash':_         => $gotoStageDataHistory(0),
+		'l_marquee_talk':_          => $W.open('https://stocktwits.com/'+_.raw, _.raw).focus(),
 		'l_warning_audio':_         => $notifyPlayAudio(_audioTest, false, true),
 		'l_warning_never_notify':_  => $notifyRequestPermission(true),
 		'l_fixed':_                 => _animationsComplete ? ($gotoStageDataHistory(0) || $forceNextStagePoll()) : $animationsFastSplash(true),
@@ -264,7 +265,7 @@ const $L = {
 			sym = dataRef;
 		else if(typeof dataRef == 'number') {
 			idx = dataRef;
-			sym = _stageData['items'][dataRef][$SYM];
+			sym = _stageData['items'][dataRef] ? _stageData['items'][dataRef][$SYM] : dataRef;
 		}
 		if((e.ctrlKey || e.altKey || e.type=='contextmenu') && (el.dataset&&el.dataset.alt!='none'))
 			ref = 'alt_default';
@@ -886,31 +887,41 @@ const $L = {
 			$marqueeInitiate(_stageData['marquee']);
 			return;
 		}
-		let html='', rank=0, maxRank=20;
-		_warnings.filter(Boolean).forEach(msg => html += `<div class="l_marquee_warning"><i>${_char['warning']} WARNING ${_char['warning']}</i>${msg}</div> `);
-		if(html)
-			html = $F('f_marquee_blink_wide') + html + _F;
+		let html=$F('f_marquee_blink_wide'), itemHtml='', rank=0, maxRank=20, topType='', lastTopType='';
+		_warnings.filter(Boolean).forEach(msg => itemHtml += `<div class="l_marquee_warning"><i>${_char['warning']} WARNING ${_char['warning']}</i>${msg}</div> `);
+		if(itemHtml)
+			html = itemHtml + _F;
 		for(let i=0; i < _stageData['top'].length; i++) {
-			let item=_stageData['top'][i], isMarketIndex=(item.length>2&&typeof item[2]=='string');
-			if(isMarketIndex) {
-				if(!html) html += $F('f_marquee_blink_wide');
-				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>${$H(item[2])}</i>`;
+			let item=_stageData['top'][i];
+			if(item.length>2 && typeof item[2]=='string') {
+				topType = 'index';
+				itemHtml = `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>${$H(item[2])}</i>`;
 				if(item.length > 3)
-					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[3]<0?'&#9660;':'&#9650;'} ${Math.abs(item[3]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
-				html += `${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
+					itemHtml += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[3]<0?'&#9660;':'&#9650;'} ${Math.abs(item[3]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
+				itemHtml += `${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
+			}
+			else if(item.length==2 && typeof item[1]=='string') {
+				topType = 'talk';
+				itemHtml = `<div class="l_marquee_talk" data-ref="${item[0]}"><span>@${item[0].replace(/[^A-Z0-9_].+/i,'')}:</span> ${item[1].replace(/(\$[A-Z.]+)/g,"<i>$1</i>")}</div> `;
 			}
 			else if(item[0][0] != _char['crypto'] || $isShowing('l_crypto')) {
-				if(!rank) {
-					if(i >= 5)
-						maxRank /= 2;
-					html += $F('f_marquee_blink_wide');
-				}
-				html += `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>#${++rank}</i>${item[0]} &#177; `;
+				topType = 'default';
+				if(!rank && i >= 5)
+					maxRank /= 2;
+				itemHtml = `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>#${++rank}</i>${item[0]} &#177; `;
 				if(item.length > 2)
-					html += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[2]<0?'&#9660;':'&#9650;'} ${Math.abs(item[2]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
-				html += `${item[1]}%</div> `;
-				if(rank >= maxRank) break;
+					itemHtml += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[2]<0?'&#9660;':'&#9650;'} ${Math.abs(item[2]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
+				itemHtml += `${item[1]}%</div> `;
+				if(rank >= maxRank)
+					lastTopType = topType = 'break';
 			}
+			else
+				continue;
+			if(itemHtml)
+				html += (i && lastTopType!=topType ? _F : '') + itemHtml;
+			if(topType == 'break')
+				break;
+			lastTopType = topType;
 		}
 		$marqueeInitiate(html);
 		if(resetInterval)
