@@ -43,32 +43,32 @@ const $L = {
 		'bloodbath':  ['#FC656F', '#FAB6B6', '#F77272', '#FF4747', '#FFAE74', '#FFCC54', '#361010', '#4B1818', '#602121', '#825900', '#FFEC73', '#F2D088', '#D4F0A3', '#91AD03', '#FAB143', '#FF0000', '#FF7070', '#FC868E']
 	}, _theme: 'default', _themeBGColorIndex: 7,
 	_keyMap: {
-		'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@/options', 'https://www.seekingalpha.com/symbol/@-USD'],
-		'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/stocks/quotes/@/options', 'https://www.barchart.com/crypto/coins/@'],
-		'C': ['https://www.cnbc.com/quotes/@', 'https://www.cnbc.com/quotes/@?tab=options', 'https://www.cnbc.com/quotes/@.CM='],
+		'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@-USD'],
+		'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/crypto/coins/@'],
+		'C': ['https://www.cnbc.com/quotes/@', 'https://www.cnbc.com/quotes/@.CM='],
 		'D': ['https://research.tdameritrade.com/grid/public/research/stocks/summary?symbol=@'],
 		'E': ['https://www.etrade.wallst.com/v1/stocks/snapshot/snapshot.asp?symbol=@'],
-		'F': ['https://www.finviz.com/quote.ashx?t=@',  null, 'https://www.finviz.com/crypto_charts.ashx?t=@USD'],
-		'G': ['https://www.benzinga.com/quote/@', null, 'https://www.benzinga.com/quote/@-USD'],
+		'F': ['https://www.finviz.com/quote.ashx?t=@', 'https://www.finviz.com/crypto_charts.ashx?t=@USD'],
+		'G': ['https://www.benzinga.com/quote/@', 'https://www.benzinga.com/quote/@-USD'],
 		'H': ['https://www.stockcharts.com/h-sc/ui?s=@'],
 		'I': ['https://www.investing.com/search/?q=@'],
-		'J': ['https://www.wsj.com/market-data/quotes/@', 'https://www.wsj.com/market-data/quotes/@/options'],
+		'J': ['https://www.wsj.com/market-data/quotes/@'],
 		'K': ['https://www.morningstar.com/stocks/xnas/@/quote'],
-		'L': ['https://www.fool.com/quote/@', null, 'https://www.fool.com/quote/crypto/@'],
-		'M': ['https://www.marketwatch.com/investing/stock/@', 'https://www.marketwatch.com/investing/stock/@/options', 'https://www.marketwatch.com/investing/cryptocurrency/@USD'],
+		'L': ['https://www.fool.com/quote/@', 'https://www.fool.com/quote/crypto/@'],
+		'M': ['https://www.marketwatch.com/investing/stock/@', 'https://www.marketwatch.com/investing/cryptocurrency/@USD'],
 		'N': ['https://money.cnn.com/quote/quote.html?symb=@'],
-		'O': ['https://www.cboe.com/delayed_quotes/@', 'https://www.cboe.com/delayed_quotes/@/quote_table'],
+		'O': ['https://www.cboe.com/delayed_quotes/@'],
 		'P': ['https://eresearch.fidelity.com/eresearch/goto/evaluate/snapshot.jhtml?symbols=@'],
-		'Q': ['https://www.nasdaq.com/market-activity/stocks/@', 'https://www.nasdaq.com/market-activity/stocks/@/option-chain'],
-		'R': ['https://www.robinhood.com/stocks/@', null, 'https://www.robinhood.com/crypto/@'],
-		'S': ['https://www.stocktwits.com/symbol/@', null, 'https://www.stocktwits.com/symbol/@.X'],
+		'Q': ['https://www.nasdaq.com/market-activity/stocks/@'],
+		'R': ['https://www.robinhood.com/stocks/@', 'https://www.robinhood.com/crypto/@'],
+		'S': ['https://www.stocktwits.com/symbol/@', 'https://www.stocktwits.com/symbol/@.X'],
 		'T': ['https://www.tradestation.com/research/stocks/@'],
 		'U': ['https://www.gurufocus.com/stock/@'],
-		'V': ['https://www.tradingview.com/chart/?symbol=@', null, 'https://www.tradingview.com/chart/?symbol=@USD'],
-		'W': ['https://www.twitter.com/search?q=%24@', null, 'https://www.twitter.com/search?q=%24@.X'],
+		'V': ['https://www.tradingview.com/chart/?symbol=@', 'https://www.tradingview.com/chart/?symbol=@USD'],
+		'W': ['https://www.twitter.com/search?q=%24@','https://www.twitter.com/search?q=%24@.X'],
 		'X': ['https://www.foxbusiness.com/quote?stockTicker=@'],
-		'Y': ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@/options', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F', 'https://finance.yahoo.com/quote/@=X'],
-		'Z': ['https://www.zacks.com/stock/quote/@', 'https://www.zacks.com/stock/quote/@/options-chain'],
+		'Y': ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F', 'https://finance.yahoo.com/quote/@=X'],
+		'Z': ['https://www.zacks.com/stock/quote/@'],
 	}, _keyRow: 0, _keyMapIndexDefault: 'Y', _keyMapIndex: null,
 	_taMap: {
 		'AS': ['Ascending triangle', 'asc<i>&nbsp;triangle</i>', 'F'],
@@ -123,7 +123,6 @@ const $L = {
 		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`).focus(),
 		'l_marquee_info':_          => $setURLFormat(_.sym, false),
 		'l_history_toggle':_        => $historyDropDownToggle(_.idx, [$PCT5,$PCT,$PRC,$VOL,$AGE]),
-		'l_options':_               => $W.open($createURL(_.sym, $KOPT), `l_${_.type}_${$KOPT}`).focus(),
 		'alt_default':_             => _.raw ? $setSymbolsOnTop(_.raw, null, true) : $editSymbolsOnTop(),
 		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`).focus()
 	},
@@ -167,7 +166,7 @@ const $L = {
 		'LNK':_  => _.val,
 		'TAN':_  => $H(_.val),
 		'HLT':2, 'TAN':8, 'AGE': 6,
-		'KSTK':0, 'KETF':0, 'KOPT':1, 'KCRP':2, 'KFTR':3, 'KCUR':4,
+		'KSTK':0, 'KETF':0, 'KCRP':1, 'KFTR':2, 'KCUR':3,
 		'WAUD':0, 'WNOT':1
 	},
 	_settings: {
@@ -494,8 +493,6 @@ const $L = {
 		if(!(_keyMapIndex=_settings['l_keymap_index']))
 			_keyMapIndex = _keyMapIndexDefault;
 		for(let key in _keyMap) {
-			if(!_keyMap[key][$KOPT])
-				_keyMap[key][$KOPT] = _keyMap[key][$KSTK];
 			for(let type of [$KCRP,$KFTR,$KCUR]) {
 				if(!_keyMap[key][type])
 					_keyMap[key][type] = _keyMap[_keyMapIndexDefault][type];
@@ -1281,7 +1278,7 @@ const $L = {
 					</td>
 					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS,_forceContentTableShrink)}</td>
 					<td colspan="4">HALT: ${$cell(row,$HLT)}</td>
-					<td class="${row[$OPT]?'l_options':''}">${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
+					<td>${$popoutContentTableRow(row)}${$cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			else {
