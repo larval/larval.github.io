@@ -397,7 +397,7 @@ const $L = {
 		$E('l_root').className = 'l_animations_complete';
 		$E('l_menu').className = (_stageData && !$isWeekend() ? $getMode('l_') : 'l_default');
 		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
-		if($hasSettings() && _stageData && _stageData['top'] && _stageData['top'].length > 1)
+		if($hasSettings() && _stageData && _stageData['marquee'] && _stageData['marquee'].length > 1)
 			$marqueeUpdate();
 		else
 			$marqueeInitiate();
@@ -878,18 +878,14 @@ const $L = {
 		}
 	},
 	marqueeUpdate: (resetInterval, passive) => {
-		if(!_animationsComplete || !_stageData || !_stageData['top'] || _stageData['top'].length < 2 || (passive && $E('l_marquee_about')))
+		if(!_animationsComplete || !_stageData || !_stageData['marquee'] || _stageData['marquee'].length < 2 || (passive && $E('l_marquee_about')))
 			return;
-		else if(_stageData['marquee']) {
-			$marqueeInitiate(_stageData['marquee']);
-			return;
-		}
 		let html=$F('f_marquee_blink_wide'), itemHtml='', rank=0, maxRank=20, topType='', lastTopType='';
 		_warnings.filter(Boolean).forEach(msg => itemHtml += `<div class="l_marquee_warning"><i>${_char['warning']} WARNING ${_char['warning']}</i>${msg}</div> `);
 		if(itemHtml)
 			html = itemHtml + _F;
-		for(let i=0; i < _stageData['top'].length; i++) {
-			let item=_stageData['top'][i];
+		for(let i=0; i < _stageData['marquee'].length; i++) {
+			let item=_stageData['marquee'][i];
 			if(item.length>2 && typeof item[2]=='string') {
 				topType = 'index';
 				itemHtml = `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>${$H(item[2])}</i>`;
