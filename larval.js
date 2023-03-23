@@ -589,7 +589,7 @@ const $L = {
 		}
 		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
 	},
-	getHistoryData: args => $getData('history.json', $parseHistoryData, args),
+	getHistoryData: args => $getData('stage-history.json', $parseHistoryData, args),
 	parseHistoryData: (json, args) => {
 		let error=false, dropDownMode=(args&&args['dropDownTypes']);
 		$getHistoryData = null;
@@ -886,14 +886,14 @@ const $L = {
 			html = itemHtml + _F;
 		for(let i=0; i < _stageData['marquee'].length; i++) {
 			let item=_stageData['marquee'][i];
-			if(item.length>2 && typeof item[2]=='string') {
+			if(item.length > 2 && typeof item[2]=='string' && typeof item[1]!='string') {
 				topType = 'index';
 				itemHtml = `<div class="l_marquee_link" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right'>${$H(item[2])}</i>`;
 				if(item.length > 3)
 					itemHtml += `<div class="l_marquee_highlight" data-ref="${item[0]}">&#10094;<i>${item[3]<0?'&#9660;':'&#9650;'} ${Math.abs(item[3]).toFixed(2)}%</i> &#10095; &#10140;</div> `;
 				itemHtml += `${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
-			else if(item.length==2 && typeof item[1]=='string') {
+			else if(item.length > 1 && typeof item[1]=='string') {
 				topType = 'talk';
 				itemHtml = `<div class="l_marquee_talk" data-ref="${item[0]}"><span>@${item[0].replace(/[^A-Z0-9_].+/i,'')}:</span> ${item[1].replace(/(\$[A-Z.]+)/g,"<i>$1</i>")}</div> `;
 			}
