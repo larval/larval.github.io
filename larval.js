@@ -975,7 +975,10 @@ const $L = {
 			}
 			else if(item.length > 1 && typeof item[1]=='string') {
 				topType = 'talk';
-				itemHtml = `<div class="l_marquee_talk" data-ref="${item[0]}"><span> ${item.length>2?item[2]:item[0].replace(/[^A-Z0-9_].+/i,'')}:</span> ${item[1].replace(/(\$[A-Z.]+)/g,"<i>$1</i>")}</div> `;
+				itemHtml = `<div class="l_marquee_talk" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right_talk'>@${item[0].replace(/[^A-Z0-9_].+/i,'')}</i> `;
+				if(item.length > 2)
+					itemHtml += `<div class="l_marquee_highlight_talk" data-ref="${item[0]}"> &#10094; <i>${$H(item[2])}</i> &#10095; &#10140;</div> `;
+				itemHtml += `${item[1]}</div> `;
 			}
 			else if(item[0][0] != _char['crypto'] || $isShowing('l_crypto')) {
 				topType = 'default';

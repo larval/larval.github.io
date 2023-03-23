@@ -398,10 +398,14 @@ i { font-style: normal !important; }
 	padding-left: 10px;
 	padding-right: 10px;
 }
-.l_marquee_highlight { cursor: pointer; }
+.l_marquee_highlight, .l_marquee_highlight_talk { cursor: pointer; }
 .l_marquee_highlight i {
 	animation: l_fade_in 1s linear infinite; 
 	color: var(--l-color-10) !important;
+	padding-left: 2px;
+}
+.l_marquee_highlight_talk i {
+	color: var(--l-color-0) !important;
 	padding-left: 2px;
 }
 .l_marquee_blink_wide { padding-left: 15px !important; }
@@ -409,7 +413,10 @@ i { font-style: normal !important; }
 	padding-right: 10px;
 	color: var(--l-color-0);
 }
-.l_marquee_talk i { color: var(--l-color-0); }
+.l_top_only .l_marquee_highlight_talk i { color: var(--l-color-0) !important; }
+.l_top_only .l_marquee_alt_padded_right_talk { color: var(--l-color-10) !important; }
+.l_stage_only .l_marquee_highlight_talk i { color: var(--l-color-10) !important; }
+.l_stage_only .l_marquee_alt_padded_right_talk { color: var(--l-color-0) !important; }
 .l_marquee_warning span {
 	color: var(--l-color-10);
 	border-bottom: 2px solid var(--l-color-10);
@@ -420,7 +427,7 @@ i { font-style: normal !important; }
 	margin-right: 10px;
 }
 .l_marquee_alt, .l_marquee_alt_padded, .l_marquee_alt_padded_right, #l_stage_about span, #l_top_about span  { color: var(--l-color-0); }
-.l_marquee_alt_padded_right { padding-right: 10px; }
+.l_marquee_alt_padded_right, .l_marquee_alt_padded_right_talk { padding-right: 10px; }
 .l_marquee_alt_padded {
 	padding-left: 10px;
 	padding-right: 10px;
@@ -431,7 +438,7 @@ i { font-style: normal !important; }
 	border-bottom: 2px solid #333;
 	border-bottom: 2px solid transparent;
 }
-#l_marquee_content, #l_marquee_content_clone, .l_marquee_item, .l_marquee_link, .l_marquee_highlight, .l_marquee_warning, .l_marquee_talk, .l_marquee_info {
+#l_marquee_content, #l_marquee_content_clone, .l_marquee_item, .l_marquee_link, .l_marquee_highlight, .l_marquee_highlight_talk, .l_marquee_warning, .l_marquee_talk, .l_marquee_info {
 	display: inline-block;
 }
 #l_marquee_about {
