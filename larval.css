@@ -3,7 +3,7 @@
 	font-style: normal;
 	font-weight: normal;
 	font-display: block;
-	src: url(larval.woff2) format('woff2');
+	src: url('/larval.woff2') format('woff2');
 }
 @keyframes l_body {
 	0% { background: #222; }
@@ -55,17 +55,16 @@
 @keyframes l_marquee_container_normal {
 	to { height: 175px; }
 }
+@keyframes l_pulsate {
+	0% { opacity: 0.5; }
+	50% { opacity: 1.0; }
+	100% { opacity: 0.5; }
+}
 @keyframes l_marquee_container_highlight {
 	5% { box-shadow: 0 0 17px 3px var(--l-color-10), 0 0 4px 2px var(--l-color-10); }
 	10% { box-shadow: 0 0 5px 3px rgba(0,0,0,0.75); }
 	15% { box-shadow: 0 0 17px 3px var(--l-color-10), 0 0 4px 2px var(--l-color-10); }
 	20% { box-shadow: 0 0 5px 3px rgba(0,0,0,0.75); }
-}
-@keyframes l_menu_highlight {
-	5% { box-shadow: 0 10px 5px var(--l-color-10); }
-	10% { box-shadow: 0 10px 5px #111; }
-	15% { box-shadow: 0 10px 5px var(--l-color-10); }
-	20% { box-shadow: 0 10px 5px #111; }
 }
 @keyframes l_marquee {
 	0% { transform: translateX(var(--l-marquee-start)); }
@@ -392,7 +391,7 @@ i { font-style: normal !important; }
 	padding-left: 2px; 
 	padding-right: 2px;
 }
-.l_marquee_blink, .l_marquee_blink_wide, .l_marquee_highlight_wide, #l_marquee_about i {
+.l_marquee_blink, .l_marquee_blink_wide, .l_marquee_highlight_wide, #l_stage_about i, #l_top_about i {
 	display: inline-block;
 	color: var(--l-color-10);
 	animation: l_fade_in 1s linear infinite; 
@@ -420,7 +419,7 @@ i { font-style: normal !important; }
 	color: var(--l-color-10);
 	margin-right: 10px;
 }
-.l_marquee_alt, .l_marquee_alt_padded, .l_marquee_alt_padded_right, #l_marquee_about span  { color: var(--l-color-0); }
+.l_marquee_alt, .l_marquee_alt_padded, .l_marquee_alt_padded_right, #l_stage_about span, #l_top_about span  { color: var(--l-color-0); }
 .l_marquee_alt_padded_right { padding-right: 10px; }
 .l_marquee_alt_padded {
 	padding-left: 10px;
@@ -453,7 +452,7 @@ i { font-style: normal !important; }
 	border-bottom: none;
 	border-radius: 20px 20px 0 0;
 	text-align: center;
-	text-shadow: 2px 2px 0 #5C8C5B;
+	text-shadow: 2px 2px 0 var(--l-color-8);
 	margin: auto;
 	transition: 0.25s;
 	user-select: none; 
@@ -486,6 +485,7 @@ i { font-style: normal !important; }
 }
 #l_control_table {
 	width: 100%;
+	height: 100%;
 	border-collapse: collapse;
 	font-weight: bold;
 	text-align: center;
@@ -556,7 +556,7 @@ i { font-style: normal !important; }
 	right: -20px;
 	opacity: 0;
 }
-#l_content_table tr td .l_hover_active_left {
+#l_content_table tr td.l_news i.l_hover_active, #l_content_table tr td.l_twit i.l_hover_active {
 	font-style: italic;
 	text-decoration: underline;
 	color: var(--l-color-9);
@@ -586,9 +586,51 @@ i { font-style: normal !important; }
 	text-align: left;
 	position: relative;
 }
-#l_content_table tr td:nth-child(2) {
-	text-align: left;
-	word-break: break-all;
+#l_content_table tr td:nth-child(2) { text-align: left; }
+.l_stage_only #l_content_table tr td:nth-child(2) { word-break: break-all; }
+.l_top_only #l_content_table tr td:nth-child(2) { 
+	word-break: keep-all;
+	text-align: center;
+}
+.l_top_user i {
+	display: block;
+	width: 175px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.l_top_row td{
+	padding: 0 !important;
+	margin: 0 !important;
+	height: 100%;
+}
+#l_top_search {
+	width: 95%;
+	height: 95%;
+	background: transparent;
+	appearance: none;
+	outline: none;
+	border: none;
+	text-align: center;
+	font-size: 20px;
+	transition: opacity 1;
+}
+#l_top_search:disabled { animation: l_pulsate 0.5s ease alternate infinite; }
+.l_top_searched_symbol { color: var(--l-color-9) !important; }
+.l_top_only #l_progress { display: block !important; }
+.l_top_only #l_progress_display {
+	width: 100% !important;
+	margin: 0 !important;
+}
+.l_top_only.l_animations_complete #l_fixed { cursor: default !important; }
+.l_top_only #l_progress_cap_right, .l_top_only #l_progress_cap_left, .l_top_only #l_stage_alt_link, .l_stage_only #l_top_alt_link , .l_top_only #l_stage_about, .l_stage_only #l_top_about, .l_top_only  #l_logo_stage, .l_stage_only  #l_logo_top, .l_stage_only #l_control_table tr.l_top_row, .l_top_only #l_control_table tr.l_stage_row  {
+	display: none;
+}
+.l_top_only #l_content_table tr td:nth-child(3) .l_history_active, .l_top_only #l_content_table tr td:nth-child(2) .l_history_active {
+	text-align: center !important;
+}
+.l_top_only .l_history_active div {
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 .l_content_table_notify_0 tr td:nth-child(3),
 .l_content_table_notify_1 tr td:nth-child(1),
@@ -746,16 +788,13 @@ input[type="checkbox"] {
 .l_none {
 	text-align: center !important;
 }
-.l_up {
-	padding-left: 5px;
-	color: var(--l-color-13);
-}
-.l_down {
-	padding-left: 5px;	
-	color: var(--l-color-15);
-}
+
+.l_up, .l_top_up { color: var(--l-color-13); }
+.l_down, .l_top_down { color: var(--l-color-15); }
+.l_top_up, .l_top_down { text-decoration: underline; }
+.l_up, .l_down { padding-left: 5px; }
 .l_halt, .l_crypto, .l_futures, .l_currency { color: var(--l-color-9); }
-.l_top { background-color: var(--l-color-11) !important; }
+.l_top_highlight { background-color: var(--l-color-11) !important; }
 .l_noclick { cursor: default !important; }
 .l_notify_popout {
 	position: absolute;
@@ -944,7 +983,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_content_table tr:hover:not(:first-child) td:not(.l_history), #l_content_table .l_tr_keyrow_selected:not(:first-child) td:not(.l_history) {
 		text-decoration: underline;
 	}
-	#l_content_table tr:hover .l_history_toggle, td.l_news:hover  {
+	#l_content_table tr:hover .l_history_toggle, td.l_news:hover, td.l_twit:hover  {
 		background-color: var(--l-color-11) !important;
 	}
 	#l_content_table tr.l_notify_up:hover .l_history_toggle, #l_content_table tr.l_notify_up td.l_news:hover, #l_content_table tr.l_notify_top_up:hover .l_history_toggle, #l_content_table tr.l_notify_top_up td.l_news:hover {
@@ -953,7 +992,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_content_table tr.l_notify_down:hover .l_history_toggle, #l_content_table tr.l_notify_down td.l_news:hover, #l_content_table tr.l_notify_top_down:hover .l_history_toggle, #l_content_table tr.l_notify_top_down td.l_news:hover {
 		background-color: var(--l-color-16) !important;
 	}
-	#l_content_table tr td:nth-child(1):hover ~ .l_history_toggle:not(.l_history), #l_content_table tr td:nth-child(2):hover ~ .l_history_toggle:not(.l_history)  { 
+	#l_content_table tr td:nth-child(1):hover ~ .l_history_toggle:not(.l_history), #l_root:not(.l_top_only) #l_content_table tr td:nth-child(2):hover ~ .l_history_toggle  { 
 		background-color: initial !important;
 	}
 	#l_content_table tr:hover td .l_hover_inactive, #l_content_table .l_tr_keyrow_selected td .l_hover_inactive, .l_content_table_alt_display tr td .l_hover_inactive {
@@ -963,16 +1002,11 @@ input[type=checkbox]:checked:disabled + label:before {
 		display: block !important;
 		animation: l_hover_active 0.5s ease 0s 1 normal forwards;
 	}
-	#l_content_table tr:hover td .l_hover_active_left,#l_content_table .l_tr_keyrow_selected td .l_hover_active_left {
+	#l_content_table tr:hover td.l_news i.l_hover_active, #l_content_table .l_tr_keyrow_selected td.l_news i.l_hover_active, #l_content_table tr:hover td.l_twit i.l_hover_active, #l_content_table .l_tr_keyrow_selected td.l_twit i.l_hover_active {
 		display: block !important;
 		animation: l_hover_active_left 0.5s ease 0s 1 normal forwards;
 	}
-	.l_content_table_alt_display tr td .l_hover_active {
-		display: block !important;
-		right: 0 !important;
-		opacity: 1 !important;
-	}
-	.l_content_table_alt_display tr td .l_hover_active_left {
+	.l_content_table_alt_display tr td.l_news i.l_hover_active, .l_content_table_alt_display tr td.l_twit i.l_hover_active {
 		display: block !important;
 		left: 0 !important;
 		opacity: 1 !important;
@@ -980,6 +1014,9 @@ input[type=checkbox]:checked:disabled + label:before {
 	.l_notify_enable:hover, .l_notify_disable:hover {
 		left: -35px;
 		width: 30px;
+	}
+	.l_top_up:hover, .l_top_down:hover {
+		opacity: 0.5;
 	}
 }
 @media only screen and (min-width: 1000px) {
@@ -990,6 +1027,7 @@ input[type=checkbox]:checked:disabled + label:before {
 }
 @media only screen and (max-width: 1300px) {
 	.l_notify_popout i { display: none; }
+	.l_top_user i { width: 125px; }
 }
 @media only screen and (max-width: 1500px) {
 	#l_content, #l_marquee_container { width: 75%; }
@@ -1013,6 +1051,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_footer { font-size: 15px; }
 	#l_last_update { font-size: 12px; }
 	.l_tab_info { padding: 10px !important; }
+	.l_top_user i { width: 75px; }
 }
 @media only screen and (max-width: 600px) {
 	#l_logo {
