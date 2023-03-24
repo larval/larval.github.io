@@ -126,7 +126,7 @@ const $L = {
 		'l_tab':_                   => $settingsTabSelect(_.el),
 		'l_warning_audio':_         => $notifyPlayAudio(_audioTest, false, true),
 		'l_warning_never_notify':_  => $notifyRequestPermission(true),
-		'shift_default':_           => _.raw ? $W.open('https://top.larval.com/symbol/'+_.raw, _.raw).focus() : $editSymbolsOnTop(),
+		'shift_default':_           => _.raw ? $W.open('https://top.larval.com/'+($M(/[A-Z0-9_]+$/ig,_.raw)?_M[0]:_.raw), _.raw).focus() : $editSymbolsOnTop(),
 		'alt_default':_             => _.raw ? $setSymbolsOnTop(_.raw, null, true) : $editSymbolsOnTop(),
 		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`).focus()
 	},
@@ -146,8 +146,8 @@ const $L = {
 		'NumpadEnter':e             => $onclick(e),
 		'PageDown':e                => _keyRow+=_contentTableRowCountThatAreInView,
 		'PageUp':e                  => _keyRow-=_contentTableRowCountThatAreInView,
-		'ShiftLeft':(e,ev)          => $contentTableRoll(ev.shiftKey),
-		'ShiftRight':(e,ev)         => $contentTableRoll(ev.shiftKey),
+		'ShiftLeft':e               => void(0),
+		'ShiftRight':e              => void(0),
 		'Slash':e                   => $marqueeHotKeyHelp(),
 		'Space':e                   => $onclick(e),
 		'Tab':(e,ev)                => $animationsToggle(null, ev.shiftKey)
@@ -861,7 +861,7 @@ const $L = {
 	settingsAreOpen: () => $E('l_control').offsetHeight > 10,
 	settingsButtonToggle: forceDirection => {
 		if(!_stageData) return; 
-		const modeText=(_topMode?'search':'settings'), controlHeight=($E('l_control').scrollHeight>(_topMode?70:200)?$E('l_control_table').scrollHeight:(_topMode?80:250))+'px', closed=($E('l_control').style.height!=controlHeight);
+		const modeText=(_topMode?'search':'settings'), controlHeight=($E('l_control').scrollHeight>(_topMode?80:200)?$E('l_control_table').scrollHeight:(_topMode?80:250))+'px', closed=($E('l_control').style.height!=controlHeight);
 		if(typeof forceDirection=='boolean' && forceDirection!==closed)
 			return(false);
 		$E('l_control').style.height = (closed?controlHeight:'0px');
