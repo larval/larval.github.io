@@ -43,7 +43,7 @@ const $L = {
 		'default':    ['#A6FDA4','#E1FDE4','#88CF86','#7DFF7A','#A6FDA4','#FF4444','#2A302A','#303630','#363C36','#825900','#FFDE96','#FAEED4','#A6FDA4','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDE8C'],
 		'afterhours': ['#95ABFC','#CDDFFF','#8BA4FF','#7492FF','#D274FF','#FF4444','#2A2A30','#303034','#36363C','#660303','#FF73BB','#D4DCFA','#A0FACA','#00AAAA','#85FFD6','#FF0080','#FDA4CF','#A6B7F7'],
 		'bloodbath':  ['#FC656F','#FAB6B6','#F77272','#FF4747','#FFAE74','#FFCC54','#361010','#4B1818','#602121','#825900','#FFEC73','#F2D088','#D4F0A3','#91AD03','#FAB143','#FF0000','#FF7070','#FC868E'],
-		'top':        ['#A6FFFF','#E1FDFF','#88CFD1','#A6FFFF','#75bcff','#9175ff','#2A3030','#303636','#363C3C','#825900','#FFDE96','#FCFCD2','#A6FFFF','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDEDE']
+		'top':        ['#A6FFFF','#E1FDFF','#88CFD1','#A6FFFF','#75bcff','#9175ff','#2A3030','#303636','#363C3C','#825900','#FFDE96','#FCF0D2','#A6FFFF','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDEDE']
 	}, _theme: 'default', _themeBGColorIndex: 7,
 	_keyMap: {
 		'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@-USD'],
@@ -110,7 +110,7 @@ const $L = {
 	},
 	_clickMap: {
 		'l_content_table_header':_  => $setSortStageData(_.idx),
-		'l_fixed':_                 => _animationsComplete ? ($gotoStageDataHistory(0) || $forceNextStagePoll()) : $animationsFastSplash(true),
+		'l_fixed':_                 => $broadBehaviorToggle(_topMode),
 		'l_history_toggle':_        => $historyDropDownToggle(_.idx),
 		'l_hotkey_help':_           => $marqueeHotKeyHelp(),
 		'l_last_update':_           => $forceNextStagePoll(),
@@ -139,7 +139,7 @@ const $L = {
 		'Backspace':e               => $vpmToggle(),
 		'End':e                     => _keyRow = e.parentElement.childElementCount - 1,
 		'Enter':e                   => $onclick(e),
-		'Escape':e                  => $gotoStageDataHistory(0) || $settingsButtonToggle(false) || $scrollToTop(),
+		'Escape':e                  => $broadBehaviorToggle(_topMode),
 		'F5':e                      => $settingsClear('User requested.'),
 		'F12':e                     => $setThemeRandom('<i>Going under the hood?</i> Let\'s make the outside look as hideous as the inside first.'),
 		'Home':e                    => _keyRow = 1,
@@ -318,16 +318,16 @@ const $L = {
 		$animationsFastSplash();
 		if(!_animationsComplete || !_stageData || (e && (e.ctrlKey || e.altKey)))
 			return;
+		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=_keyRow, match;
 		if(_topMode) {
-			if(!$isMobile(false) && (!document.activeElement || document.activeElement.id!='l_top_search')) {
-				$settingsButtonToggle(true);
+			if($I(['Backspace','Delete','Escape'],(match=e&&e.code)?match:'') >= 0 && !$topSearch())
+				return($broadBehaviorToggle(true));
+			else if(!$isMobile(false) && (!document.activeElement || document.activeElement.id!='l_top_search'))
 				$E('l_top_search').focus();
-			}
+			$settingsButtonToggle(true);
 			$topSearchRunOnEnter(e);
 			return;
 		}
-		const rows=$E('l_content_table').getElementsByTagName('tr');
-		let lastKeyRow=_keyRow, match;
 		if(!_keyRow) {
 			for(let i=0; i < rows.length; i++) {
 				if(!rows[i].matches(':hover'))
@@ -638,13 +638,24 @@ const $L = {
 				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${_stageData['notify']}</span>${_F}`, false, 8000);
 			$animationsUpdateFlash();
 		}
-		$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
 		if(_topMode) {
+			if(_stageDataHistory.length==1 && json['search'])
+				_stageDataHistory.unshift({'top':true,'items':[],'marquee':[],'next':0,'highlight':0,'ts':0});
+			else if(!_stageData['search']) {
+				if(_stageDataHistory.length > 1 && !json['search'])
+					_stageDataHistory.pop();
+				_stageDataHistory[0] = $cloneObject(_stageData);
+			}
 			$E('l_top_search').disabled = false;
-			if(json['search']) _E.value = json['search'];
+			if(json['search']) {
+				_E.value = json['search'];
+				$updateStageDataHistory(_stageDataHistoryIndex=-2);
+			}
 			if($topSearch()) $animationsFastSplash();
 			else $getHistoryData();
 		}
+		else
+			$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
 	},
 	getHistoryData: args => (_stageDataHistoryIndex>-1||--_stageDataHistoryIndex<-1) ? $getData(`/${_stageMode}-history.json`, $parseHistoryData, args) : null,
 	parseHistoryData: (json, args) => {
@@ -657,6 +668,8 @@ const $L = {
 					if(json['items'][row[0]])
 						_stageData['items'][i].push(json['items'][row[0]]);
 				});
+				if(!_stageData['search'])
+					_stageDataHistory[0] = $cloneObject(_stageData);
 				if(dropDownMode)
 					$historyDropDown(args['dropDownIndex'])
 				return;
@@ -730,8 +743,7 @@ const $L = {
 	},
 	gotoStageDataHistory: direction => {
 		const lastIndex=_stageDataHistoryIndex;
-		if(_topMode)
-			return(false);
+		if(_topMode) return(false);
 		else if(!direction) {
 			_keyRow = 0;
 			if(_stageDataHistoryIndex >= 0)
@@ -763,13 +775,15 @@ const $L = {
 		}
 		return(false);
 	},
-	updateStageDataHistory: () => {
+	updateStageDataHistory: quiet => {
 		const historyTotal=_stageDataHistory.length-1, historyIndex=_stageDataHistoryIndex<0?historyTotal:_stageDataHistoryIndex;
 		const stageData=$cloneObject(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
 		$setStageData(stageData);
 		$sortStageData(true);
 		const minutesAgo=Math.round(($epochNow()-_stageData['ts'])/60,0);
-		if(historyIndex == historyTotal)
+		if(quiet)
+			return;
+		else if(historyIndex == historyTotal)
 			$marqueeFlash('All caught up, exiting history mode...', true);
 		else
 			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
@@ -799,9 +813,20 @@ const $L = {
 		}
 		return(approx ? '~'+(Math.ceil(number/100)*100).toString() : number.toString());
 	},
+	broadBehaviorToggle: topMode => {
+		if(!_animationsComplete)
+			$animationsFastSplash(true);
+		else if(topMode) {
+			if($E('l_top_search').disabled) return;
+			else if($settingsButtonToggle(false)) $topSearchRun('');
+			else $settingsButtonToggle(true);
+		}
+		else if($scrollToTop() || $settingsButtonToggle(false) || $gotoStageDataHistory(0)) return;
+		else $forceNextStagePoll();		
+	},
 	multiplierExplicit: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
 	htmlPercent: (number, precision) => number ? ($N(Math.abs(number), precision) + $F(number>0?'f_l_up':'f_l_down')) : $F('f_empty_cell'),
-	scrollToTop: smooth => $W.scrollTo({top: 0, behavior: smooth ? 'smooth' : 'auto'}),
+	scrollToTop: smooth => ($W.scrollY ? $W.scrollTo({top: 0, behavior: smooth?'smooth':'auto'}) : false) !== false,
 	forceNextStagePoll: force => (_topMode&&!force) ? $settingsButtonToggle() : $animationsUpdateFlash(0.75),
 	epochNow: () => Math.floor(Date.now() / 1000),
 	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
@@ -833,6 +858,7 @@ const $L = {
 		$settingsLoad(true);
 		$settingsTabUpdateUI();
 	},
+	settingsAreOpen: () => $E('l_control').offsetHeight > 10,
 	settingsButtonToggle: forceDirection => {
 		if(!_stageData) return; 
 		const modeText=(_topMode?'search':'settings'), controlHeight=($E('l_control').scrollHeight>(_topMode?70:200)?$E('l_control_table').scrollHeight:(_topMode?80:250))+'px', closed=($E('l_control').style.height!=controlHeight);
@@ -1183,14 +1209,21 @@ const $L = {
 			$marqueeFlash(`Links will now direct to <i>${display}</i> for this session, hold down <i>shift</i> to make it permanent.`);
 	},
 	topSearch: set => typeof set=='string' ? ($E('l_top_search').value=set) : $E('l_top_search').value,
-	topSearchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))||$E('l_top_search').disabled) ? null : $topSearchRun(),
-	topSearchRun: () => {
+	topSearchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $topSearchRun(),
+	topSearchRun: value => {
 		if($E('l_top_search').disabled)
 			return;
-		_E.disabled = true;
-		_E.blur();
-		$settingsButtonToggle(true);
-		$forceNextStagePoll(true);
+		if(typeof value=='string')
+			_E.value = value;
+		if(!_E.value && _stageDataHistory.length && _stageDataHistory[0]['items'].length>0) {
+			_stageDataHistoryIndex = 0;
+			$updateStageDataHistory(true);
+		}
+		else {
+			_E.disabled = true;
+			_E.blur();
+			$forceNextStagePoll(true);
+		}
 	},
 	topSearchFromURL: (string, run) => {
 		let args=[];
@@ -1313,7 +1346,7 @@ const $L = {
 	isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
 	contentTableNeedsShrink: force => ((force||!_contentTableShrunk) && (($B('l_content_table') ? Math.floor(_B.x*2+_B.width) : 0) > $D.body.offsetWidth)),
-	contentTableRoll: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
+	contentTableRoll: roll => !_topMode ? $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display') : null,
 	contentTableRowPopout: row => {
 		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
 			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:_keyMapIndexDefault), `&#128200;&nbsp;${_taMap[row[$TAN]][1]}`]);

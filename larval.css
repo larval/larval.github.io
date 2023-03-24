@@ -628,7 +628,6 @@ i { font-style: normal !important; }
 	width: 100% !important;
 	margin: 0 !important;
 }
-.l_top_only.l_animations_complete #l_fixed { cursor: default !important; }
 .l_top_only #l_progress_cap_right, .l_top_only #l_progress_cap_left, .l_top_only #l_stage_alt_link, .l_stage_only #l_top_alt_link , .l_top_only #l_stage_about, .l_stage_only #l_top_about, .l_top_only  #l_logo_stage, .l_stage_only  #l_logo_top, .l_stage_only #l_control_table tr.l_top_row, .l_top_only #l_control_table tr.l_stage_row  {
 	display: none;
 }
