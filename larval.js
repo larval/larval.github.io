@@ -146,12 +146,10 @@ const $L = {
 		'NumpadEnter':e             => $onclick(e),
 		'PageDown':e                => _keyRow+=_contentTableRowCountThatAreInView,
 		'PageUp':e                  => _keyRow-=_contentTableRowCountThatAreInView,
-		'ShiftLeft':e               => void(0),
-		'ShiftRight':e              => void(0),
 		'Slash':e                   => $marqueeHotKeyHelp(),
 		'Space':e                   => $onclick(e),
 		'Tab':(e,ev)                => $animationsToggle(null, ev.shiftKey)
-	},
+	}, _hotKeyMapIgnore: ['ShiftLeft','ShiftRight'],
 	_enumMap: {
 		'stage': {
 			'SYM':_   => $H(_.val),
@@ -341,7 +339,9 @@ const $L = {
 			_keyRow = 0;
 		else if(e) {
 			e.preventDefault();
-			if(_hotKeyMap[e.code])
+			if($I(_hotKeyMapIgnore,e.code) >= 0)
+				return;
+			else if(_hotKeyMap[e.code])
 				_hotKeyMap[e.code](rows[_keyRow], e);
 			else if((match=e.code.match(/^(Digit|Numpad)([0-9])$/)))
 				$setSortStageData(parseInt(match[2]));
