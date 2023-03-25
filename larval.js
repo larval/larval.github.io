@@ -38,7 +38,7 @@ const $L = {
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
 	_char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'warning':"\u26a0 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$", 'user':"@" },
-	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]+)\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]+)\/?$/i, '$':/^[#/]*?symbol\/([A-Z]+)\/?$/ },
+	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{5,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?([A-Z]{1,4})\/?$/ },
 	_themes: {
 		'default':    ['#A6FDA4','#E1FDE4','#88CF86','#7DFF7A','#A6FDA4','#FF4444','#2A302A','#303630','#363C36','#825900','#FFDE96','#FAEED4','#A6FDA4','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDE8C'],
 		'afterhours': ['#95ABFC','#CDDFFF','#8BA4FF','#7492FF','#D274FF','#FF4444','#2A2A30','#303034','#36363C','#660303','#FF73BB','#D4DCFA','#A0FACA','#00AAAA','#85FFD6','#FF0080','#FDA4CF','#A6B7F7'],
