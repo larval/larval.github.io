@@ -379,10 +379,12 @@ const $L = {
 		$notifyRequestWakeLock();
 		while(_notifications.length > 0)
 			(_notifications.shift()).close();
-		if(!_marqueeInterval)
-			return;
-		$marqueeUpdate(true);
-		$animationsProgressReset();
+		if(_topMode)
+			$marqueeUpdate();
+		else if(_marqueeInterval) {
+			$marqueeUpdate(true);
+			$animationsProgressReset();
+		}
 	},
 	onresize: e => {
 		if(!$isMobile(false))
@@ -1066,7 +1068,8 @@ const $L = {
 	marqueeIntervalReset: () => {
 		if(_marqueeInterval)
 			clearInterval(_marqueeInterval);
-		_marqueeInterval = setInterval($marqueeUpdate, $marqueeLengthToSeconds(true));
+		else if(!_topMode)
+			_marqueeInterval = setInterval($marqueeUpdate, $marqueeLengthToSeconds(true));
 	},
 	marqueeHotKeyHelp: () => {
 		let key, match, html=`${$F('f_marquee_blink')} The following hotkeys and gestures are available: ${_F} Use the <i class="l_marquee_alt">tab</i> key to alternate animation modes. ${_F} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_F} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_F} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
