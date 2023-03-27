@@ -761,6 +761,7 @@ const $L = {
 			if(_stageDataHistoryIndex >= -1 && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
 				$marqueeFlash('Attempting to gather recent history from the server...');
 				$getHistoryData();
+				return(false);
 			}
 			else if(_stageDataHistoryIndex < 0)
 				_stageDataHistoryIndex = _stageDataHistory.length - 2;
@@ -1055,7 +1056,7 @@ const $L = {
 			$scrollToTop();
 			$marqueeIntervalReset();
 			_marqueeFlashTimeout = setTimeout($marqueeFlash, duration?duration:5000);
-			$animationsReset('l_marquee_flash', 'l_content_fade_in 1s ease forwards');
+			$animationsReset('l_marquee_flash', 'l_marquee_fade_in 1s ease forwards');
 		}
 		else {
 			$E('l_marquee_container').classList.remove('l_na_marquee_container_override');
