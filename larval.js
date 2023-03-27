@@ -727,7 +727,7 @@ const $L = {
 				const isLast=(idx>=stageDataForSymbols.length-1);
 				if(lastItem == $F('f_blank_line') && isLast)
 					htmlItems.pop();
-				else if(row && row[_topMode?$TPCTN:$PCT5])
+				else if(row && (_topMode||row[$PCT5]))
 					htmlItems.push(lastItem=`<div class="l_hover_container${row[$HILT]?' l_top_searched_symbol':''}">${isAge?row.slice(-1)[0]:$cell(row,type,idx)}</div>`);
 				else if(lastItem != _F && !isLast)
 					htmlItems.push(lastItem=_F);
