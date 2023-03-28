@@ -26,7 +26,6 @@ const $L = {
 	_contentTableRowCountThatAreInView: 10,
 	_titlePrefix: '',
 	_title:	'',
-	_topMode: false,
 	_frameData: null,
 	_swipeStartPosition: null,
 	_wakeLock: null,
@@ -34,11 +33,13 @@ const $L = {
 	_fragments: {},
 	_warnings: [],
 	_naId: 'l_na',
+	_topMode: false,
+	_topSymbolsToDisplay: 4,
+	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{5,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?([A-Z]{1,4})\/?$/ },
 	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
 	_char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'warning':"\u26a0 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$", 'user':"@" },
-	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{5,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?([A-Z]{1,4})\/?$/ },
 	_themes: {
 		'default':    ['#A6FDA4','#E1FDE4','#88CF86','#7DFF7A','#A6FDA4','#FF4444','#2A302A','#303630','#363C36','#825900','#FFDE96','#FAEED4','#A6FDA4','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDE8C'],
 		'afterhours': ['#95ABFC','#CDDFFF','#8BA4FF','#7492FF','#D274FF','#FF4444','#2A2A30','#303034','#36363C','#660303','#FF73BB','#D4DCFA','#A0FACA','#00AAAA','#85FFD6','#FF0080','#FDA4CF','#A6B7F7'],
@@ -395,7 +396,7 @@ const $L = {
 			return;
 		else if(_contentTableShrunk=!_contentTableShrunk)
 			setTimeout($onresize, 100);
-		$contentTableUpdateRowCountThatAreInView();
+		$contentTableUpdateDisplayParameters();
 		$contentTableUpdate();
 	},
 	onscroll: e => {
@@ -618,6 +619,8 @@ const $L = {
 		else if(_stageDataHistoryIndex >= 0)
 			_stageDataHistory.push($cloneObject(json));
 		else {
+			if(_topMode && json['search'])
+				json['items'].forEach((r,i) => json['items'][i][$TSYM] = $historyToSummaryString(json['items'][i][$THST]));
 			$setStageData(json);
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=_stageData['ts']);
 			if(!$hasSettings() && _stageDataHistory.length==0) {
@@ -667,13 +670,16 @@ const $L = {
 		else {
 			if(_topMode) {
 				_stageData['items'].forEach((row, i) => {
-					if(json['items'][row[0]])
-						_stageData['items'][i].push(json['items'][row[0]]);
+					if(!json['items'][row[0]])
+						return;
+					_stageData['items'][i][$TSYM] = $historyToSummaryString(json['items'][row[0]]);
+					_stageData['items'][i].push(json['items'][row[0]]);
 				});
 				if(!_stageData['search'])
 					_stageDataHistory[0] = $cloneObject(_stageData);
 				if(dropDownMode)
 					$historyDropDown(args['dropDownIndex'])
+				$contentTableUpdate();
 				return;
 			}
 			let h = json.length;
@@ -709,6 +715,21 @@ const $L = {
 					return([...row, null, `~${Math.round((epoch-history['ts'])/60,0)}m&nbsp;ago`]);
 			}
 		}).reverse();
+	},
+	historyToSummaryString: history => {
+		if(typeof history!='object' || !Array.isArray(history)) return;
+		let ret='', symbols=[], symbolsWithMood=[], historyCount=history.length-_topSymbolsToDisplay;
+		for(let h=0; h < history.length; h++) {
+			const row=history[h][$HMOD], symbol=history[h][$HMOD].substr(1);
+			if($I(symbols, symbol) >= 0)
+				continue;
+			symbolsWithMood.push(history[h][$HMOD]);
+			symbols.push(symbol);
+			if(symbolsWithMood.length >= _topSymbolsToDisplay)
+				break;
+		}
+		ret = symbolsWithMood.slice(0,_topSymbolsToDisplay).join(', ') + (historyCount>0?', +'+historyCount:'');
+		return(ret);
 	},
 	historyDropDownToggle: idx => _stageDataHistoryIndex >= -1 ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
 	historyDropDown: idx => {
@@ -1319,8 +1340,8 @@ const $L = {
 		if(updateView)
 			$contentTableUpdate(false);
 	},
-	contentTableUpdateRowCountThatAreInView: () => {
-		let rows=$E('l_content_table').getElementsByTagName('tr'), total=-5;
+	contentTableUpdateDisplayParameters: () => {
+		let rows=$E('l_content_table').getElementsByTagName('tr'), displayCount=Math.min(Math.max(1,Math.round($W.innerWidth*.33/125)),4), total=-5;
 		for(let i=0; i < rows.length; i++) {
 			const box=rows[i].getBoundingClientRect();
 			if(box.top < $W.innerHeight && box.bottom >= 0)
@@ -1329,7 +1350,10 @@ const $L = {
 		if(total < 10)
 			total = 10;
 		_contentTableRowCountThatAreInView = total;
-		return(total);
+		if(_topMode && displayCount < _topSymbolsToDisplay) {
+			_topSymbolsToDisplay = displayCount;
+			$contentTableUpdate();
+		}
 	},
 	cellRollover: (row, primary, secondary) => {
 		let cell='<div class="l_hover_container">';
@@ -1487,7 +1511,7 @@ const $L = {
 		if(doNotify && !$isSafari())
 			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
 		$E('l_content_table').innerHTML = html;
-		$contentTableUpdateRowCountThatAreInView();
+		$contentTableUpdateDisplayParameters();
 		if(!doNotResetKeyRow)
 			_keyRow = 0;
 		else
