@@ -723,10 +723,8 @@ const $L = {
 			const row=history[h][$HMOD], symbol=history[h][$HMOD].substr(1);
 			if($I(symbols, symbol) >= 0)
 				continue;
-			symbolsWithMood.push(history[h][$HMOD]);
+			symbolsWithMood[history[h][$HILT]?'unshift':'push'](history[h][$HMOD]);
 			symbols.push(symbol);
-			if(symbolsWithMood.length >= _topSymbolsToDisplay)
-				break;
 		}
 		ret = symbolsWithMood.slice(0,_topSymbolsToDisplay).join(', ') + (historyCount>0?', +'+historyCount:'');
 		return(ret);
