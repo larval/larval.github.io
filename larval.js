@@ -178,7 +178,7 @@ const $L = {
 			'TPCTN':_  => $htmlPercent(_.val,2),
 			'TPCTRN':_ => $htmlPercent(_.val,2),
 			'TSTR':_   => $H(_.val),
-			'TEND':_   => $H(_.val),
+			'TEND':_   => $topTimeFormat(_.val),
 			'TPCT':_   => $htmlPercent(_.val,2),
 			'TPCTR':_  => $htmlPercent(_.val,2),
 			'TTWT':_   => $H(_.val),
@@ -1233,6 +1233,7 @@ const $L = {
 		else
 			$marqueeFlash(`Links will now direct to <i>${display}</i> for this session, hold down <i>shift</i> to make it permanent.`);
 	},
+	topTimeFormat: str => str + (str.match(/[0-9]{2}\/[0-9]{2}$/)?'@[<u>TBD</u>]':''),
 	topSearch: set => typeof set=='string' ? ($E('l_top_search').value=set) : $E('l_top_search').value,
 	topSearchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $topSearchRun(),
 	topSearchRun: value => {
