@@ -24,6 +24,7 @@ const $L = {
 	_marqueeFlashTimeout: null,
 	_contentTableSoftLimit: 100,
 	_contentTableRowCountThatAreInView: 10,
+	_extURLOptions: 'noreferrer noopener',
 	_titlePrefix: '',
 	_title:	'',
 	_frameData: null,
@@ -118,18 +119,18 @@ const $L = {
 		'l_marquee_flash':_         => $gotoStageDataHistory(0),
 		'l_marquee_info':_          => $setURLFormat(_.sym, false),
 		'l_marquee_talk':_          => _topMode ? $topSearchFromURL(_.raw, true) : $W.open('https://top.larval.com/'+_.raw, _.raw).focus(),
-		'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`).focus(),
+		'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`, _extURLOptions),
 		'l_notify_disable':_        => $notifyException(_.raw, true),
 		'l_notify_enable':_         => $notifyException(_.raw, false),
 		'l_range_volume_type':_     => $vpmToggle(),
 		'l_settings_button':_       => $settingsButtonToggle(),
-		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`).focus(),
+		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`, _extURLOptions),
 		'l_tab':_                   => $settingsTabSelect(_.el),
 		'l_warning_audio':_         => $notifyPlayAudio(_audioTest, false, true),
 		'l_warning_never_notify':_  => $notifyRequestPermission(true),
 		'shift_default':_           => _.raw ? $W.open('https://top.larval.com/'+($M(/[A-Z0-9_]+$/ig,_.raw)?_M[0]:_.raw), _.raw).focus() : $editSymbolsOnTop(),
 		'alt_default':_             => _.raw ? $setSymbolsOnTop(_.raw, null, true) : $editSymbolsOnTop(),
-		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`).focus()
+		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`, _extURLOptions)
 	},
 	_hotKeyMap: {
 		'ArrowDown':e               => _keyRow++,
@@ -448,9 +449,10 @@ const $L = {
 			_E.className = _naId;
 		$E('l_root').classList.add('l_animations_complete');
 		$E('l_menu').className = (_stageData && !$isWeekend() ? $getThemeMode('l_') : 'l_default');
-		if($topSearch())
+		if(!_topMode)
+			$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
+		else if($topSearch())
 			$settingsButtonToggle(true);
-		$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
 		if($hasSettings() && _stageData && _stageData['marquee'] && _stageData['marquee'].length > 1)
 			$marqueeUpdate();
 		else
