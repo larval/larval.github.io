@@ -35,7 +35,7 @@ const $L = {
 	_warnings: [],
 	_naId: 'l_na',
 	_topMode: false,
-	_topSymbolsToDisplay: 4,
+	_topSymbolsToDisplay: 8,
 	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{5,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?([A-Z]{1,4})\/?$/ },
 	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
@@ -174,17 +174,15 @@ const $L = {
 		},
 		'top': {
 			'TUSR':_   => $H(_.val),
-			'TSYM':_   => Array.isArray(_.row[$THST])&&_contentTableShrunk ? _.row[$THST].length : $H(_.val),
+			'TSYM':_   => Array.isArray(_.row[$THST])&&_contentTableShrunk ? _.row[$THST].length : _.val,
 			'TRAT':_   => isNaN(_.val) ? `<i data-msg-idx="${_.idx}" class="${_.val[0]=='+'?'l_top_up':'l_top_down'}">${_.val.substr(1)}</i>` : (_.val+'%'),
-			'TPCTN':_  => $htmlPercent(_.val,2),
-			'TPCTRN':_ => $htmlPercent(_.val,2),
+			'TPCT':_   => $htmlPercent(_.val,2),
+			'TPCR':_   => $htmlPercent(_.val,2),
 			'TSTR':_   => $H(_.val),
 			'TEND':_   => $topTimeFormat(_.val),
-			'TPCT':_   => $htmlPercent(_.val,2),
-			'TPCTR':_  => $htmlPercent(_.val,2),
 			'TTWT':_   => $H(_.val),
 			'THST':_   => void(0),
-			'HMID':0, 'HPRC':1, 'HMOD':2, 'HPCTN':3, 'HPCTRN':4, 'HSTR':5, 'HEND':6, 'HPCT':7, 'HPCTR':8, 'HILT':9
+			'HMID':0, 'HPRC':1, 'HMOD':2, 'HPCT':3, 'HPCR':4, 'HSTR':5, 'HEND':6, 'HILT':7
 		}
 	}, _stageDataMap: [], _topDataMap: [], _dataMap: null,
 	_settings: {
@@ -397,7 +395,7 @@ const $L = {
 			return;
 		else if(_contentTableShrunk=!_contentTableShrunk)
 			setTimeout($onresize, 100);
-		$contentTableUpdateDisplayParameters();
+		$contentTableUpdateRowCountThatAreInView();
 		$contentTableUpdate();
 	},
 	onscroll: e => {
@@ -720,20 +718,16 @@ const $L = {
 	},
 	historyToSummaryString: history => {
 		if(typeof history!='object' || !Array.isArray(history)) return;
-		let ret='', symbols=[], symbolsWithMood=[], historyCount=history.length-_topSymbolsToDisplay;
+		let symbols=[];
 		for(let h=0; h < history.length; h++) {
-			const row=history[h][$HMOD], symbol=history[h][$HMOD].substr(1);
-			if($I(symbols, symbol) >= 0)
-				continue;
-			symbolsWithMood[history[h][$HILT]?'unshift':'push'](history[h][$HMOD]);
-			symbols.push(symbol);
+			if($I(symbols, history[h][$HMOD]) < 0)
+				symbols[history[h][$HILT]?'unshift':'push'](history[h][$HMOD]);
 		}
-		ret = symbolsWithMood.slice(0,_topSymbolsToDisplay).join(', ') + (historyCount>0?', +'+historyCount:'');
-		return(ret);
+		return('[<u>'+('0'+history.length).slice(-2)+'</u>] '+symbols.slice(0,_topSymbolsToDisplay).join(', '));
 	},
-	historyDropDownToggle: idx => _stageDataHistoryIndex >= -1 ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
+	historyDropDownToggle: idx => (!_topMode&&_stageDataHistoryIndex>=-1) ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
 	historyDropDown: idx => {
-		const types=_topMode?[$TSYM,$TRAT,$TPCTN,$TPCTRN,$TSTR,$TEND]:[$PCT5,$PCT,$PRC,$VOL,$AGE];
+		const types=_topMode?[$TSYM,$TRAT,$TPCT,$TPCR,$TSTR,$TEND]:[$PCT5,$PCT,$PRC,$VOL,$AGE];
 		let stageRow=_stageData['items'][idx], stageDataForSymbols=(_topMode?stageRow[$THST]:$getHistoryForSymbol(stageRow[$SYM],_stageData['ts'])), hadHistoryDisplays=[];
 		if(!stageDataForSymbols)
 			return;
@@ -1341,8 +1335,8 @@ const $L = {
 		if(updateView)
 			$contentTableUpdate(false);
 	},
-	contentTableUpdateDisplayParameters: () => {
-		let rows=$E('l_content_table').getElementsByTagName('tr'), displayCount=Math.min(Math.max(1,Math.round($W.innerWidth*.33/125)),4), total=-5;
+	contentTableUpdateRowCountThatAreInView: () => {
+		let rows=$E('l_content_table').getElementsByTagName('tr'), total=-5;
 		for(let i=0; i < rows.length; i++) {
 			const box=rows[i].getBoundingClientRect();
 			if(box.top < $W.innerHeight && box.bottom >= 0)
@@ -1351,10 +1345,17 @@ const $L = {
 		if(total < 10)
 			total = 10;
 		_contentTableRowCountThatAreInView = total;
-		if(_topMode && displayCount < _topSymbolsToDisplay) {
-			_topSymbolsToDisplay = displayCount;
-			$contentTableUpdate();
-		}
+		return(total);
+	},
+	cellTopRollover: (row, primary, secondary) => {
+		let cell='<div class="l_hover_container">', hasSecondary=(row[$THST]&&row[$THST][0][secondary]);
+		if(hasSecondary)
+			cell += `<i class="l_hover_active">${$cell(row[$THST][0],secondary)}</i><i class="l_hover_inactive">`;
+		cell += $cell(row, !row[primary]&&typeof secondary=='string' ? secondary : primary);
+		if(hasSecondary)
+			cell += '</i>';
+		cell += '</div>';
+		return(cell);
 	},
 	cellRollover: (row, primary, secondary) => {
 		let cell='<div class="l_hover_container">';
@@ -1435,13 +1436,13 @@ const $L = {
 					rowClass = ' l_top_highlight';
 				}
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
-					<td class="l_top_user">${notifyControl}<i>${$cell(row,$TUSR)}<i></td>
+					<td class="l_top_user">${notifyControl}<i>${$cell(row,$TUSR)}</i></td>
 					<td class="l_history_toggle${row[$TTWT]?' l_twit':''}">${$cellRollover(row,$TSYM,$TTWT)}</td>
 					<td class="l_history_toggle">${$cellRollover(row,$TRAT,'0%')}</td>
-					<td class="l_history_toggle">${$cellRollover(row,$TPCTN,$TPCT)}</td>
-					<td class="l_history_toggle">${$cellRollover(row,$TPCTRN,$TPCTR)}</td>
-					<td class="l_history_toggle">${$cellRollover(row,$TSTR,$TSTR)}</td>
-					<td class="l_history_toggle">${$cellRollover(row,$TEND,$TEND)}</td>
+					<td class="l_history_toggle">${$cellTopRollover(row,$TPCT,$HPCT)}</td>
+					<td class="l_history_toggle">${$cellTopRollover(row,$TPCR,$HPCR)}</td>
+					<td class="l_history_toggle">${$cellTopRollover(row,$TSTR,$HSTR)}</td>
+					<td class="l_history_toggle">${$cellTopRollover(row,$TEND,$HEND)}</td>
 					</tr>`;
 			}
 			else if($isHaltRow(row)) {
@@ -1512,7 +1513,7 @@ const $L = {
 		if(doNotify && !$isSafari())
 			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
 		$E('l_content_table').innerHTML = html;
-		$contentTableUpdateDisplayParameters();
+		$contentTableUpdateRowCountThatAreInView();
 		if(!doNotResetKeyRow)
 			_keyRow = 0;
 		else

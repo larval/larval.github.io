@@ -582,6 +582,18 @@ i { font-style: normal !important; }
 	text-overflow: ellipsis;
 	word-break: keep-all;
 }
+#l_content_table tr td.l_twit div.l_hover_container::before {
+	display: inline-block;
+	content: '';
+}
+#l_content_table tr td.l_twit i.l_hover_inactive {
+	position: absolute;
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	word-break: keep-all;
+}
 #l_content_table tr td .l_hover_inactive { visibility: visible; }
 .l_content_table_header, .l_content_table_header_selected, .l_content_table_header_selected_reverse {
 	width: 1%;
@@ -599,13 +611,14 @@ i { font-style: normal !important; }
 }
 #l_content_table tr td:nth-child(2) { text-align: left; }
 .l_stage_only #l_content_table tr td:nth-child(2) { word-break: break-all; }
-.l_top_only #l_content_table tr td:nth-child(2) { 
-	word-break: keep-all;
-	text-align: center;
+.l_top_only #l_content_table tr td:nth-child(2) { word-break: keep-all; }
+.l_top_only #l_content_table u { 
+	color: var(--l-color-9) !important;
+	text-decoration: none;
 }
 .l_top_user i {
 	display: block;
-	width: 175px;
+	width: 125px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
@@ -798,7 +811,6 @@ input[type="checkbox"] {
 .l_none {
 	text-align: center !important;
 }
-
 .l_up, .l_top_up { color: var(--l-color-13); }
 .l_down, .l_top_down { color: var(--l-color-15); }
 .l_top_up, .l_top_down { text-decoration: underline; }
@@ -1037,7 +1049,7 @@ input[type=checkbox]:checked:disabled + label:before {
 }
 @media only screen and (max-width: 1300px) {
 	.l_notify_popout i { display: none; }
-	.l_top_user i { width: 125px; }
+	.l_top_user i { width: 100px; }
 }
 @media only screen and (max-width: 1500px) {
 	#l_content, #l_marquee_container { width: 75%; }
@@ -1061,7 +1073,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_footer { font-size: 15px; }
 	#l_last_update { font-size: 12px; }
 	.l_tab_info { padding: 10px !important; }
-	.l_top_user i { width: 75px; }
+	.l_top_user i { width: 50px; }
 }
 @media only screen and (max-width: 600px) {
 	#l_logo {
