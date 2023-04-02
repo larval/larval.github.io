@@ -616,7 +616,7 @@ const $L = {
 		let retry=false;
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
 			retry = true;
-		else if(_stageDataHistoryIndex >= 0)
+		else if(_stageDataHistoryIndex >= 0 && !_topMode)
 			_stageDataHistory.push($cloneObject(json));
 		else {
 			if(_topMode && json['search'])
