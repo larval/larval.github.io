@@ -657,31 +657,32 @@ const $L = {
 				$updateStageDataHistory(_stageDataHistoryIndex=-2);
 			}
 			if($topSearch()) $animationsFastSplash();
-			else $getHistoryData();
+			else if($getHistoryData) $getHistoryData();
 		}
 		else
 			$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
 	},
 	getHistoryData: args => (_stageDataHistoryIndex>-1||--_stageDataHistoryIndex<-1) ? $getData(`/${_stageMode}-history.json`, $parseHistoryData, args) : null,
 	parseHistoryData: (json, args) => {
-		let error=false, dropDownMode=(args&&typeof args['dropDownIndex']!='undefined');
+		const dropDownMode=(args&&typeof args['dropDownIndex']!='undefined');
 		if(!json || json.length < 2)
-			error = true;
+			return;
+		else if(_topMode) {
+			_stageData['items'].forEach((row, i) => {
+				if(!json['items'][row[0]])
+					return;
+				_stageData['items'][i][$TSYM] = $historyToSummaryString(json['items'][row[0]]);
+				_stageData['items'][i].push(json['items'][row[0]]);
+			});
+			if(!_stageData['search'])
+				_stageDataHistory[0] = $cloneObject(_stageData);
+			if(dropDownMode)
+				$historyDropDown(args['dropDownIndex'])
+			$contentTableUpdate();
+			return;
+		}
 		else {
-			if(_topMode) {
-				_stageData['items'].forEach((row, i) => {
-					if(!json['items'][row[0]])
-						return;
-					_stageData['items'][i][$TSYM] = $historyToSummaryString(json['items'][row[0]]);
-					_stageData['items'][i].push(json['items'][row[0]]);
-				});
-				if(!_stageData['search'])
-					_stageDataHistory[0] = $cloneObject(_stageData);
-				if(dropDownMode)
-					$historyDropDown(args['dropDownIndex'])
-				$contentTableUpdate();
-				return;
-			}
+			$getHistoryData = null;
 			let h = json.length;
 			while(--h > 0) {
 				if(json[h]['ts'] == _stageDataHistory[0]['ts'])
@@ -698,11 +699,9 @@ const $L = {
 				}
 			}
 			else
-				error = true;
+				return;
 		}
-		if(!error)
-			return;
-		else if(dropDownMode)
+		if(dropDownMode)
 			$historyDropDown(args['dropDownIndex']);
 		else
 			$marqueeFlash('Sorry, no additional history is available to rewind to at this time.');
@@ -725,7 +724,7 @@ const $L = {
 		}
 		return('[<u>'+('0'+history.length).slice(-2)+'</u>] '+symbols.slice(0,_topSymbolsToDisplay).join(', '));
 	},
-	historyDropDownToggle: idx => (!_topMode&&_stageDataHistoryIndex>=-1) ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
+	historyDropDownToggle: idx => ($getHistoryData&&!_topMode&&_stageDataHistoryIndex>=-1) ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
 	historyDropDown: idx => {
 		const types=_topMode?[$TSYM,$TRAT,$TPCT,$TPCR,$TSTR,$TEND]:[$PCT5,$PCT,$PRC,$VOL,$AGE];
 		let stageRow=_stageData['items'][idx], stageDataForSymbols=(_topMode?stageRow[$THST]:$getHistoryForSymbol(stageRow[$SYM],_stageData['ts'])), hadHistoryDisplays=[];
@@ -776,8 +775,10 @@ const $L = {
 		}
 		else if(direction > 0) {
 			if(_stageDataHistoryIndex >= -1 && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
-				$marqueeFlash('Attempting to gather recent history from the server...');
-				$getHistoryData();
+				if($getHistoryData) {
+					$marqueeFlash('Attempting to gather recent history from the server...');
+					$getHistoryData();
+				}
 				return(false);
 			}
 			else if(_stageDataHistoryIndex < 0)
