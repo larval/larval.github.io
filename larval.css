@@ -1002,7 +1002,7 @@ input[type=checkbox]:checked:disabled + label:before {
 		box-shadow: 0 0 10px #666;
 		cursor: pointer;
 	}
-	#l_content_table tr:hover:not(:first-child) td:not(.l_history), #l_content_table .l_tr_keyrow_selected:not(:first-child) td:not(.l_history) {
+	#l_content_table tr:hover:not(:first-child) td:not(.l_history), #l_content_table .l_tr_keyrow_selected:not(:first-child) td:not(.l_history), #l_content_table tr td.l_static:hover i.l_hover_inactive {
 		text-decoration: underline;
 	}
 	#l_content_table tr:hover .l_history_toggle, td.l_news:hover, td.l_twit:hover  {
