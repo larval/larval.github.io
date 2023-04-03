@@ -582,11 +582,11 @@ i { font-style: normal !important; }
 	text-overflow: ellipsis;
 	word-break: keep-all;
 }
-#l_content_table tr td.l_twit div.l_hover_container::before {
+#l_content_table tr td.l_twit div.l_hover_container::before,#l_content_table tr td.l_static div.l_hover_container::before  {
 	display: inline-block;
 	content: '';
 }
-#l_content_table tr td.l_twit i.l_hover_inactive {
+#l_content_table tr td.l_twit i.l_hover_inactive, #l_content_table tr td.l_static i.l_hover_inactive {
 	position: absolute;
 	width: 100%;
 	overflow: hidden;
@@ -1017,7 +1017,7 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_content_table tr td:nth-child(1):hover ~ .l_history_toggle:not(.l_history), #l_root:not(.l_top_only) #l_content_table tr td:nth-child(2):hover ~ .l_history_toggle  { 
 		background-color: initial !important;
 	}
-	#l_content_table tr:hover td .l_hover_inactive, #l_content_table .l_tr_keyrow_selected td .l_hover_inactive, .l_content_table_alt_display tr td .l_hover_inactive {
+	#l_content_table tr:hover td:not(.l_static) .l_hover_inactive, #l_content_table .l_tr_keyrow_selected td .l_hover_inactive, .l_content_table_alt_display tr td .l_hover_inactive {
 		visibility: hidden !important;
 	}
 	#l_content_table tr:hover td .l_hover_active, #l_content_table .l_tr_keyrow_selected td .l_hover_active {

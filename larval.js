@@ -1357,12 +1357,12 @@ const $L = {
 		cell += '</div>';
 		return(cell);
 	},
-	cellRollover: (row, primary, secondary) => {
-		let cell='<div class="l_hover_container">';
-		if(row[secondary])
-			cell += `<i class="l_hover_active">${$cell(row,secondary)}</i><i class="l_hover_inactive">`;
+	cellRollover: (row, primary, secondary, staticPrimary) => {
+		let cell='<div class="l_hover_container">', hasSecondary=(row[secondary]||staticPrimary);
+		if(hasSecondary)
+			cell += (row[secondary] ? `<i class="l_hover_active">${$cell(row,secondary)}</i><i class="l_hover_inactive">` : `<i class="l_hover_inactive">`);
 		cell += $cell(row, !row[primary]&&typeof secondary=='string' ? secondary : primary);
-		if(row[secondary])
+		if(hasSecondary)
 			cell += '</i>';
 		cell += '</div>';
 		return(cell);
@@ -1478,7 +1478,7 @@ const $L = {
 				}
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$cell(row,$SYM)}</td>
-					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS)}</td>
+					<td class="${row[$NWS]?'l_news':'l_static'}">${$cellRollover(row,$NAM,$NWS,true)}</td>
 					<td class="l_history_toggle">${$cellRollover(row,$PCT5,$PCTM)}</td>
 					<td class="l_history_toggle">${$cellRollover(row,$PCT,$PCTY)}</td>
 					<td class="l_history_toggle">${$cellRollover(row,$PRC,$PRC5)}</td>
