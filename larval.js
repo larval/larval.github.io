@@ -318,7 +318,7 @@ const $L = {
 			return;
 		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=_keyRow, match;
 		if(_topMode) {
-			if($I(['Backspace','Delete','Escape'],(match=e&&e.code)?match:'') >= 0 && !$topSearch())
+			if($I(['Escape','Backspace','Delete'],(match=e&&e.code)?match:'') >= 0 && (!_I||!$topSearch()))
 				return($broadBehaviorToggle(true));
 			else if(!$isMobile(false) && (!document.activeElement || document.activeElement.id!='l_top_search'))
 				$E('l_top_search').focus();
