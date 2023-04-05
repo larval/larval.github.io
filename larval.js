@@ -318,7 +318,7 @@ const $L = {
 			return;
 		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=_keyRow, match;
 		if(_topMode) {
-			if($I(['Escape','Backspace','Delete'],(match=e&&e.code)?match:'') >= 0 && (!_I||!$topSearch()))
+			if($I(['Escape','Backspace','Delete'],(match=e&&e.code)?match:'') >= 0 && (!_I||!$topSearchCriteria('')))
 				return($broadBehaviorToggle(true));
 			else if(!$isMobile(false) && (!document.activeElement || document.activeElement.id!='l_top_search'))
 				$E('l_top_search').focus();
@@ -449,7 +449,7 @@ const $L = {
 		$E('l_menu').className = (_stageData && !$isWeekend() ? $getThemeMode('l_') : 'l_default');
 		if(!_topMode)
 			$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
-		else if($topSearch())
+		else if($topSearchCriteria())
 			$settingsButtonToggle(true);
 		if($hasSettings() && _stageData && _stageData['marquee'] && _stageData['marquee'].length > 1)
 			$marqueeUpdate();
@@ -611,7 +611,7 @@ const $L = {
 		if($setTheme($getThemeMode()) !== false && $Q('meta[name="theme-color"]'))
 			_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
 	},
-	getStageData: updateView => $getData(`/${_stageMode}.json`, $parseStageData, {'updateView':updateView,'search':$topSearch()}),
+	getStageData: updateView => $getData(`/${_stageMode}.json`, $parseStageData, {'updateView':updateView,'search':$topSearchCriteria()}),
 	parseStageData: (json, args) => {
 		let retry=false;
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
@@ -656,7 +656,7 @@ const $L = {
 				_E.value = json['search'];
 				$updateStageDataHistory(_stageDataHistoryIndex=-2);
 			}
-			if($topSearch()) $animationsFastSplash();
+			if($topSearchCriteria()) $animationsFastSplash();
 			else if($getHistoryData) $getHistoryData();
 		}
 		else
@@ -839,6 +839,7 @@ const $L = {
 			if($E('l_top_search').disabled) return;
 			else if($settingsButtonToggle(false)) $topSearchRun('');
 			else $settingsButtonToggle(true);
+			$marqueeUpdate();
 		}
 		else if($scrollToTop() || $settingsButtonToggle(false) || $gotoStageDataHistory(0)) return;
 		else $forceNextStagePoll();		
@@ -1229,13 +1230,14 @@ const $L = {
 			$marqueeFlash(`Links will now direct to <i>${display}</i> for this session, hold down <i>shift</i> to make it permanent.`);
 	},
 	topTimeFormat: str => str + (str.match(/[0-9]{2}\/[0-9]{2}$/)?'@[<u>TBD</u>]':''),
-	topSearch: set => typeof set=='string' ? ($E('l_top_search').value=set) : $E('l_top_search').value,
+	topSearchCriteria: set => typeof set=='string' ? ($E('l_top_search').value=set) : $E('l_top_search').value,
 	topSearchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $topSearchRun(),
 	topSearchRun: value => {
 		if($E('l_top_search').disabled)
 			return;
 		if(typeof value=='string')
 			_E.value = value;
+		$W.history.pushState(null, null, _E.value.replace(/[^A-Z0-9_@#$]+/ig,'/'));
 		if(!_E.value && _stageDataHistory.length && _stageDataHistory[0]['items'].length>0) {
 			_stageDataHistoryIndex = 0;
 			$updateStageDataHistory(true);
@@ -1243,6 +1245,7 @@ const $L = {
 		else {
 			_E.disabled = true;
 			_E.blur();
+			$settingsButtonToggle(!!$topSearchCriteria());
 			$forceNextStagePoll(true);
 		}
 	},
