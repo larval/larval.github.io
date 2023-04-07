@@ -318,7 +318,7 @@ const $L = {
 			return;
 		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=_keyRow, match;
 		if(_topMode) {
-			if($I(['Escape','Backspace','Delete'],(match=e&&e.code)?match:'') >= 0 && (!_I||!$topSearchCriteria('')))
+			if($I(['Escape','Backspace','Delete'],(match=e&&e.code)?match:'') >= 0 && (!_I||!$topSearchCriteria()))
 				return($broadBehaviorToggle(true));
 			else if(!$isMobile(false) && (!document.activeElement || document.activeElement.id!='l_top_search'))
 				$E('l_top_search').focus();
@@ -437,6 +437,7 @@ const $L = {
 			$forceNextStagePoll();
 		_swipeStartPosition = null;
 	},
+	onpopstate: e => (e&&e.state) ? $parseStageData(e.state, {'fromPopState':true,'updateView':true}) : null,
 
 	/* [$] FUNCTIONS */
 	animationsComplete: fastSplash => {
@@ -621,6 +622,8 @@ const $L = {
 		else {
 			if(_topMode && json['search'])
 				json['items'].forEach((r,i) => json['items'][i][$TSYM] = $historyToSummaryString(json['items'][i][$THST]));
+			if(!args || !args['fromPopState'])
+				$historyPush(json);
 			$setStageData(json);
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=_stageData['ts']);
 			if(!$hasSettings() && _stageDataHistory.length==0) {
@@ -652,12 +655,12 @@ const $L = {
 				_stageDataHistory[0] = $cloneObject(_stageData);
 			}
 			$E('l_top_search').disabled = false;
-			if(json['search']) {
+			if(typeof json['search'] == 'string')
 				_E.value = json['search'];
+			if(json['search'])
 				$updateStageDataHistory(_stageDataHistoryIndex=-2);
-			}
 			if($topSearchCriteria()) $animationsFastSplash();
-			else if($getHistoryData) $getHistoryData();
+			else if($getHistoryData && !(args&&args['fromPopState'])) $getHistoryData();
 		}
 		else
 			$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
@@ -674,8 +677,12 @@ const $L = {
 				_stageData['items'][i][$TSYM] = $historyToSummaryString(json['items'][row[0]]);
 				_stageData['items'][i].push(json['items'][row[0]]);
 			});
-			if(!_stageData['search'])
+			if(!_stageData['search']) {
+				_stageData['search'] = '';
+				_stageData['path'] = '/';
 				_stageDataHistory[0] = $cloneObject(_stageData);
+				$historyPush(_stageDataHistory[0]);
+			}
 			if(dropDownMode)
 				$historyDropDown(args['dropDownIndex'])
 			$contentTableUpdate();
@@ -724,6 +731,7 @@ const $L = {
 		}
 		return('[<u>'+('0'+history.length).slice(-2)+'</u>] '+symbols.slice(0,_topSymbolsToDisplay).join(', '));
 	},
+	historyPush: obj => ($W.history&&$W.history.pushState&&typeof(obj)=='object'&&obj['path']) ? $W.history.pushState(obj,'',obj['path']) : null,
 	historyDropDownToggle: idx => ($getHistoryData&&!_topMode&&_stageDataHistoryIndex>=-1) ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
 	historyDropDown: idx => {
 		const types=_topMode?[$TSYM,$TRAT,$TPCT,$TPCR,$TSTR,$TEND]:[$PCT5,$PCT,$PRC,$VOL,$AGE];
@@ -1237,7 +1245,6 @@ const $L = {
 			return;
 		if(typeof value=='string')
 			_E.value = value;
-		$W.history.pushState(null, null, _E.value.replace(/[^A-Z0-9_@#$]+/ig,'/'));
 		if(!_E.value && _stageDataHistory.length && _stageDataHistory[0]['items'].length>0) {
 			_stageDataHistoryIndex = 0;
 			$updateStageDataHistory(true);
