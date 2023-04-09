@@ -437,7 +437,17 @@ const $L = {
 			$forceNextStagePoll();
 		_swipeStartPosition = null;
 	},
-	onpopstate: e => (e&&e.state) ? $parseStageData(e.state, {'fromPopState':true,'updateView':true}) : null,
+	onpopstate: e => {
+		if(!e || !e.state)
+			return;
+		else if(_topMode)
+			$parseStageData(e.state, {'fromPopState':true,'updateView':true});
+		else if(typeof(e.state.fixed) == 'number') {
+			console.log(e.state);
+			$W.history.go(e.state.fixed);
+			$gotoStageDataHistory(e.state.fixed);
+		}
+	},
 
 	/* [$] FUNCTIONS */
 	animationsComplete: fastSplash => {
@@ -662,8 +672,13 @@ const $L = {
 			if($topSearchCriteria()) $animationsFastSplash();
 			else if($getHistoryData && !(args&&args['fromPopState'])) $getHistoryData();
 		}
-		else
+		else {
+			if(_stageDataHistory.length==1 && $W.history && $W.history.pushState) {
+				[1,null,-1].forEach(state => $W.history.pushState({'fixed':state},''));
+				$W.history.go(-1);
+			}
 			$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
+		}
 	},
 	getHistoryData: args => (_stageDataHistoryIndex>-1||--_stageDataHistoryIndex<-1) ? $getData(`/${_stageMode}-history.json`, $parseHistoryData, args) : null,
 	parseHistoryData: (json, args) => {
