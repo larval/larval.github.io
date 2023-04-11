@@ -1417,7 +1417,7 @@ const $L = {
 		return(_F);
 	},
 	contentTableUpdate: (doNotify, doNotResetKeyRow) => {
-		if(!_stageData) return;
+		if(!_stageData || !_animationsComplete) return;
 		$E('l_menu').className = (_animationsComplete && !$isWeekend() ? $getThemeMode('l_') : 'l_default');
 		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
 		const columns = (_topMode ? ['user',_contentTableShrunk?'sym#':'symbols','bull','user%','real%','start','end'] : ['symbol',_contentTableShrunk?$F('f_empty_cell'):'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options']);
