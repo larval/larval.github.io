@@ -36,7 +36,7 @@ const $L = {
 	_naId: 'l_na',
 	_topMode: false,
 	_topSymbolsToDisplay: 8,
-	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{5,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?([A-Z]{1,4})\/?$/ },
+	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{1,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?([A-Z]{1,4})\/?$/ },
 	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
