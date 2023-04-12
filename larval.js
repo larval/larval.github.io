@@ -13,7 +13,6 @@ const $L = {
 	_notifyAllowed: null,
 	_notifyExceptions: [],
 	_animationsComplete: false,
-	_contentTableShrunk: false,
 	_nextStagePollTimeout: null,
 	_nextStagePollLong: 300,
 	_nextStagePollShort: 30,
@@ -155,7 +154,7 @@ const $L = {
 	_enumMap: {
 		'stage': {
 			'SYM':_   => $H(_.val),
-			'NAM':_   => _contentTableShrunk ? $F('f_empty_cell') : $H(_.val),
+			'NAM':_   => $H(_.val),
 			'PCT5':_  => $isHaltRow(_.row) ? $H(_.val?_.val:'HALTED') : $htmlPercent(_.val,2),
 			'PCT':_   => $htmlPercent(_.val,2),
 			'PRC':_   => '$' + $N(_.val,_.row[$OPT]=='currency'&&_.val<10?4:2),
@@ -167,14 +166,14 @@ const $L = {
 			'VOL5':_  => '+' + $multiplierFormat(_.val,1),
 			'PCTM':_  => 'M=' + $htmlPercent(_.val,0),
 			'PCTY':_  => 'Y=' + $htmlPercent(_.val,0),
-			'NWS':_   => _contentTableShrunk ? $F('f_empty_cell') : $H(_.val),
+			'NWS':_   => $H(_.val),
 			'LNK':_   => _.val,
 			'KSTK':0, 'KETF':0, 'KCRP':1, 'KFTR':2, 'KCUR':3, 'KUSR':4,
 			'WAUD':0, 'WNOT':1, 'HLT':2, 'AGE': 6, 'TAN':8
 		},
 		'top': {
 			'TUSR':_   => $H(_.val),
-			'TSYM':_   => Array.isArray(_.row[$THST])&&_contentTableShrunk ? _.row[$THST].length : _.val,
+			'TSYM':_   => _.val,
 			'TRAT':_   => isNaN(_.val) ? `<i data-msg-idx="${_.idx}" class="${_.val[0]=='+'?'l_top_up':'l_top_down'}">${_.val.substr(1)}</i>` : (_.val+'%'),
 			'TPCT':_   => $htmlPercent(_.val,2),
 			'TPCR':_   => $htmlPercent(_.val,2),
@@ -387,14 +386,9 @@ const $L = {
 		}
 	},
 	onresize: e => {
-		if(!$isMobile(false))
-			$settingsButtonToggle(false);
-		else
+		if($isMobile(false))
 			return;
-		if(!(_contentTableShrunk ^ $contentTableNeedsShrink()))
-			return;
-		else if(_contentTableShrunk=!_contentTableShrunk)
-			setTimeout($onresize, 100);
+		$settingsButtonToggle(false);
 		$contentTableUpdateRowCountThatAreInView();
 		$contentTableUpdate();
 	},
@@ -648,7 +642,6 @@ const $L = {
 			_stageDataHistory.push($cloneObject(_stageData));
 			$sortStageData(false);
 			if(args && args['updateView']) {
-				_contentTableShrunk = false;
 				$contentTableUpdate(true);
 				$marqueeUpdate(true, true);
 			}
@@ -1401,7 +1394,6 @@ const $L = {
 	isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
 	isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
-	contentTableNeedsShrink: force => ((force||!_contentTableShrunk) && (($B('l_content_table') ? Math.floor(_B.x*2+_B.width) : 0) > $D.body.offsetWidth)),
 	contentTableRoll: roll => !_topMode ? $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display') : null,
 	contentTableRowPopout: row => {
 		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
@@ -1420,7 +1412,7 @@ const $L = {
 		if(!_stageData || !_animationsComplete) return;
 		$E('l_menu').className = (_animationsComplete && !$isWeekend() ? $getThemeMode('l_') : 'l_default');
 		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
-		const columns = (_topMode ? ['user',_contentTableShrunk?'sym#':'symbols','bull','user%','real%','start','end'] : ['symbol',_contentTableShrunk?$F('f_empty_cell'):'company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options']);
+		const columns = (_topMode ? ['user','symbols','bull','user%','real%','start','end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options']);
 		if(_assetTypes[0] != stockAssetType) {
 			if($E(_assetTypes[0]))
 				_E.id = stockAssetType;
@@ -1544,11 +1536,7 @@ const $L = {
 			_keyRow = 0;
 		else
 			$onkeydown(null);
-		if($contentTableNeedsShrink()) {
-			_contentTableShrunk = true;
-			$contentTableUpdate(doNotify, doNotResetKeyRow);
-		}
-		else if(doNotify && notifyRows.length > 0)
+		if(doNotify && notifyRows.length > 0)
 			$notify(notifyRows);
 		if(typeof _stageData['highlight']=='number')
 			$historyDropDownToggle(_stageData['highlight']);
