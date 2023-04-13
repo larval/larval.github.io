@@ -696,30 +696,23 @@ const $L = {
 			$contentTableUpdate();
 			return;
 		}
-		else {
-			$getHistoryData = null;
-			let h = json.length;
-			while(--h > 0) {
-				if(json[h]['ts'] == _stageDataHistory[0]['ts'])
-					break;
-			}
-			if(h > 0) {
-				json.length = h;
-				_stageDataHistory = json.concat(_stageDataHistory);
-				if(dropDownMode)
-					$historyDropDown(args['dropDownIndex'])
-				else {
-					_stageDataHistoryIndex = h - 1;
-					$updateStageDataHistory();
-				}
-			}
-			else
-				return;
+		$getHistoryData = null;
+		let h = json.length;
+		while(--h > 0) {
+			if(json[h]['ts'] == _stageDataHistory[0]['ts'])
+				break;
 		}
-		if(dropDownMode)
-			$historyDropDown(args['dropDownIndex']);
-		else
-			$marqueeFlash('Sorry, no additional history is available to rewind to at this time.');
+		if(h > 0) {
+			json.length = h;
+			_stageDataHistory = json.concat(_stageDataHistory);
+			if(dropDownMode)
+				$historyDropDown(args['dropDownIndex']);
+			else {
+				$marqueeFlash('Sorry, no additional history is available to rewind to at this time.');
+				_stageDataHistoryIndex = h - 1;
+				$updateStageDataHistory();
+			}
+		}
 	},
 	getHistoryForSymbol: (sym, ts) => {
 		return _stageDataHistory.filter(stageData => stageData['ts'] <= ts).map(history => {
