@@ -6,8 +6,12 @@ const $L = {
 	_stageData: null,
 	_stageDataSortByColumn: 0,
 	_stageDataLastUpdate: 0,
-	_stageDataHistoryIndex: -1,
 	_stageDataHistory: [],
+	_stageDataHistorySwap: [],
+	_stageDataHistoryFirst: false,
+	_stageDataHistoryIndex: -1,
+	_stageDataHistorySessionId: 0,
+	_stageDataFetching: null,
 	_notifications: [],
 	_notifyTitleInterval: null,
 	_notifyAllowed: null,
@@ -35,7 +39,7 @@ const $L = {
 	_naId: 'l_na',
 	_topMode: false,
 	_topSymbolsToDisplay: 8,
-	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{1,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?([A-Z]{1,4})\/?$/ },
+	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{1,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?symbol\/([A-Z]{1,4})\/?$/ },
 	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
 	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
@@ -117,7 +121,7 @@ const $L = {
 		'l_last_update':_           => $forceNextStagePoll(),
 		'l_marquee_flash':_         => $gotoStageDataHistory(0),
 		'l_marquee_info':_          => $setURLFormat(_.sym, false),
-		'l_marquee_talk':_          => _topMode ? $topSearchFromURL(_.raw, true) : $W.open('https://top.larval.com/'+_.raw, _.raw).focus(),
+		'l_marquee_talk':_          => $topSearchFromURL(_.raw, true),
 		'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`, _extURLOptions),
 		'l_notify_disable':_        => $notifyException(_.raw, true),
 		'l_notify_enable':_         => $notifyException(_.raw, false),
@@ -137,6 +141,7 @@ const $L = {
 		'ArrowLeft':e               => $gotoStageDataHistory(1),
 		'ArrowRight':e              => $gotoStageDataHistory(-1),
 		'Backquote':e               => $editSymbolsOnTop(),
+		'Backslash':(e,ev)          => $animationsToggle(null, ev.shiftKey),
 		'Backspace':e               => $vpmToggle(),
 		'End':e                     => _keyRow = e.parentElement.childElementCount - 1,
 		'Enter':e                   => $onclick(e),
@@ -149,7 +154,7 @@ const $L = {
 		'PageUp':e                  => _keyRow-=_contentTableRowCountThatAreInView,
 		'Slash':e                   => $marqueeHotKeyHelp(),
 		'Space':e                   => $onclick(e),
-		'Tab':(e,ev)                => $animationsToggle(null, ev.shiftKey)
+		'Tab':e                     => $toggleStageMode(e)
 	}, _hotKeyMapIgnore: ['ShiftLeft','ShiftRight'],
 	_enumMap: {
 		'stage': {
@@ -251,9 +256,9 @@ const $L = {
 			}
 		}
 		$D.body.id = $D.body.className = 'l_n';
-		$setStageMode(location.href.match(/top/i) ? 'top' : 'stage');
 		if($E('l_awaiting_data')) _E.innerText = _E.title;
-		_title = document.title = (_topMode?'Larval - Top market players':'Larval - Live market volatility dashboard');
+		$historySetup();
+		$setStageMode(location.href.match(/top/i) ? 'top' : 'stage');
 		$settingsLoad();
 		$notifySetup(false);
 		$keyMapSetup();
@@ -264,7 +269,7 @@ const $L = {
 	onclick: e => {
 		let idx=0, msgIdx=-1, sym='', type=$KSTK, dataRef=null, ref='', refList=Object.keys(_clickMap), el=(e&&e.target?e.target:e);
 		$notifySetup(true);
-		if(!el) return;
+		if(!el || !_stageData) return;
 		for(let next=el; !!next.parentElement; next=next.parentElement) {
 			if(!ref) {
 				for(let c in refList) {
@@ -301,8 +306,7 @@ const $L = {
 			sym += '/message/' + _stageData['items'][idx][$THST][msgIdx][$HMID];
 			ref = 'default';
 		}
-		else if(!ref)
-			return;
+		else if(!ref) return;
 		if($I(_symbolsStatic,sym) >= 0)      { type = $KSTK; sym = _symbolsStatic[_I]; }
 		else if(sym[0] == _char['user'])     { type = $KUSR; sym = sym.substr(1); }
 		else if(sym[0] == _char['etf'])      { type = $KETF; sym = sym.substr(1); }
@@ -313,8 +317,9 @@ const $L = {
 	},
 	onkeydown: e => {
 		$animationsFastSplash();
-		if(!_animationsComplete || !_stageData || (e && (e.ctrlKey || e.altKey)))
+		if(!_animationsComplete||!_stageData||(e&&(e.ctrlKey||e.altKey))||$toggleStageMode(e))
 			return;
+		$contentTableRoll(e.shiftKey);
 		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=_keyRow, match;
 		if(_topMode) {
 			if($I(['Escape','Backspace','Delete'],(match=e&&e.code)?match:'') >= 0 && (!_I||!$topSearchCriteria()))
@@ -372,8 +377,7 @@ const $L = {
 	onkeyup: e => $contentTableRoll(e.shiftKey),
 	onvisibilitychange: e => {
 		_frameData = null;
-		if(!$isVisible())
-			return;
+		if(!$isVisible()) return;
 		$updateTitleWithPrefix('');
 		$notifyRequestWakeLock();
 		while(_notifications.length > 0)
@@ -386,8 +390,7 @@ const $L = {
 		}
 	},
 	onresize: e => {
-		if($isMobile(false))
-			return;
+		if($isMobile(false)) return;
 		$settingsButtonToggle(false);
 		$contentTableUpdateRowCountThatAreInView();
 		$contentTableUpdate();
@@ -418,8 +421,7 @@ const $L = {
 	ontouchend: e => {
 		if($E('l_fixed_highlight') && _E.style.opacity)
 			_E.style.opacity = 0;
-		if(!_swipeStartPosition)
-			return;
+		if(!_swipeStartPosition) return;
 		const swipeMovement = [e.changedTouches[0].clientX-_swipeStartPosition[0], e.changedTouches[0].clientY-_swipeStartPosition[1], e.changedTouches[0].clientY-_swipeStartPosition[2]],
 			width = $W.innerWidth||$D.documentElement.clientWidth||$D.body.clientWidth,
 			height = $W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight,
@@ -432,21 +434,29 @@ const $L = {
 		_swipeStartPosition = null;
 	},
 	onpopstate: e => {
-		if(!e || !e.state)
+		if(!e || !e.state) return;
+		else if(_stageDataHistorySessionId < 0) {
+			if(!e.state.session)
+				_stageDataHistorySessionId = -_stageDataHistorySessionId;
+			else
+				$W.history.back();
 			return;
+		}
+		else if(typeof(e.state.toggle) == 'boolean')
+			$toggleStageMode(e.state.toggle);
 		else if(_topMode)
 			$parseStageData(e.state, {'fromPopState':true,'updateView':true});
 		else if(typeof(e.state.fixed) == 'number') {
-			console.log(e.state);
 			$W.history.go(e.state.fixed);
 			$gotoStageDataHistory(e.state.fixed);
 		}
+		else if(typeof(e.state.fixed) != 'undefined')
+			$W.history.replaceState(e.state, null, '/');
 	},
 
 	/* [$] FUNCTIONS */
 	animationsComplete: fastSplash => {
-		if(_animationsComplete)
-			return;
+		if(_animationsComplete) return;
 		_animationsComplete = true;
 		if(!fastSplash && $E(_naId))
 			_E.className = _naId;
@@ -468,8 +478,7 @@ const $L = {
 			$animationsToggle(false, null);
 	},
 	animationsFastSplash: () => {
-		if(_animationsComplete || !_stageData)
-			return;
+		if(_animationsComplete || !_stageData) return;
 		$animationsReset('l_logo', 'l_logo 0.5s ease 1 normal 0.5s forwards');
 		$animationsReset('l_fixed', 'l_fixed 0.5s ease 1 normal forwards');
 		$animationsReset('l_marquee_container', 'l_marquee_container 0.5s ease forwards');
@@ -477,8 +486,7 @@ const $L = {
 		$animationsUpdateFlash();
 	},
 	animationsUpdateFlash: nextPollMS => {
-		if(!_animationsComplete || !$T('path'))
-			return;
+		if(!_animationsComplete || !$T('path')) return;
 		for(let t=0,i=0; t < _T.length; t++) {
 			const path=_T[t], animate=path.lastElementChild, flashable=path.classList.contains('l_logo_worm_flashable');
 			if(animate.getAttribute('begin')) {
@@ -537,7 +545,7 @@ const $L = {
 			$W.requestAnimationFrame($animationsDisableIfUnderFPS);
 		else if(_frameData.duration > 0 && (_frameData.frames/_frameData.duration) < _frameData.fps) {
 			$animationsToggle(false, null);
-			$marqueeFlash('Slow graphics detected, disabling most animations.  Use the <i>tab</i> key to re-enable.');
+			$marqueeFlash('Slow graphics detected, disabling most animations.  Use the <i>backslash</i> key to re-enable.');
 			$removeFunction('animationsDisableIfUnderFPS');
 		}
 		else if(--_frameData.attempt > 0) {
@@ -568,7 +576,7 @@ const $L = {
 		return(next);
 	},
 	vpmToggle: () => {
-		if(_settings['l_vpm'] === null && !confirm('Toggle from "volume per day" to the average "volume per minute" (VPM)?'))
+		if(!_stageData || (_settings['l_vpm'] === null && !confirm('Toggle from "volume per day" to the average "volume per minute" (VPM)?')))
 			return;
 		$settings('l_vpm', !_settings['l_vpm']);
 		_stageData = $vpmStageData(_stageData);
@@ -577,7 +585,7 @@ const $L = {
 	},
 	vpmStageData: stageData => {
 		const vpm=_settings['l_vpm'];
-		if(!(stageData['vpm'] ^ vpm))
+		if(!stageData || !(stageData['vpm'] ^ vpm))
 			return(stageData);
 		let stageTime=new Date(stageData['ts']*1000), minutesSinceOpen=0, minutesInADay=1440, args;
 		if(!stageData['afterhours'])
@@ -605,10 +613,10 @@ const $L = {
 		return(stageData);
 	},
 	getData: (jsonFile, jsonCallback, args) => {
-		fetch(_stageURL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:''))
+		fetch(_stageDataFetching=(_stageURL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
 		.then(resp => resp.json())
-		.then(json => jsonCallback(json, args))
-		.catch(err => jsonCallback(null, args));
+		.then(json => (_stageDataFetching=null) || jsonCallback(json, args))
+		.catch(err => (_stageDataFetching=null) || jsonCallback(null, args));
 	},
 	setStageData: stageData => { 
 		_stageData = $vpmStageData(stageData);
@@ -627,7 +635,7 @@ const $L = {
 			if(_topMode && json['search'])
 				json['items'].forEach((r,i) => json['items'][i][$TSYM] = $historyToSummaryString(json['items'][i][$THST]));
 			if(!args || !args['fromPopState'])
-				$historyPush(json);
+				$historyPushWithPath(json);
 			$setStageData(json);
 			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=_stageData['ts']);
 			if(!$hasSettings() && _stageDataHistory.length==0) {
@@ -663,11 +671,11 @@ const $L = {
 			if(json['search'])
 				$updateStageDataHistory(_stageDataHistoryIndex=-2);
 			if($topSearchCriteria()) $animationsFastSplash();
-			else if($getHistoryData && !(args&&args['fromPopState'])) $getHistoryData();
+			else if(!args || !args['fromPopState']) $getHistoryData();
 		}
 		else {
 			if(_stageDataHistory.length==1 && $W.history && $W.history.pushState) {
-				[1,null,-1].forEach(state => $W.history.pushState({'fixed':state},''));
+				[1,null,-1].forEach(state => $historyPush({'fixed':state}));
 				$W.history.go(-1);
 			}
 			$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
@@ -676,12 +684,10 @@ const $L = {
 	getHistoryData: args => (_stageDataHistoryIndex>-1||--_stageDataHistoryIndex<-1) ? $getData(`/${_stageMode}-history.json`, $parseHistoryData, args) : null,
 	parseHistoryData: (json, args) => {
 		const dropDownMode=(args&&typeof args['dropDownIndex']!='undefined');
-		if(!json || json.length < 2)
-			return;
+		if(!json || json.length < 2) return;
 		else if(_topMode) {
 			_stageData['items'].forEach((row, i) => {
-				if(!json['items'][row[0]])
-					return;
+				if(!json['items'][row[0]]) return;
 				_stageData['items'][i][$TSYM] = $historyToSummaryString(json['items'][row[0]]);
 				_stageData['items'][i].push(json['items'][row[0]]);
 			});
@@ -689,14 +695,14 @@ const $L = {
 				_stageData['search'] = '';
 				_stageData['path'] = '/';
 				_stageDataHistory[0] = $cloneObject(_stageData);
-				$historyPush(_stageDataHistory[0]);
+				$historyPushWithPath(_stageDataHistory[0]);
 			}
 			if(dropDownMode)
 				$historyDropDown(args['dropDownIndex'])
 			$contentTableUpdate();
 			return;
 		}
-		$getHistoryData = null;
+		_stageDataHistoryFirst = true;
 		let h = json.length;
 		while(--h > 0) {
 			if(json[h]['ts'] == _stageDataHistory[0]['ts'])
@@ -732,13 +738,27 @@ const $L = {
 		}
 		return('[<u>'+('0'+history.length).slice(-2)+'</u>] '+symbols.slice(0,_topSymbolsToDisplay).join(', '));
 	},
-	historyPush: obj => ($W.history&&$W.history.pushState&&typeof(obj)=='object'&&obj['path']) ? $W.history.pushState(obj,'',obj['path']) : null,
-	historyDropDownToggle: idx => ($getHistoryData&&!_topMode&&_stageDataHistoryIndex>=-1) ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
+	historySetup: () => {
+		if(_stageDataHistorySessionId) return;
+		$historyPush({'root':true});
+		_stageDataHistorySessionId = Date.now();
+	},
+	historyReset: () => {
+		if(_stageDataHistorySessionId < 0 || $W.history.state.root) return;
+		_stageDataHistorySessionId = -_stageDataHistorySessionId;
+		$W.history.back();
+	},
+	historyPush: obj => {
+		if(typeof(obj)!='object' || !$W['history'] || !$W['history']['pushState']) return;
+		obj['session'] = _stageDataHistorySessionId;
+		$W.history.pushState(obj, _title, obj['path']?obj['path']:'');
+	},
+	historyPushWithPath: obj => obj['path'] ? $historyPush(obj) : null,
+	historyDropDownToggle: idx => (!_stageDataHistoryFirst&&!_topMode&&_stageDataHistoryIndex>=-1) ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
 	historyDropDown: idx => {
 		const types=_topMode?[$TSYM,$TRAT,$TPCT,$TPCR,$TSTR,$TEND]:[$PCT5,$PCT,$PRC,$VOL,$AGE];
 		let stageRow=_stageData['items'][idx], stageDataForSymbols=(_topMode?stageRow[$THST]:$getHistoryForSymbol(stageRow[$SYM],_stageData['ts'])), hadHistoryDisplays=[];
-		if(!stageDataForSymbols)
-			return;
+		if(!stageDataForSymbols) return;
 		if($A('.l_history_active'))
 			hadHistoryDisplays = Array.from(_A).map(e => e.remove() || e.id);
 		if($A('.l_history'))
@@ -768,8 +788,7 @@ const $L = {
 	},
 	gotoStageDataHistory: direction => {
 		const lastIndex=_stageDataHistoryIndex;
-		if(_topMode) return(false);
-		else if(!direction) {
+		if(!direction) {
 			_keyRow = 0;
 			if(_stageDataHistoryIndex >= 0)
 				_stageDataHistoryIndex = -1;
@@ -784,7 +803,7 @@ const $L = {
 		}
 		else if(direction > 0) {
 			if(_stageDataHistoryIndex >= -1 && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
-				if($getHistoryData) {
+				if(!_stageDataHistoryFirst) {
 					$marqueeFlash('Attempting to gather recent history from the server...');
 					$getHistoryData();
 				}
@@ -808,13 +827,12 @@ const $L = {
 		const stageData=$cloneObject(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
 		$setStageData(stageData);
 		$sortStageData(true);
+		if(quiet || !_stageData) return;
 		const minutesAgo=Math.round(($epochNow()-_stageData['ts'])/60,0);
-		if(quiet)
-			return;
-		else if(historyIndex == historyTotal)
+		if(historyIndex == historyTotal)
 			$marqueeFlash('All caught up, exiting history mode...', true);
 		else
-			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${$getHistoryData?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
+			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${!_stageDataHistoryFirst?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
 	},
 	setNextStagePoll: (seconds, marqueeInitiate) => {
 		if(_animationsComplete)
@@ -864,7 +882,7 @@ const $L = {
 	removeFunction: fn => $W['$'+fn] = $L[fn] = () => {},
 	forceRedraw: el => el && (el.style.transform='translateZ(0)') && void el.offsetHeight,
 	setTheme: name => (_theme!=name && _themes[name] && _themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color))),
-	getThemeMode: prefix => (prefix?prefix:'') + (['afterhours','bloodbath','top'].find(key => _stageData[key]) || 'default'),
+	getThemeMode: prefix => _stageData ? ((prefix?prefix:'') + (['afterhours','bloodbath','top'].find(key => _stageData[key]) || 'default')) : null,
 	setThemeRandom: message => {
 		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
 		$setTheme('random');
@@ -872,8 +890,39 @@ const $L = {
 	},
 	setStageMode: set => {
 		_topMode = (set=='top');
+		_title = document.title = (_topMode?'Larval - Top market players':'Larval - Live market volatility dashboard');
 		_dataMap = $W[`_${_stageMode=set}DataMap`];
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^_topMode?'remove':'add'](cn));
+	},
+	toggleStageMode: e => {
+		const explicit=(typeof(e)=='boolean'), topUrl=(e&&typeof(e)=='string'?e:null), stageDataHistory=_stageDataHistory;
+		if(!explicit && !topUrl && (!e||!e.code||e.code!='Tab'||_stageDataFetching))
+			return(!_animationsComplete || !_stageData);
+		if(e.preventDefault)
+			e.preventDefault();
+		if(topUrl)
+			$historyPush({'toggle':false, 'path':'/'});
+		[_marqueeInterval, _notifyTitleInterval].forEach(i => i&&clearInterval(i));
+		[_marqueeFlashTimeout, _nextStagePollTimeout].forEach(t => t&&clearTimeout(t));
+		_stageDataHistory = _stageDataHistorySwap;
+		_stageDataHistorySwap = stageDataHistory;
+		$settingsButtonToggle(false);
+		$setStageMode(_topMode ? 'stage' : 'top');
+		$settingsButtonTextToggle(false);
+		if(_stageDataHistory.length > 0)
+			$setStageData(_stageDataHistory[0]);
+		if(!_topMode || !_stageDataHistory.length)
+			$getStageData(true);
+		if(topUrl)
+			$settingsButtonToggle(true);
+		else
+			$contentTableUpdate();
+		$gotoStageDataHistory(_stageDataHistoryIndex=0);
+		$marqueeFlash(`Toggling site mode to: <i>${_topMode?'Top market players':'Volatility'}</i>`);
+		$scrollToTop();
+		if(!explicit)
+			$historyPush({'toggle':_topMode, 'path':topUrl?topUrl:'/'});
+		return(true);
 	},
 	settingsTabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
 	settingsTabSelect: el => {
@@ -888,13 +937,14 @@ const $L = {
 		$settingsTabUpdateUI();
 	},
 	settingsAreOpen: () => $E('l_control').offsetHeight > 10,
+	settingsButtonTextToggle: closed => $E('l_settings_button').innerHTML = (closed?`&#9660; ${_topMode?'search':'settings'} &#9660;`:`&#9650; ${_topMode?'search':'settings'} &#9650;`),
 	settingsButtonToggle: forceDirection => {
 		if(!_stageData) return; 
-		const modeText=(_topMode?'search':'settings'), controlHeight=($E('l_control').scrollHeight>(_topMode?80:200)?$E('l_control_table').scrollHeight:(_topMode?80:250))+'px', closed=($E('l_control').style.height!=controlHeight);
+		const controlHeight=($E('l_control').scrollHeight>(_topMode?80:200)?$E('l_control_table').scrollHeight:(_topMode?80:250))+'px', closed=($E('l_control').style.height!=controlHeight);
 		if(typeof forceDirection=='boolean' && forceDirection!==closed)
 			return(false);
+		$settingsButtonTextToggle(closed);
 		$E('l_control').style.height = (closed?controlHeight:'0px');
-		$E('l_settings_button').innerHTML = (closed?`&#9660; ${modeText} &#9660;`:`&#9650; ${modeText} &#9650;`);
 		return(true);
 	},
 	settingsChange: e => { 
@@ -977,8 +1027,7 @@ const $L = {
 		else if(typeof idOrEvent == 'object' && idOrEvent.target && idOrEvent.target.id)
 			id = idOrEvent.target.id;
 		const input=$E(id), display=$E(`${id}_display`);
-		if(!input || !display)
-			return;
+		if(!input || !display) return;
 		if(id == 'l_range_volume') {
 			if(!(input.disabled=typeof _settingsSelectedTab['l_range_volume']!='number'))
 				display.innerHTML = (_settings['l_vpm'] ? $multiplierExplicit(input.value*_multipliers[_settingsSelectedTab['multiplier']] / _settingsSelectedTab['vpm_shift'],'K',_settingsSelectedTab['vpm_precision']) : ((input.value / _settingsSelectedTab['volume_shift']).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['volume_shift']))) + _settingsSelectedTab['multiplier']));
@@ -1094,11 +1143,10 @@ const $L = {
 	marqueeIntervalReset: () => {
 		if(_marqueeInterval)
 			clearInterval(_marqueeInterval);
-		else if(!_topMode)
-			_marqueeInterval = setInterval($marqueeUpdate, $marqueeLengthToSeconds(true));
+		_marqueeInterval = setInterval($marqueeUpdate, $marqueeLengthToSeconds(true));
 	},
 	marqueeHotKeyHelp: () => {
-		let key, match, html=`${$F('f_marquee_blink')} The following hotkeys and gestures are available: ${_F} Use the <i class="l_marquee_alt">tab</i> key to alternate animation modes. ${_F} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_F} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_F} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
+		let key, match, html=`${$F('f_marquee_blink')} The following hotkeys and gestures are available: ${_F} Use the <i class="l_marquee_alt">tab</i> key to toggle the site mode. ${_F} Use the <i class="l_marquee_alt">backslash</i> key to alternate animation modes. ${_F} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_F} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_F} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in _keyMap) {
 			if((match=_keyMap[key][$KSTK].match(/([a-z]+)\.[a-z]+\//i)))
 				html += `<div class="l_marquee_info" data-ref="${key}"><i class='l_marquee_alt_padded'>${key}</i>${$H(match[1])}</div> `
@@ -1110,8 +1158,7 @@ const $L = {
 	},
 	notify: notifyRows => {
 		$notifyClear();
-		if(_stageDataHistory.length < 2)
-			return;
+		if(_stageDataHistory.length < 2) return;
 		if(!$isVisible() && typeof Notification != 'undefined' && Notification.permission == 'granted') {
 			_notifications.push(new Notification('Larval - Market volatility found!', {
 				icon: '/icon-192x192.png',
@@ -1227,8 +1274,7 @@ const $L = {
 		return(keyMap[type].replace('@', symbol));
 	},
 	setURLFormat: (key, saveSettings) => {
-		if(!_keyMap[key])
-			return;
+		if(!_keyMap[key]) return;
 		_keyMapIndex = key;
 		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain&&domain.hostname?domain.hostname:url);
 		if(saveSettings) {
@@ -1242,8 +1288,7 @@ const $L = {
 	topSearchCriteria: set => typeof set=='string' ? ($E('l_top_search').value=set) : $E('l_top_search').value,
 	topSearchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $topSearchRun(),
 	topSearchRun: value => {
-		if($E('l_top_search').disabled)
-			return;
+		if($E('l_top_search').disabled) return;
 		if(typeof value=='string')
 			_E.value = value;
 		if(!_E.value && _stageDataHistory.length && _stageDataHistory[0]['items'].length>0) {
@@ -1257,13 +1302,19 @@ const $L = {
 			$forceNextStagePoll(true);
 		}
 	},
-	topSearchFromURL: (string, run) => {
+	topSearchFromURL: (str, run) => {
 		let args=[];
-		Object.entries(_topURLMap).find(kv => $M(kv[1],string) ? kv[0].split('').forEach((c,i) => args.push(c+_M[i+1])) : null);
-		if(args.length > 0)
-			$E('l_top_search').value = args.join(' ');
-		if(run)
-			$topSearchRun();
+		Object.entries(_topURLMap).find(kv => $M(kv[1],str) ? kv[0].split('').forEach((c,i) => args.push(c+_M[i+1])) : null);
+		if($E('l_top_search') && args.length > 0)
+			_E.value = args.join(' ');
+		if(run) {
+			if(!_topMode) {
+				$historyReset();
+				setTimeout(()=>$toggleStageMode(str), 100);
+			}
+			else
+				$topSearchRun();
+		}
 	},
 	editSymbolsOnTop: () => {
 		let symbols=_settings['l_symbols_on_top'];
@@ -1284,6 +1335,7 @@ const $L = {
 		return(_symbolsOnTop);
 	},
 	setSymbolsOnTop: (symbols, removeOrToggle, updateView) => {
+		if(_topMode) return;
 		const remove=(removeOrToggle===true), toggle=(removeOrToggle===null);
 		let msg='', orderedTopListStr='', orderedTopList, savedSymbols, onTopDiff=$U(Object.values(_symbolsOnTop)).length;
 		if(!symbols && remove)
@@ -1293,8 +1345,7 @@ const $L = {
 		orderedTopList = $U(Object.values(_symbolsOnTop)).sort((a, b) => a.localeCompare(b));
 		orderedTopListStr = orderedTopList.join(', ').trim(', ');
 		$settings('l_symbols_on_top', orderedTopListStr);
-		if(!updateView)
-			return;
+		if(!updateView) return;
 		onTopDiff -= orderedTopList.length;
 		if(!orderedTopListStr)
 			msg = 'Your on top list is empty, alt-click a row below to add a symbol.';
@@ -1387,7 +1438,7 @@ const $L = {
 	isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
 	isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
 	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
-	contentTableRoll: roll => !_topMode ? $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display') : null,
+	contentTableRoll: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
 	contentTableRowPopout: row => {
 		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
 			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:_keyMapIndexDefault), `&#128200;&nbsp;${_taMap[row[$TAN]][1]}`]);
