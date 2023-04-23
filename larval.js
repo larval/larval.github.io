@@ -10,6 +10,7 @@ const $L = {
 	_stageDataHistorySwap: [],
 	_stageDataHistoryFirst: false,
 	_stageDataHistoryIndex: -1,
+	_stageDataHistoryNext: '',
 	_stageDataHistorySessionId: 0,
 	_stageDataFetching: null,
 	_notifications: [],
@@ -114,6 +115,7 @@ const $L = {
 		}
 	},
 	_clickMap: {
+		'l_alt_link':_				=> $toggleStageMode(_topMode),
 		'l_content_table_header':_  => $setSortStageData(_.idx),
 		'l_fixed':_                 => $broadBehaviorToggle(_topMode),
 		'l_history_toggle':_        => $historyDropDownToggle(_.idx),
@@ -224,6 +226,7 @@ const $L = {
 	T: tagName => (_T = $D.getElementsByTagName(tagName)), _T: null,
 	U: array => array.filter((x,i,a) => array.indexOf(x)==i),
 	W: window,
+	X: obj => Array.isArray(obj) ? obj.filter(Boolean) : JSON.parse(JSON.stringify(obj,(k,v)=>v?v:undefined)),
 
 	/* [$] EVENTS (window|document) */
 	LOAD: e => {
@@ -434,18 +437,30 @@ const $L = {
 		_swipeStartPosition = null;
 	},
 	onpopstate: e => {
-		if(!e || !e.state) return;
-		else if(_stageDataHistorySessionId < 0) {
-			if(!e.state.session)
+		if(!e || !e.state) {
+			if(!_topMode)
+				$gotoStageDataHistory(1);
+			return;
+		}
+		if(_stageDataHistorySessionId < 0) {
+			if(!e.state.session || e.state.root) {
+				if(_stageDataHistoryNext) {
+					$toggleStageMode(_stageDataHistoryNext);
+					_stageDataHistoryNext = '';
+				}
 				_stageDataHistorySessionId = -_stageDataHistorySessionId;
+			}
 			else
 				$W.history.back();
 			return;
 		}
-		else if(typeof(e.state.toggle) == 'boolean')
-			$toggleStageMode(e.state.toggle);
-		else if(_topMode)
+		else if(_topMode && e.state.items)
 			$parseStageData(e.state, {'fromPopState':true,'updateView':true});
+
+		else if(typeof(e.state.toggle) == 'boolean' || e.state.root)
+			$toggleStageMode(e.state.root || e.state.toggle);
+		else if(_topMode === (typeof(e.state.fixed) != 'undefined'))
+			$toggleStageMode(_topMode);
 		else if(typeof(e.state.fixed) == 'number') {
 			$W.history.go(e.state.fixed);
 			$gotoStageDataHistory(e.state.fixed);
@@ -624,7 +639,7 @@ const $L = {
 		if($setTheme($getThemeMode()) !== false && $Q('meta[name="theme-color"]'))
 			_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
 	},
-	getStageData: updateView => $getData(`/${_stageMode}.json`, $parseStageData, {'updateView':updateView,'search':$topSearchCriteria()}),
+	getStageData: updateView => $getData(`/${_stageMode}.json`, $parseStageData, $X({'updateView':updateView,'search':_topMode?$topSearchCriteria():''})),
 	parseStageData: (json, args) => {
 		let retry=false;
 		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
@@ -666,8 +681,11 @@ const $L = {
 				_stageDataHistory[0] = $cloneObject(_stageData);
 			}
 			$E('l_top_search').disabled = false;
-			if(typeof json['search'] == 'string')
+			if(typeof json['search'] == 'string') {
 				_E.value = json['search'];
+				if(json['search'])
+					$settingsButtonToggle(true);
+			}
 			if(json['search'])
 				$updateStageDataHistory(_stageDataHistoryIndex=-2);
 			if($topSearchCriteria()) $animationsFastSplash();
@@ -743,10 +761,13 @@ const $L = {
 		$historyPush({'root':true});
 		_stageDataHistorySessionId = Date.now();
 	},
-	historyReset: () => {
-		if(_stageDataHistorySessionId < 0 || $W.history.state.root) return;
+	historyReset: str => {
+		if(str) str = _stageDataHistoryNext;
+		if(_stageDataHistorySessionId < 0 || $W.history.state.root)
+			return(false);
 		_stageDataHistorySessionId = -_stageDataHistorySessionId;
 		$W.history.back();
+		return(true);
 	},
 	historyPush: obj => {
 		if(typeof(obj)!='object' || !$W['history'] || !$W['history']['pushState']) return;
@@ -756,8 +777,8 @@ const $L = {
 	historyPushWithPath: obj => obj['path'] ? $historyPush(obj) : null,
 	historyDropDownToggle: idx => (!_stageDataHistoryFirst&&!_topMode&&_stageDataHistoryIndex>=-1) ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
 	historyDropDown: idx => {
-		const types=_topMode?[$TSYM,$TRAT,$TPCT,$TPCR,$TSTR,$TEND]:[$PCT5,$PCT,$PRC,$VOL,$AGE];
-		let stageRow=_stageData['items'][idx], stageDataForSymbols=(_topMode?stageRow[$THST]:$getHistoryForSymbol(stageRow[$SYM],_stageData['ts'])), hadHistoryDisplays=[];
+		const types=(_topMode?[$TSYM,$TRAT,$TPCT,$TPCR,$TSTR,$TEND]:[$PCT5,$PCT,$PRC,$VOL,$AGE]), stageRow=(_stageData&&_stageData['items']&&_stageData['items'][idx]?_stageData['items'][idx]:null);
+		let stageDataForSymbols=(_topMode?stageRow[$THST]:$getHistoryForSymbol(stageRow[$SYM],_stageData['ts'])), hadHistoryDisplays=[];
 		if(!stageDataForSymbols) return;
 		if($A('.l_history_active'))
 			hadHistoryDisplays = Array.from(_A).map(e => e.remove() || e.id);
@@ -802,12 +823,9 @@ const $L = {
 				_stageDataHistoryIndex++;
 		}
 		else if(direction > 0) {
-			if(_stageDataHistoryIndex >= -1 && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
-				if(!_stageDataHistoryFirst) {
-					$marqueeFlash('Attempting to gather recent history from the server...');
-					$getHistoryData();
-				}
-				return(false);
+			if(!_stageDataHistoryFirst && _stageDataHistoryIndex >= -1 && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
+				$marqueeFlash('Attempting to gather recent history from the server...');
+				$getHistoryData();
 			}
 			else if(_stageDataHistoryIndex < 0)
 				_stageDataHistoryIndex = _stageDataHistory.length - 2;
@@ -895,7 +913,7 @@ const $L = {
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^_topMode?'remove':'add'](cn));
 	},
 	toggleStageMode: e => {
-		const explicit=(typeof(e)=='boolean'), topUrl=(e&&typeof(e)=='string'?e:null), stageDataHistory=_stageDataHistory;
+		const explicit=(typeof(e)=='boolean'), topUrl=(e&&typeof(e)=='string'?e:''), stageDataHistory=_stageDataHistory;
 		if(!explicit && !topUrl && (!e||!e.code||e.code!='Tab'||_stageDataFetching))
 			return(!_animationsComplete || !_stageData);
 		if(e.preventDefault)
@@ -913,8 +931,10 @@ const $L = {
 			$setStageData(_stageDataHistory[0]);
 		if(!_topMode || !_stageDataHistory.length)
 			$getStageData(true);
-		if(topUrl)
-			$settingsButtonToggle(true);
+		else if(topUrl)
+			$topSearchFromURL(topUrl, true);
+		else if(explicit === false)
+			$topSearchRun('');
 		else
 			$contentTableUpdate();
 		$gotoStageDataHistory(_stageDataHistoryIndex=0);
@@ -927,7 +947,7 @@ const $L = {
 	settingsTabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
 	settingsTabSelect: el => {
 		const id=(el?el.id:_settingsSelectedTabName);
-		if(!id) return;
+		if(!id || _topMode) return;
 		if($E(_settingsSelectedTabName))
 			_E.classList.remove('l_tab_selected');
 		if($E(id))
@@ -1078,7 +1098,7 @@ const $L = {
 				itemHtml += `${item[1]<0?'&#9660;':'&#9650;'} ${Math.abs(item[1]).toFixed(2)}%</div> `;
 			}
 			else if(item.length > 1 && typeof item[1]=='string') {
-				topType = 'talk';
+				topType = 'continue';
 				itemHtml = `<div class="l_marquee_talk" data-ref="${item[0]}"><i class='l_marquee_alt_padded_right_talk'>@${item[0].replace(/[^A-Z0-9_].+/i,'')}</i> `;
 				if(item.length > 2)
 					itemHtml += `<div class="l_marquee_highlight_talk" data-ref="${item[0]}"> &#10094; <i>${$H(item[2])}</i> &#10095; &#10140;</div> `;
@@ -1099,8 +1119,8 @@ const $L = {
 				continue;
 			if(itemHtml)
 				html += (i&&(_topMode||lastTopType!=topType)?_F:'') + itemHtml;
-			if(topType == 'break')
-				break;
+			if(topType == 'continue') continue;
+			if(topType == 'break') break;
 			lastTopType = topType;
 		}
 		$marqueeInitiate(html);
@@ -1307,14 +1327,11 @@ const $L = {
 		Object.entries(_topURLMap).find(kv => $M(kv[1],str) ? kv[0].split('').forEach((c,i) => args.push(c+_M[i+1])) : null);
 		if($E('l_top_search') && args.length > 0)
 			_E.value = args.join(' ');
-		if(run) {
-			if(!_topMode) {
-				$historyReset();
-				setTimeout(()=>$toggleStageMode(str), 100);
-			}
-			else
-				$topSearchRun();
-		}
+		if(!run) return;
+		else if(!_topMode && $historyReset(str))
+			$toggleStageMode(str);
+		else
+			$topSearchRun();
 	},
 	editSymbolsOnTop: () => {
 		let symbols=_settings['l_symbols_on_top'];

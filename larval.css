@@ -247,12 +247,14 @@ i { font-style: normal !important; }
 	right: 0;
 	transform: rotate(180deg);
 }
-#l_afterhours_left span, #l_afterhours_right span { display: inline; }
+#l_afterhours_left span, #l_afterhours_right span { display: block; }
 #l_afterhours_left i, #l_afterhours_right i { display: none; }
-.l_bloodbath #l_afterhours_left span, .l_bloodbath #l_afterhours_right span { display: none !important; }
-.l_bloodbath #l_afterhours_left i, .l_bloodbath #l_afterhours_right i { display: inline !important; }
+#l_afterhours_left u, #l_afterhours_right u { display: none; text-decoration: none; }
+.l_bloodbath #l_afterhours_left i, .l_bloodbath #l_afterhours_right i, .l_top_only #l_afterhours_left u, .l_top_only #l_afterhours_right u { display: block !important; }
 .l_bloodbath #l_afterhours_left, .l_bloodbath #l_afterhours_right, .l_afterhours #l_afterhours_left, .l_afterhours #l_afterhours_right { display: block !important; }
-.l_default #l_afterhours_left, .l_default #l_afterhours_right { display: none !important; }
+.l_bloodbath #l_afterhours_left span, .l_bloodbath #l_afterhours_right span, .l_top_only #l_afterhours_left span, .l_top_only #l_afterhours_right span { display: none !important; }
+.l_default #l_afterhours_left, .l_default #l_afterhours_right { display: block !important; }
+.l_top_only.l_animations_complete #l_afterhours_left, .l_top_only.l_animations_complete #l_afterhours_right { display: block !important; }
 #l_logo {
 	position: relative;
 	z-index: 3;
@@ -645,7 +647,7 @@ i { font-style: normal !important; }
 	width: 100% !important;
 	margin: 0 !important;
 }
-.l_top_only #l_progress_cap_right, .l_top_only #l_progress_cap_left, .l_top_only #l_stage_alt_link, .l_stage_only #l_top_alt_link , .l_top_only #l_stage_about, .l_stage_only #l_top_about, .l_top_only  #l_logo_stage, .l_stage_only  #l_logo_top, .l_stage_only #l_control_table tr.l_top_row, .l_top_only #l_control_table tr.l_stage_row  {
+.l_top_only #l_progress_cap_right, .l_top_only #l_progress_cap_left, .l_top_only #l_stage_about, .l_stage_only #l_top_about, .l_top_only  #l_logo_stage, .l_stage_only  #l_logo_top, .l_stage_only #l_control_table tr.l_top_row, .l_top_only #l_control_table tr.l_stage_row  {
 	display: none;
 }
 .l_top_only #l_content_table tr td:nth-child(3) .l_history_active, .l_top_only #l_content_table tr td:nth-child(2) .l_history_active {
@@ -907,7 +909,12 @@ input[type="checkbox"] {
 #l_footer a:hover {
 	color: var(--l-color-0) !important;
 }
+#l_alt_link { cursor: pointer; }
+#l_alt_link u, #l_alt_link i { text-decoration: none; display: none; }
+.l_top_only #l_alt_link u { display: inline; }
+.l_stage_only #l_alt_link i { display: inline; }
 #l_last_update {
+	cursor: pointer;
 	font-size: 14px;
 }
 .l_scrolled {
