@@ -414,7 +414,7 @@ const $L = {
 	ontouchstart: e => { _swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY, -1]; },
 	ontouchmove: e => {
 		const height=$W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight, yDiff=e.changedTouches[0].clientY-_swipeStartPosition[2];
-		if($W.pageYOffset || !_animationsComplete || !_swipeStartPosition || height < 1)
+		if($W.pageYOffset || !_animationsComplete || !_swipeStartPosition || _topMode || height < 1)
 			return;
 		else if(_swipeStartPosition[2] < 0)
 			_swipeStartPosition[2] = e.changedTouches[0].clientY;
@@ -424,7 +424,7 @@ const $L = {
 	ontouchend: e => {
 		if($E('l_fixed_highlight') && _E.style.opacity)
 			_E.style.opacity = 0;
-		if(!_swipeStartPosition) return;
+		if(!_swipeStartPosition || _topMode) return;
 		const swipeMovement = [e.changedTouches[0].clientX-_swipeStartPosition[0], e.changedTouches[0].clientY-_swipeStartPosition[1], e.changedTouches[0].clientY-_swipeStartPosition[2]],
 			width = $W.innerWidth||$D.documentElement.clientWidth||$D.body.clientWidth,
 			height = $W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight,
@@ -913,7 +913,7 @@ const $L = {
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^_topMode?'remove':'add'](cn));
 	},
 	toggleStageMode: e => {
-		const explicit=(typeof(e)=='boolean'), topUrl=(e&&typeof(e)=='string'?e:''), stageDataHistory=_stageDataHistory;
+		const explicit=(typeof(e)=='boolean'), topUrl=(e&&typeof(e)=='string'?e:'');
 		if(!explicit && !topUrl && (!e||!e.code||e.code!='Tab'||_stageDataFetching))
 			return(!_animationsComplete || !_stageData);
 		if(e.preventDefault)
@@ -922,8 +922,7 @@ const $L = {
 			$historyPush({'toggle':false, 'path':'/'});
 		[_marqueeInterval, _notifyTitleInterval].forEach(i => i&&clearInterval(i));
 		[_marqueeFlashTimeout, _nextStagePollTimeout].forEach(t => t&&clearTimeout(t));
-		_stageDataHistory = _stageDataHistorySwap;
-		_stageDataHistorySwap = stageDataHistory;
+		[_stageDataHistory, _stageDataHistorySwap] = [_stageDataHistorySwap, _stageDataHistory];
 		$settingsButtonToggle(false);
 		$setStageMode(_topMode ? 'stage' : 'top');
 		$settingsButtonTextToggle(false);
@@ -1153,7 +1152,7 @@ const $L = {
 			$scrollToTop();
 			$marqueeIntervalReset();
 			_marqueeFlashTimeout = setTimeout($marqueeFlash, duration?duration:5000);
-			$animationsReset('l_marquee_flash', 'l_marquee_fade_in 1s ease forwards');
+			$animationsReset('l_marquee_flash', 'l_fade_in 1s ease forwards');
 		}
 		else {
 			$E('l_marquee_container').classList.remove('l_na_marquee_container_override');

@@ -70,10 +70,6 @@
 	0% { transform: translateX(var(--l-marquee-start)); }
 	100% { transform: translateX(var(--l-marquee-end)); }
 }
-@keyframes l_marquee_fade_in {
-	from { filter: blur(4px); }
-	to { filter: blur(0); }
-}
 @keyframes l_content_fade_in {
 	from { color: transparent; }
 	to { color: inherit; }
@@ -240,21 +236,17 @@ i { font-style: normal !important; }
 	animation: l_afterhours 2s ease-in-out alternate infinite; 
 	z-index: 0;
 }
-#l_afterhours_left {
-	left: 0;
-}
-#l_afterhours_right {
-	right: 0;
-	transform: rotate(180deg);
-}
+#l_afterhours_left { left: 0; }
+#l_afterhours_right { right: 0; transform: rotate(180deg); }
 #l_afterhours_left span, #l_afterhours_right span { display: block; }
 #l_afterhours_left i, #l_afterhours_right i { display: none; }
 #l_afterhours_left u, #l_afterhours_right u { display: none; text-decoration: none; }
 .l_bloodbath #l_afterhours_left i, .l_bloodbath #l_afterhours_right i, .l_top_only #l_afterhours_left u, .l_top_only #l_afterhours_right u { display: block !important; }
 .l_bloodbath #l_afterhours_left, .l_bloodbath #l_afterhours_right, .l_afterhours #l_afterhours_left, .l_afterhours #l_afterhours_right { display: block !important; }
 .l_bloodbath #l_afterhours_left span, .l_bloodbath #l_afterhours_right span, .l_top_only #l_afterhours_left span, .l_top_only #l_afterhours_right span { display: none !important; }
-.l_default #l_afterhours_left, .l_default #l_afterhours_right { display: block !important; }
 .l_top_only.l_animations_complete #l_afterhours_left, .l_top_only.l_animations_complete #l_afterhours_right { display: block !important; }
+.l_animations_complete #l_afterhours_left, .l_animations_complete #l_afterhours_right { display: block !important; }
+.l_default #l_afterhours_left, .l_default #l_afterhours_right { display: none !important; }
 #l_logo {
 	position: relative;
 	z-index: 3;
@@ -388,7 +380,7 @@ i { font-style: normal !important; }
 	display: none;
 	margin: auto 0 0 auto;
 	text-align: center;
-	animation: l_marquee_fade_in 1s ease forwards;
+	animation: l_fade_in 1s ease forwards;
 }
 #l_marquee_flash i { color: var(--l-color-0); }
 #l_marquee_notify { color: var(--l-color-10); }
