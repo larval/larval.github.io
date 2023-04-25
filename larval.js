@@ -955,15 +955,13 @@ const $L = {
 		$settingsLoad(true);
 		$settingsTabUpdateUI();
 	},
-	settingsAreOpen: () => $E('l_control').offsetHeight > 10,
 	settingsButtonTextToggle: closed => $E('l_settings_button').innerHTML = (closed?`&#9660; ${_topMode?'search':'settings'} &#9660;`:`&#9650; ${_topMode?'search':'settings'} &#9650;`),
 	settingsButtonToggle: forceDirection => {
-		if(!_stageData) return; 
-		const controlHeight=($E('l_control').scrollHeight>(_topMode?80:200)?$E('l_control_table').scrollHeight:(_topMode?80:250))+'px', closed=($E('l_control').style.height!=controlHeight);
-		if(typeof forceDirection=='boolean' && forceDirection!==closed)
+		const isOpen=!!$E('l_control').dataset.opened, toOpen=!!(_E.dataset.opened=(isOpen?'':'true'));
+		if((typeof forceDirection=='boolean' && forceDirection === isOpen) || !_stageData)
 			return(false);
-		$settingsButtonTextToggle(closed);
-		$E('l_control').style.height = (closed?controlHeight:'0px');
+		_E.style.height = (toOpen?(_topMode?'80':'250'):'0')+'px';
+		$settingsButtonTextToggle(toOpen);
 		return(true);
 	},
 	settingsChange: e => { 
