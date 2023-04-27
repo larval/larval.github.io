@@ -128,7 +128,7 @@ const $L = {
 		'l_notify_disable':_        => $notifyException(_.raw, true),
 		'l_notify_enable':_         => $notifyException(_.raw, false),
 		'l_range_volume_type':_     => $vpmToggle(),
-		'l_settings_button':_       => $settingsButtonToggle(),
+		'l_settings_button':_       => $settingsButtonToggle(null, true),
 		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`, _extURLOptions),
 		'l_tab':_                   => $settingsTabSelect(_.el),
 		'l_warning_audio':_         => $notifyPlayAudio(_audioTest, false, true),
@@ -227,6 +227,17 @@ const $L = {
 	U: array => array.filter((x,i,a) => array.indexOf(x)==i),
 	W: window,
 	X: obj => Array.isArray(obj) ? obj.filter(Boolean) : JSON.parse(JSON.stringify(obj,(k,v)=>v?v:undefined)),
+	Z: (str, ms) => {
+		if(!_Z || (Date.now() - _Z) > (ms?ms:250))
+			console.log(new Date(_Z=Date.now()).toLocaleTimeString('en-US',{hour:"numeric",minute:"numeric",second:'numeric'})+'-'.repeat(80));
+		try { throw new Error(); }
+		catch(e) {
+			if(e&&e.stack)
+				console.log($X(e.stack.split(/[\r\n]/g).map((x,i) => { let m=x.match(/\s*at\s+([^ ]+)/i); return !m||!m[1]||m[1].match(/[^A-Z0-9]/i)?null:m[1]; } )).splice(1).reverse().join(" \u279C ") + (typeof str=='undefined'?'':`  \u2588  ${str}`));
+			else
+				console.trace();
+		}
+	}, _Z: null,
 
 	/* [$] EVENTS (window|document) */
 	LOAD: e => {
@@ -437,6 +448,7 @@ const $L = {
 		_swipeStartPosition = null;
 	},
 	onpopstate: e => {
+		$settingsButtonToggle(false);
 		if(!e || !e.state) {
 			if(!_topMode)
 				$gotoStageDataHistory(1);
@@ -761,14 +773,6 @@ const $L = {
 		$historyPush({'root':true});
 		_stageDataHistorySessionId = Date.now();
 	},
-	historyReset: str => {
-		if(str) str = _stageDataHistoryNext;
-		if(_stageDataHistorySessionId < 0 || $W.history.state.root)
-			return(false);
-		_stageDataHistorySessionId = -_stageDataHistorySessionId;
-		$W.history.back();
-		return(true);
-	},
 	historyPush: obj => {
 		if(typeof(obj)!='object' || !$W['history'] || !$W['history']['pushState']) return;
 		obj['session'] = _stageDataHistorySessionId;
@@ -930,7 +934,7 @@ const $L = {
 			$setStageData(_stageDataHistory[0]);
 		if(!_topMode || !_stageDataHistory.length)
 			$getStageData(true);
-		else if(topUrl)
+		else if(_topMode && topUrl)
 			$topSearchFromURL(topUrl, true);
 		else if(explicit === false)
 			$topSearchRun('');
@@ -956,12 +960,17 @@ const $L = {
 		$settingsTabUpdateUI();
 	},
 	settingsButtonTextToggle: closed => $E('l_settings_button').innerHTML = (closed?`&#9660; ${_topMode?'search':'settings'} &#9660;`:`&#9650; ${_topMode?'search':'settings'} &#9650;`),
-	settingsButtonToggle: forceDirection => {
-		const isOpen=!!$E('l_control').dataset.opened, toOpen=!!(_E.dataset.opened=(isOpen?'':'true'));
-		if((typeof forceDirection=='boolean' && forceDirection === isOpen) || !_stageData)
+	settingsButtonToggle: (direction, force) => {
+		if(!$E('l_control') || !_stageData)
 			return(false);
-		_E.style.height = (toOpen?(_topMode?'80':'250'):'0')+'px';
-		$settingsButtonTextToggle(toOpen);
+		else if(typeof _E.dataset.opened == 'undefined' || !_animationsComplete)
+			return($E('l_control').dataset.opened='');
+		const isOpen=!!$E('l_control').dataset.opened, forceDirection=(typeof direction=='boolean' ? direction : !isOpen);
+		if(typeof forceDirection=='boolean' && forceDirection === isOpen && !force)
+			return(false);
+		_E.dataset.opened = (isOpen? '' : 'true');
+		_E.style.height = (isOpen?'0':(_topMode?'80':'250'))+'px';
+		$settingsButtonTextToggle(!isOpen);
 		return(true);
 	},
 	settingsChange: e => { 
@@ -1315,7 +1324,6 @@ const $L = {
 		else {
 			_E.disabled = true;
 			_E.blur();
-			$settingsButtonToggle(!!$topSearchCriteria());
 			$forceNextStagePoll(true);
 		}
 	},
@@ -1325,7 +1333,7 @@ const $L = {
 		if($E('l_top_search') && args.length > 0)
 			_E.value = args.join(' ');
 		if(!run) return;
-		else if(!_topMode && $historyReset(str))
+		else if(!_topMode)
 			$toggleStageMode(str);
 		else
 			$topSearchRun();
