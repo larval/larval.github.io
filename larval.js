@@ -961,7 +961,7 @@ const $L = {
 	},
 	settingsButtonTextToggle: closed => $E('l_settings_button').innerHTML = (closed?`&#9660; ${_topMode?'search':'settings'} &#9660;`:`&#9650; ${_topMode?'search':'settings'} &#9650;`),
 	settingsButtonToggle: (direction, force) => {
-		if(!$E('l_control') || !_stageData)
+		if(!$E('l_control') && (_stageData||force))
 			return(false);
 		else if(typeof _E.dataset.opened == 'undefined' || !_animationsComplete)
 			return($E('l_control').dataset.opened='');
@@ -1000,6 +1000,8 @@ const $L = {
 	settingsLoad: passive => {
 		_naId = $isMobile(true) ? 'l_nam' : 'l_na';
 		let now=new Date(), exs=null, settings=null;
+		if(!passive)
+			$settingsButtonToggle(false, true);
 		if(_topMode && $E('l_settings_button')) {
 			_E.innerHTML = _E.innerHTML.replace('settings','search');
 			$topSearchFromURL(location.hash?location.hash:location.pathname);
