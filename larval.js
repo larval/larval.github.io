@@ -331,7 +331,7 @@ const $L = {
 	},
 	onkeydown: e => {
 		$animationsFastSplash();
-		if(!_animationsComplete||!_stageData||(e&&(e.ctrlKey||e.altKey))||$toggleStageMode(e))
+		if(!_animationsComplete||!_stageData||(e&&(e.ctrlKey||e.altKey))||(e&&$toggleStageMode(e)))
 			return;
 		$contentTableRoll(e.shiftKey);
 		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=_keyRow, match;
@@ -468,7 +468,6 @@ const $L = {
 		}
 		else if(_topMode && e.state.items)
 			$parseStageData(e.state, {'fromPopState':true,'updateView':true});
-
 		else if(typeof(e.state.toggle) == 'boolean' || e.state.root)
 			$toggleStageMode(e.state.root || e.state.toggle);
 		else if(_topMode === (typeof(e.state.fixed) != 'undefined'))
