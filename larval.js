@@ -1,288 +1,285 @@
+/*                       _                      
+| | __ _ _ ____   ____ _| |  ___ ___  _ __ ___  
+| |/ _` | '__\ \ / / _` | | / __/ _ \| '_ ` _ \ 
+| | (_| | |   \ V / (_| | || (_| (_) | | | | | |
+|_|\__,_|_|    \_/ \__,_|_(_)___\___/|_| |_| |*/
+
 const $L = {
-
-	/* [_] INTERNALS / DEFAULTS */
-	_stageURL: '//stage.larval.com/',
-	_stageMode: 'stage',
-	_stageData: null,
-	_stageDataSortByColumn: 0,
-	_stageDataLastUpdate: 0,
-	_stageDataHistory: [],
-	_stageDataHistorySwap: [],
-	_stageDataHistoryFirst: false,
-	_stageDataHistoryIndex: -1,
-	_stageDataHistoryNext: '',
-	_stageDataHistorySessionId: 0,
-	_stageDataFetching: null,
-	_notifications: [],
-	_notifyTitleInterval: null,
-	_notifyAllowed: null,
-	_notifyExceptions: [],
-	_animationsComplete: false,
-	_nextStagePollTimeout: null,
-	_nextStagePollLong: 300,
-	_nextStagePollShort: 30,
-	_nextStagePollCompleteEpoch: 0,
-	_marqueeLastHighlight: 0,
-	_marqueeFlashMessage: '',
-	_marqueeInterval: null,
-	_marqueeFlashTimeout: null,
-	_contentTableSoftLimit: 100,
-	_contentTableRowCountThatAreInView: 10,
-	_extURLOptions: 'noreferrer noopener',
-	_titlePrefix: '',
-	_title:	'',
-	_frameData: null,
-	_swipeStartPosition: null,
-	_wakeLock: null,
-	_symbolsOnTop: {},
-	_fragments: {},
-	_warnings: [],
-	_naId: 'l_na',
-	_topMode: false,
-	_topSymbolsToDisplay: 8,
-	_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{1,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?symbol\/([A-Z]{1,4})\/?$/ },
-	_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
-	_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
-	_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
-	_char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'warning':"\u26a0 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$", 'user':"@" },
-	_themes: {
-		'default':    ['#A6FDA4','#E1FDE4','#88CF86','#7DFF7A','#A6FDA4','#FF4444','#2A302A','#303630','#363C36','#825900','#FFDE96','#FAEED4','#A6FDA4','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDE8C'],
-		'afterhours': ['#95ABFC','#CDDFFF','#8BA4FF','#7492FF','#D274FF','#FF4444','#2A2A30','#303034','#36363C','#660303','#FF73BB','#D4DCFA','#A0FACA','#00AAAA','#85FFD6','#FF0080','#FDA4CF','#A6B7F7'],
-		'bloodbath':  ['#FC656F','#FAB6B6','#F77272','#FF4747','#FFAE74','#FFCC54','#361010','#4B1818','#602121','#825900','#FFEC73','#F2D088','#D4F0A3','#91AD03','#FAB143','#FF0000','#FF7070','#FC868E'],
-		'top':        ['#A6FFFF','#E1FDFF','#88CFD1','#A6FFFF','#75bcff','#9175ff','#2A3030','#303636','#363C3C','#825900','#FFDE96','#FCF0D2','#A6FFFF','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDEDE']
-	}, _theme: 'default', _themeBGColorIndex: 7,
-	_keyMap: {
-		'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@-USD'],
-		'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/crypto/coins/@'],
-		'C': ['https://www.cnbc.com/quotes/@', 'https://www.cnbc.com/quotes/@.CM='],
-		'D': ['https://research.tdameritrade.com/grid/public/research/stocks/summary?symbol=@'],
-		'E': ['https://www.etrade.wallst.com/v1/stocks/snapshot/snapshot.asp?symbol=@'],
-		'F': ['https://www.finviz.com/quote.ashx?t=@', 'https://www.finviz.com/crypto_charts.ashx?t=@USD'],
-		'G': ['https://www.benzinga.com/quote/@', 'https://www.benzinga.com/quote/@-USD'],
-		'H': ['https://www.stockcharts.com/h-sc/ui?s=@'],
-		'I': ['https://www.investing.com/search/?q=@'],
-		'J': ['https://www.wsj.com/market-data/quotes/@'],
-		'K': ['https://www.morningstar.com/stocks/xnas/@/quote'],
-		'L': ['https://www.fool.com/quote/@', 'https://www.fool.com/quote/crypto/@'],
-		'M': ['https://www.marketwatch.com/investing/stock/@', 'https://www.marketwatch.com/investing/cryptocurrency/@USD'],
-		'N': ['https://money.cnn.com/quote/quote.html?symb=@'],
-		'O': ['https://www.cboe.com/delayed_quotes/@'],
-		'P': ['https://eresearch.fidelity.com/eresearch/goto/evaluate/snapshot.jhtml?symbols=@'],
-		'Q': ['https://www.nasdaq.com/market-activity/stocks/@'],
-		'R': ['https://www.robinhood.com/stocks/@', 'https://www.robinhood.com/crypto/@'],
-		'S': ['https://www.stocktwits.com/symbol/@', 'https://www.stocktwits.com/symbol/@.X'],
-		'T': ['https://www.tradestation.com/research/stocks/@'],
-		'U': ['https://www.gurufocus.com/stock/@'],
-		'V': ['https://www.tradingview.com/chart/?symbol=@', 'https://www.tradingview.com/chart/?symbol=@USD'],
-		'W': ['https://www.twitter.com/search?q=%24@','https://www.twitter.com/search?q=%24@.X'],
-		'X': ['https://www.foxbusiness.com/quote?stockTicker=@'],
-		'Y': ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F', 'https://finance.yahoo.com/quote/@=X', 'https://stocktwits.com/@'],
-		'Z': ['https://www.zacks.com/stock/quote/@'],
-	}, _keyRow: 0, _keyMapIndexDefault: 'Y', _keyMapIndex: null,
-	_taMap: {
-		'AS': ['Ascending triangle', 'asc<i>&nbsp;triangle</i>', 'F'],
-		'CD': ['Channel down', 'c<i>hannel&nbsp;</i>down', 'F'],
-		'CH': ['Channel', 'chan<i>nel</i>', 'F'],
-		'CU': ['Channel up', 'c<i>hannel&nbsp;</i>up', 'F'],
-		'D1': ['Barchart directional top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
-		'DB': ['Double bottom', '2x&nbsp;bot<i>tom</i>', 'F'],
-		'DE': ['Descending triangle', 'desc<i>&nbsp;triangle</i>', 'F'],
-		'DT': ['Double top', '2x&nbsp;top', 'F'],
-		'HI': ['Inverse head and Ssoulders', 'inv<i>erse</i>&nbsp;h&amp;s', 'F'],
-		'HS': ['Head and shoulders', 'h&nbsp;&amp;&nbsp;s', 'F'],
-		'HZ': ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r', 'F'],
-		'MB': ['Multiple bottoms', '&gt;2x&nbsp;bot<i>tom</i>s', 'F'],
-		'MT': ['Multiple tops', '&gt;2x&nbsp;tops', 'F'],
-		'S1': ['Barchart strength top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
-		'TR': ['Technical resistance', 'resist<i>ance</i>', 'F'],
-		'TS': ['Technical support', '<i>tech&nbsp;</i>support', 'F'],
-		'WD': ['Wedge down', 'wedge<i>&nbsp;down</i>', 'F'],
-		'WE': ['Wedge', 'wedge', 'F'],
-		'WU': ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
+_stageURL: '//stage.larval.com/',
+_stageMode: 'stage',
+_stageData: null,
+_stageDataSortByColumn: 0,
+_stageDataLastUpdate: 0,
+_stageDataHistory: [],
+_stageDataHistorySwap: [],
+_stageDataHistoryFirst: false,
+_stageDataHistoryIndex: -1,
+_stageDataHistoryNext: '',
+_stageDataHistorySessionId: 0,
+_stageDataFetching: null,
+_notifications: [],
+_notifyTitleInterval: null,
+_notifyAllowed: null,
+_notifyExceptions: [],
+_animationsComplete: false,
+_nextStagePollTimeout: null,
+_nextStagePollLong: 300,
+_nextStagePollShort: 30,
+_nextStagePollCompleteEpoch: 0,
+_marqueeLastHighlight: 0,
+_marqueeFlashMessage: '',
+_marqueeInterval: null,
+_marqueeFlashTimeout: null,
+_contentTableSoftLimit: 100,
+_contentTableRowCountThatAreInView: 10,
+_extURLOptions: 'noreferrer noopener',
+_titlePrefix: '',
+_title:	'',
+_frameData: null,
+_swipeStartPosition: null,
+_wakeLock: null,
+_symbolsOnTop: {},
+_fragments: {},
+_warnings: [],
+_naId: 'l_na',
+_topMode: false,
+_topSymbolsToDisplay: 8,
+_topURLMap: { '@#':/^[#/]*?([A-Z0-9_]{1,32})\/message\/([0-9]+)/i, '@':/^[#/]*?([A-Z0-9_]{5,32})\/?$/i, '$':/^[#/]*?symbol\/([A-Z]{1,4})\/?$/ },
+_multipliers: { 'B':1000000000, 'M':1000000, 'K':1000 },
+_symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
+_assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
+_char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'warning':"\u26a0 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$", 'user':"@" },
+_themes: {
+	'default':    ['#A6FDA4','#E1FDE4','#88CF86','#7DFF7A','#A6FDA4','#FF4444','#2A302A','#303630','#363C36','#825900','#FFDE96','#FAEED4','#A6FDA4','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDE8C'],
+	'afterhours': ['#95ABFC','#CDDFFF','#8BA4FF','#7492FF','#D274FF','#FF4444','#2A2A30','#303034','#36363C','#660303','#FF73BB','#D4DCFA','#A0FACA','#00AAAA','#85FFD6','#FF0080','#FDA4CF','#A6B7F7'],
+	'bloodbath':  ['#FC656F','#FAB6B6','#F77272','#FF4747','#FFAE74','#FFCC54','#361010','#4B1818','#602121','#825900','#FFEC73','#F2D088','#D4F0A3','#91AD03','#FAB143','#FF0000','#FF7070','#FC868E'],
+	'top':        ['#A6FFFF','#E1FDFF','#88CFD1','#A6FFFF','#75bcff','#9175ff','#2A3030','#303636','#363C3C','#825900','#FFDE96','#FCF0D2','#A6FFFF','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDEDE']
+}, _theme: 'default', _themeBGColorIndex: 7,
+_keyMap: {
+	'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@-USD'],
+	'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/crypto/coins/@'],
+	'C': ['https://www.cnbc.com/quotes/@', 'https://www.cnbc.com/quotes/@.CM='],
+	'D': ['https://research.tdameritrade.com/grid/public/research/stocks/summary?symbol=@'],
+	'E': ['https://www.etrade.wallst.com/v1/stocks/snapshot/snapshot.asp?symbol=@'],
+	'F': ['https://www.finviz.com/quote.ashx?t=@', 'https://www.finviz.com/crypto_charts.ashx?t=@USD'],
+	'G': ['https://www.benzinga.com/quote/@', 'https://www.benzinga.com/quote/@-USD'],
+	'H': ['https://www.stockcharts.com/h-sc/ui?s=@'],
+	'I': ['https://www.investing.com/search/?q=@'],
+	'J': ['https://www.wsj.com/market-data/quotes/@'],
+	'K': ['https://www.morningstar.com/stocks/xnas/@/quote'],
+	'L': ['https://www.fool.com/quote/@', 'https://www.fool.com/quote/crypto/@'],
+	'M': ['https://www.marketwatch.com/investing/stock/@', 'https://www.marketwatch.com/investing/cryptocurrency/@USD'],
+	'N': ['https://money.cnn.com/quote/quote.html?symb=@'],
+	'O': ['https://www.cboe.com/delayed_quotes/@'],
+	'P': ['https://eresearch.fidelity.com/eresearch/goto/evaluate/snapshot.jhtml?symbols=@'],
+	'Q': ['https://www.nasdaq.com/market-activity/stocks/@'],
+	'R': ['https://www.robinhood.com/stocks/@', 'https://www.robinhood.com/crypto/@'],
+	'S': ['https://www.stocktwits.com/symbol/@', 'https://www.stocktwits.com/symbol/@.X'],
+	'T': ['https://www.tradestation.com/research/stocks/@'],
+	'U': ['https://www.gurufocus.com/stock/@'],
+	'V': ['https://www.tradingview.com/chart/?symbol=@', 'https://www.tradingview.com/chart/?symbol=@USD'],
+	'W': ['https://www.twitter.com/search?q=%24@','https://www.twitter.com/search?q=%24@.X'],
+	'X': ['https://www.foxbusiness.com/quote?stockTicker=@'],
+	'Y': ['https://finance.yahoo.com/quote/@', 'https://finance.yahoo.com/quote/@-USD', 'https://finance.yahoo.com/quote/@=F', 'https://finance.yahoo.com/quote/@=X', 'https://stocktwits.com/@'],
+	'Z': ['https://www.zacks.com/stock/quote/@'],
+}, _keyRow: 0, _keyMapIndexDefault: 'Y', _keyMapIndex: null,
+_taMap: {
+	'AS': ['Ascending triangle', 'asc<i>&nbsp;triangle</i>', 'F'],
+	'CD': ['Channel down', 'c<i>hannel&nbsp;</i>down', 'F'],
+	'CH': ['Channel', 'chan<i>nel</i>', 'F'],
+	'CU': ['Channel up', 'c<i>hannel&nbsp;</i>up', 'F'],
+	'D1': ['Barchart directional top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
+	'DB': ['Double bottom', '2x&nbsp;bot<i>tom</i>', 'F'],
+	'DE': ['Descending triangle', 'desc<i>&nbsp;triangle</i>', 'F'],
+	'DT': ['Double top', '2x&nbsp;top', 'F'],
+	'HI': ['Inverse head and Ssoulders', 'inv<i>erse</i>&nbsp;h&amp;s', 'F'],
+	'HS': ['Head and shoulders', 'h&nbsp;&amp;&nbsp;s', 'F'],
+	'HZ': ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r', 'F'],
+	'MB': ['Multiple bottoms', '&gt;2x&nbsp;bot<i>tom</i>s', 'F'],
+	'MT': ['Multiple tops', '&gt;2x&nbsp;tops', 'F'],
+	'S1': ['Barchart strength top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
+	'TR': ['Technical resistance', 'resist<i>ance</i>', 'F'],
+	'TS': ['Technical support', '<i>tech&nbsp;</i>support', 'F'],
+	'WD': ['Wedge down', 'wedge<i>&nbsp;down</i>', 'F'],
+	'WE': ['Wedge', 'wedge', 'F'],
+	'WU': ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
+},
+_eventMap: {
+	   '#l_root': {
+			click:e     => void(0),
+	}, '#l_audible, #l_options_only, #l_notify_halts, #l_show': {
+			change:e    => $CFG.change(e)
+	}, '#l_range_up, #l_range_down, #l_range_volume': {
+			input:e     => $CFG.updateRange(e),
+			change:e    => $CFG.change(e)
+	}, '#l_content_table': {
+			mousemove:e => $keyModeReset()
+	}, 'animate': {
+			endEvent:e  => e && e.target && e.target.setAttribute('begin', '')
+	}
+},
+_clickMap: {
+	'l_alt_link':_				=> $DAT.toggleStage(_topMode),
+	'l_content_table_header':_  => $DAT.setStageSort(_.idx),
+	'l_fixed':_                 => $GUI.broadBehaviorToggle(_topMode),
+	'l_history_toggle':_        => $HST.dropDownToggle(_.idx),
+	'l_hotkey_help':_           => $MRQ.hotKeyHelp(),
+	'l_last_update':_           => $POL.forceNextStage(),
+	'l_marquee_flash':_         => $HST.gotoStageData(0),
+	'l_marquee_info':_          => $DAT.setURLFormat(_.sym, false),
+	'l_marquee_talk':_          => $TOP.searchFromURL(_.raw, true),
+	'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`, _extURLOptions),
+	'l_notify_disable':_        => $NFY.exception(_.raw, true),
+	'l_notify_enable':_         => $NFY.exception(_.raw, false),
+	'l_range_volume_type':_     => $GUI.vpmToggle(),
+	'l_settings_button':_       => $CFG.buttonToggle(null, true),
+	'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`, _extURLOptions),
+	'l_tab':_                   => $CFG.tabSelect(_.el),
+	'l_warning_audio':_         => $NFY.playAudio(_audioTest, false, true),
+	'l_warning_never_notify':_  => $NFY.requestPermission(true),
+	'shift_default':_           => _.raw ? $W.open('https://top.larval.com/'+($M(/[A-Z0-9_]+$/ig,_.raw)?_M[0]:_.raw), _.raw).focus() : $DAT.editSymbolsOnTop(),
+	'alt_default':_             => _.raw ? $DAT.setSymbolsOnTop(_.raw, null, true) : $DAT.editSymbolsOnTop(),
+	'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`, _extURLOptions)
+},
+_hotKeyMap: {
+	'ArrowDown':e               => _keyRow++,
+	'ArrowUp':e                 => _keyRow--,
+	'ArrowLeft':e               => $HST.gotoStageData(1),
+	'ArrowRight':e              => $HST.gotoStageData(-1),
+	'Backquote':e               => $DAT.editSymbolsOnTop(),
+	'Backslash':(e,ev)          => $ANI.toggle(null, ev.shiftKey),
+	'Backspace':e               => $GUI.vpmToggle(),
+	'End':e                     => _keyRow = e.parentElement.childElementCount - 1,
+	'Enter':e                   => $EVT.click(e),
+	'Escape':e                  => $GUI.broadBehaviorToggle(_topMode),
+	'F5':e                      => $CFG.clear('User requested.'),
+	'F12':e                     => $GUI.setThemeRandom('<i>Going under the hood?</i> Let\'s make the outside look as hideous as the inside first.'),
+	'Home':e                    => _keyRow = 1,
+	'NumpadEnter':e             => $EVT.click(e),
+	'PageDown':e                => _keyRow+=_contentTableRowCountThatAreInView,
+	'PageUp':e                  => _keyRow-=_contentTableRowCountThatAreInView,
+	'Slash':e                   => $MRQ.hotKeyHelp(),
+	'Space':e                   => $EVT.click(e),
+	'Tab':e                     => $DAT.toggleStage(e)
+}, _hotKeyMapIgnore: ['ShiftLeft','ShiftRight'],
+_enumMap: {
+	'stage': {
+		'SYM':_   => $H(_.val),
+		'NAM':_   => $H(_.val),
+		'PCT5':_  => $isHaltRow(_.row) ? $H(_.val?_.val:'HALTED') : $htmlPercent(_.val,2),
+		'PCT':_   => $htmlPercent(_.val,2),
+		'PRC':_   => '$' + $N(_.val,_.row[$OPT]=='currency'&&_.val<10?4:2),
+		'VOL':_   => $multiplierFormat(_.val,1,true),
+		'OPT':_   => $H(_.val),
+		'OIV':_   => _.row[$SYM][0]==_char['crypto'] ? ('MC#'+_.val) : ($H(_.val>0?_.val:('~'+Math.abs(_.val))))+'%IV',
+		'ERN':_   => $H(_.val),
+		'PRC5':_  => (_.val<0?'-$':'+$') + $N(Math.abs(_.val),_.row[$OPT]=='currency'?4:2),
+		'VOL5':_  => '+' + $multiplierFormat(_.val,1),
+		'PCTM':_  => 'M=' + $htmlPercent(_.val,0),
+		'PCTY':_  => 'Y=' + $htmlPercent(_.val,0),
+		'NWS':_   => $H(_.val),
+		'LNK':_   => _.val,
+		'KSTK':0, 'KETF':0, 'KCRP':1, 'KFTR':2, 'KCUR':3, 'KUSR':4,
+		'WAUD':0, 'WNOT':1, 'HLT':2, 'AGE': 6, 'TAN':8
 	},
-	_eventMap: {
-		   '#l_root': {
-				click:e     => void(0),
-		}, '#l_audible, #l_options_only, #l_notify_halts, #l_show': {
-				change:e    => $settingsChange(e)
-		}, '#l_range_up, #l_range_down, #l_range_volume': {
-				input:e     => $updateRangeDisplay(e),
-				change:e    => $settingsChange(e)
-		}, '#l_content_table': {
-				mousemove:e => $keyModeReset()
-		}, 'animate': {
-				endEvent:e  => e && e.target && e.target.setAttribute('begin', '')
-		}
-	},
-	_clickMap: {
-		'l_alt_link':_				=> $toggleStageMode(_topMode),
-		'l_content_table_header':_  => $setSortStageData(_.idx),
-		'l_fixed':_                 => $broadBehaviorToggle(_topMode),
-		'l_history_toggle':_        => $historyDropDownToggle(_.idx),
-		'l_hotkey_help':_           => $marqueeHotKeyHelp(),
-		'l_last_update':_           => $forceNextStagePoll(),
-		'l_marquee_flash':_         => $gotoStageDataHistory(0),
-		'l_marquee_info':_          => $setURLFormat(_.sym, false),
-		'l_marquee_talk':_          => $topSearchFromURL(_.raw, true),
-		'l_news':_                  => $W.open(_stageData['items'][_.idx][$LNK], `l_news_${_.sym}`, _extURLOptions),
-		'l_notify_disable':_        => $notifyException(_.raw, true),
-		'l_notify_enable':_         => $notifyException(_.raw, false),
-		'l_range_volume_type':_     => $vpmToggle(),
-		'l_settings_button':_       => $settingsButtonToggle(null, true),
-		'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:_keyMapIndexDefault][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`, _extURLOptions),
-		'l_tab':_                   => $settingsTabSelect(_.el),
-		'l_warning_audio':_         => $notifyPlayAudio(_audioTest, false, true),
-		'l_warning_never_notify':_  => $notifyRequestPermission(true),
-		'shift_default':_           => _.raw ? $W.open('https://top.larval.com/'+($M(/[A-Z0-9_]+$/ig,_.raw)?_M[0]:_.raw), _.raw).focus() : $editSymbolsOnTop(),
-		'alt_default':_             => _.raw ? $setSymbolsOnTop(_.raw, null, true) : $editSymbolsOnTop(),
-		'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`, _extURLOptions)
-	},
-	_hotKeyMap: {
-		'ArrowDown':e               => _keyRow++,
-		'ArrowUp':e                 => _keyRow--,
-		'ArrowLeft':e               => $gotoStageDataHistory(1),
-		'ArrowRight':e              => $gotoStageDataHistory(-1),
-		'Backquote':e               => $editSymbolsOnTop(),
-		'Backslash':(e,ev)          => $animationsToggle(null, ev.shiftKey),
-		'Backspace':e               => $vpmToggle(),
-		'End':e                     => _keyRow = e.parentElement.childElementCount - 1,
-		'Enter':e                   => $onclick(e),
-		'Escape':e                  => $broadBehaviorToggle(_topMode),
-		'F5':e                      => $settingsClear('User requested.'),
-		'F12':e                     => $setThemeRandom('<i>Going under the hood?</i> Let\'s make the outside look as hideous as the inside first.'),
-		'Home':e                    => _keyRow = 1,
-		'NumpadEnter':e             => $onclick(e),
-		'PageDown':e                => _keyRow+=_contentTableRowCountThatAreInView,
-		'PageUp':e                  => _keyRow-=_contentTableRowCountThatAreInView,
-		'Slash':e                   => $marqueeHotKeyHelp(),
-		'Space':e                   => $onclick(e),
-		'Tab':e                     => $toggleStageMode(e)
-	}, _hotKeyMapIgnore: ['ShiftLeft','ShiftRight'],
-	_enumMap: {
-		'stage': {
-			'SYM':_   => $H(_.val),
-			'NAM':_   => $H(_.val),
-			'PCT5':_  => $isHaltRow(_.row) ? $H(_.val?_.val:'HALTED') : $htmlPercent(_.val,2),
-			'PCT':_   => $htmlPercent(_.val,2),
-			'PRC':_   => '$' + $N(_.val,_.row[$OPT]=='currency'&&_.val<10?4:2),
-			'VOL':_   => $multiplierFormat(_.val,1,true),
-			'OPT':_   => $H(_.val),
-			'OIV':_   => _.row[$SYM][0]==_char['crypto'] ? ('MC#'+_.val) : ($H(_.val>0?_.val:('~'+Math.abs(_.val))))+'%IV',
-			'ERN':_   => $H(_.val),
-			'PRC5':_  => (_.val<0?'-$':'+$') + $N(Math.abs(_.val),_.row[$OPT]=='currency'?4:2),
-			'VOL5':_  => '+' + $multiplierFormat(_.val,1),
-			'PCTM':_  => 'M=' + $htmlPercent(_.val,0),
-			'PCTY':_  => 'Y=' + $htmlPercent(_.val,0),
-			'NWS':_   => $H(_.val),
-			'LNK':_   => _.val,
-			'KSTK':0, 'KETF':0, 'KCRP':1, 'KFTR':2, 'KCUR':3, 'KUSR':4,
-			'WAUD':0, 'WNOT':1, 'HLT':2, 'AGE': 6, 'TAN':8
-		},
-		'top': {
-			'TUSR':_   => $H(_.val),
-			'TSYM':_   => _.val,
-			'TRAT':_   => isNaN(_.val) ? `<i data-msg-idx="${_.idx}" class="${_.val[0]=='+'?'l_top_up':'l_top_down'}">${_.val.substr(1)}</i>` : (_.val+'%'),
-			'TPCT':_   => $htmlPercent(_.val,2),
-			'TPCR':_   => $htmlPercent(_.val,2),
-			'TSTR':_   => $H(_.val),
-			'TEND':_   => $topTimeFormat(_.val),
-			'TTWT':_   => $H(_.val),
-			'THST':_   => void(0),
-			'HMID':0, 'HPRC':1, 'HMOD':2, 'HPCT':3, 'HPCR':4, 'HSTR':5, 'HEND':6, 'HILT':7
-		}
-	}, _stageDataMap: [], _topDataMap: [], _dataMap: null,
-	_settings: {
-		'l_version':          2,
-		'l_audible':          false,
-		'l_notify_halts':     true,
-		'l_options_only':     false,
-		'l_keymap_index':     '',
-		'l_symbols_on_top':   '',
-		'l_exceptions':       '',
-		'l_vpm':              null,
-		'l_no_notifications': false,
-		'l_stocks':           { 'l_show':true,  'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':10,   'vpm_precision':1 },
-		'l_stocks_ah':        { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':null, 'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
-		'l_etfs':             { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':50,   'multiplier':'M', 'percent_shift':100, 'volume_shift':100, 'vpm_shift':1000, 'vpm_precision':0 },
-		'l_crypto':           { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'M', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1000, 'vpm_precision':0 },
-		'l_futures':          { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':null, 'multiplier':'K', 'percent_shift':100, 'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
-		'l_currency':         { 'l_show':false, 'l_range_up':25,  'l_range_down':25,  'l_range_volume':null, 'multiplier':'K', 'percent_shift':100, 'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 }
-	}, _settingsBase: {}, _settingsSelectedTab: {}, _settingsSelectedTabName: '',
-	_vibrateAlert: [250,250,500,250,750,250,1000], _audioAlert: '/larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
+	'top': {
+		'TUSR':_   => $H(_.val),
+		'TSYM':_   => _.val,
+		'TRAT':_   => isNaN(_.val) ? `<i data-msg-idx="${_.idx}" class="${_.val[0]=='+'?'l_top_up':'l_top_down'}">${_.val.substr(1)}</i>` : (_.val+'%'),
+		'TPCT':_   => $htmlPercent(_.val,2),
+		'TPCR':_   => $htmlPercent(_.val,2),
+		'TSTR':_   => $H(_.val),
+		'TEND':_   => $TOP.timeFormat(_.val),
+		'TTWT':_   => $H(_.val),
+		'THST':_   => void(0),
+		'HMID':0, 'HPRC':1, 'HMOD':2, 'HPCT':3, 'HPCR':4, 'HSTR':5, 'HEND':6, 'HILT':7
+	}
+}, _stageDataMap: [], _topDataMap: [], _dataMap: null,
+_settings: {
+	'l_version':          2,
+	'l_audible':          false,
+	'l_notify_halts':     true,
+	'l_options_only':     false,
+	'l_keymap_index':     '',
+	'l_symbols_on_top':   '',
+	'l_exceptions':       '',
+	'l_vpm':              null,
+	'l_no_notifications': false,
+	'l_stocks':           { 'l_show':true,  'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':10,   'vpm_precision':1 },
+	'l_stocks_ah':        { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':null, 'multiplier':'K', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
+	'l_etfs':             { 'l_show':true,  'l_range_up':100, 'l_range_down':100, 'l_range_volume':50,   'multiplier':'M', 'percent_shift':100, 'volume_shift':100, 'vpm_shift':1000, 'vpm_precision':0 },
+	'l_crypto':           { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':25,   'multiplier':'M', 'percent_shift':10,  'volume_shift':1,   'vpm_shift':1000, 'vpm_precision':0 },
+	'l_futures':          { 'l_show':false, 'l_range_up':50,  'l_range_down':50,  'l_range_volume':null, 'multiplier':'K', 'percent_shift':100, 'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 },
+	'l_currency':         { 'l_show':false, 'l_range_up':25,  'l_range_down':25,  'l_range_volume':null, 'multiplier':'K', 'percent_shift':100, 'volume_shift':1,   'vpm_shift':1,    'vpm_precision':0 }
+}, _settingsBase: {}, _settingsSelectedTab: {}, _settingsSelectedTabName: '',
+_vibrateAlert: [250,250,500,250,750,250,1000], _audioAlert: '/larval.mp3', _audioTest: 'data:audio/mpeg;base64,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',
 
-	/* [$] SHORTHAND / COMMON */
-	A: query => (_A = $D.querySelectorAll(query)), _A: null,
-	B: id => (_B = $D.getElementById(id).getBoundingClientRect()), _B: null,
-	C: className => (_C = $D.getElementsByClassName(className)), _C: null,
-	D: document,
-	E: id => (_E = $D.getElementById(id)), _E: null,
-	F: (id, a) => (_F = (_fragments[id]?_fragments[id]:(_fragments[id]=($E(id)?_E.innerHTML:id).split('@'))).forEach((x,i)=>a&&a.splice(i*2,0,_fragments[id][i]))||(a?a:_fragments[id]).join('')), _F: null,
-	H: string => (_H = (_H=$D.createElement('p'))&&((_H.textContent=string)) ? _H.innerHTML : ''), _H: null,
-	I: (array, item) => (_I = array.indexOf(item)), _I: -1,
-	M: (match, string) => (_M = (string.match(match))), _M: null,
-	N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
-	P: (count, total) => Math.round(count / total * 100),
-	Q: query => (_Q = $D.querySelector(query)), _Q: null,
-	T: tagName => (_T = $D.getElementsByTagName(tagName)), _T: null,
-	U: array => array.filter((x,i,a) => array.indexOf(x)==i),
-	W: window,
-	X: obj => Array.isArray(obj) ? obj.filter(Boolean) : JSON.parse(JSON.stringify(obj,(k,v)=>v?v:undefined)),
-	Z: (str, ms) => {
-		if(!_Z || (Date.now() - _Z) > (ms?ms:250))
-			console.log(new Date(_Z=Date.now()).toLocaleTimeString('en-US',{hour:"numeric",minute:"numeric",second:'numeric'})+'-'.repeat(80));
-		try { throw new Error(); }
-		catch(e) {
-			if(e&&e.stack)
-				console.log($X(e.stack.split(/[\r\n]/g).map((x,i) => { let m=x.match(/\s*at\s+([^ ]+)/i); return !m||!m[1]||m[1].match(/[^A-Z0-9]/i)?null:m[1]; } )).splice(1).reverse().join(" \u279C ") + (typeof str=='undefined'?'':`  \u2588  ${str}`));
-			else
-				console.trace();
-		}
-	}, _Z: null,
+/*************************************************************************************************\
+\*******  SHORTHAND / COMMON  *************************************************  [ $?.* ]  *******/
+A: query => (_A = $D.querySelectorAll(query)), _A: null,
+B: id => (_B = $D.getElementById(id).getBoundingClientRect()), _B: null,
+C: className => (_C = $D.getElementsByClassName(className)), _C: null,
+D: document,
+E: id => (_E = $D.getElementById(id)), _E: null,
+F: (id, a) => (_F = (_fragments[id]?_fragments[id]:(_fragments[id]=($E(id)?_E.innerHTML:id).split('@'))).forEach((x,i)=>a&&a.splice(i*2,0,_fragments[id][i]))||(a?a:_fragments[id]).join('')), _F: null,
+H: string => (_H = (_H=$D.createElement('p'))&&((_H.textContent=string)) ? _H.innerHTML : ''), _H: null,
+I: (array, item) => (_I = array.indexOf(item)), _I: -1,
+M: (match, string) => (_M = (string.match(match))), _M: null,
+N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
+P: (count, total) => Math.round(count / total * 100),
+Q: query => (_Q = $D.querySelector(query)), _Q: null,
+T: tagName => (_T = $D.getElementsByTagName(tagName)), _T: null,
+U: array => array.filter((x,i,a) => array.indexOf(x)==i),
+W: window,
+X: obj => Array.isArray(obj) ? obj.filter(Boolean) : JSON.parse(JSON.stringify(obj,(k,v)=>v?v:undefined)),
+Z: (str, ms) => {
+	if(!_Z || (Date.now() - _Z) > (ms?ms:250))
+		console.log(new Date(_Z=Date.now()).toLocaleTimeString('en-US',{hour:"numeric",minute:"numeric",second:'numeric'})+'-'.repeat(80));
+	try { throw new Error(); }
+	catch(e) {
+		if(e&&e.stack)
+			console.log($X(e.stack.split(/[\r\n]/g).map((x,i) => { let m=x.match(/\s*at\s+([^ ]+)/i); return !m||!m[1]||m[1].match(/[^A-Z0-9]/i)?null:m[1]; } )).splice(1).reverse().join(" \u279C ") + (typeof str=='undefined'?'':`  \u2588  ${str}`));
+		else
+			console.trace();
+	}
+}, _Z: null,
 
-	/* [$] EVENTS (window|document) */
-	LOAD: e => {
-		Object.keys($L._enumMap).forEach(enumGroup => { 
-			for(let i=0, cellKeys=Object.keys($L._enumMap[enumGroup]); i < cellKeys.length; i++) {
-				const key=cellKeys[i];
-				if(typeof $L._enumMap[enumGroup][key] == 'number')
-					$L[key] = $L._enumMap[enumGroup][key];
-				else {
-					$L[key] = i;
-					$L[`_${enumGroup}DataMap`].push($L._enumMap[enumGroup][key]);
-				}
-			}
-		});
-		for(let k of Object.keys($L)) {
-			window[k[0]=='_'?k:('$'+k)] = $L[k];
-			if(k.substr(0,2) != 'on')
-				continue;
-			else if(typeof window[k] != 'undefined')
-				window.addEventListener(k.substr(2), $L[k]);
-			else if(typeof document[k] != 'undefined')
-				document.addEventListener(k.substr(2), $L[k]);
-		}
-		for(let query of Object.keys(_eventMap)) {
-			if(!$A(query))
-				continue;
-			for(let a=0; a < _A.length; a++) {
-				for(let e of Object.keys(_eventMap[query]))
-					_A[a].addEventListener(e, _eventMap[query][e]);
+/*************************************************************************************************\
+\*******  APP ENTRY POINT (main)  ******************************************  [ $L.LOAD ]  *******/
+LOAD: e => {
+	Object.keys($L._enumMap).forEach(enumGroup => { 
+		for(let i=0, cellKeys=Object.keys($L._enumMap[enumGroup]); i < cellKeys.length; i++) {
+			const key=cellKeys[i];
+			if(typeof $L._enumMap[enumGroup][key] == 'number')
+				$L[key] = $L._enumMap[enumGroup][key];
+			else {
+				$L[key] = i;
+				$L[`_${enumGroup}DataMap`].push($L._enumMap[enumGroup][key]);
 			}
 		}
-		$D.body.id = $D.body.className = 'l_n';
-		if($E('l_awaiting_data')) _E.innerText = _E.title;
-		$historySetup();
-		$setStageMode(location.href.match(/top/i) ? 'top' : 'stage');
-		$settingsLoad();
-		$notifySetup(false);
-		$keyMapSetup();
-		$getStageData(false);
-		$animationsDisableIfUnderFPS(6000, 30, 2);
-		setTimeout($animationsComplete, 5750);
-	},
-	onclick: e => {
+	});
+	for(let k of Object.keys($L))
+		window[k[0]=='_'?k:('$'+k)] = $L[k];
+	for(let k of Object.keys($EVT))
+		(typeof window['on'+k]=='undefined'?$D:$W).addEventListener(k, $EVT[k]);
+	for(let query of Object.keys(_eventMap)) {
+		if(!$A(query)) continue;
+		for(let a=0; a < _A.length; a++) {
+			for(let e of Object.keys(_eventMap[query]))
+				_A[a].addEventListener(e, _eventMap[query][e]);
+		}
+	}
+	$D.body.id = $D.body.className = 'l_n';
+	if($E('l_awaiting_data')) _E.innerText = _E.title;
+	['EVT','HST','DAT','CFG','NFY','GUI','NET','ANI','MRQ','POL','TOP'].forEach(m => $L[m].setup());
+},
+/*************************************************************************************************\
+\*******  GLOBAL EVENTS (automatically hooked)  *****************************  [ $EVT.* ]  *******/
+EVT: {
+	setup: () => void(0),
+	click: e => {
 		let idx=0, msgIdx=-1, sym='', type=$KSTK, dataRef=null, ref='', refList=Object.keys(_clickMap), el=(e&&e.target?e.target:e);
-		$notifySetup(true);
+		$NFY.setup(true);
 		if(!el || !_stageData) return;
 		for(let next=el; !!next.parentElement; next=next.parentElement) {
 			if(!ref) {
@@ -329,19 +326,19 @@ const $L = {
 		else if(sym[0] == _char['currency']) { type = $KCUR; sym = ((sym.substr(-1)=='-'?'USD':sym)+(sym.substr(-1)=='+'?'USD':sym)).replace(/[^A-Z]+/g,''); }
 		_clickMap[ref]({'raw':raw, 'sym':sym, 'idx':idx, 'type':type, 'el':el});
 	},
-	onkeydown: e => {
-		$animationsFastSplash();
-		if(!_animationsComplete||!_stageData||(e&&(e.ctrlKey||e.altKey))||(e&&$toggleStageMode(e)))
+	keydown: e => {
+		$ANI.fastSplash();
+		if(!_animationsComplete||!_stageData||(e&&(e.ctrlKey||e.altKey))||(e&&$DAT.toggleStage(e)))
 			return;
-		$contentTableRoll(e.shiftKey);
+		$GUI.contentTableRoll(e&&e.shiftKey);
 		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=_keyRow, match;
 		if(_topMode) {
-			if($I(['Escape','Backspace','Delete'],(match=e&&e.code)?match:'') >= 0 && (!_I||!$topSearchCriteria()))
-				return($broadBehaviorToggle(true));
+			if($I(['Escape','Backspace','Delete'],(match=e&&e.code)?match:'') >= 0 && (!_I||!$TOP.searchCriteria()))
+				return($GUI.broadBehaviorToggle(true));
 			else if(!$isMobile(false) && (!document.activeElement || document.activeElement.id!='l_top_search'))
 				$E('l_top_search').focus();
-			$settingsButtonToggle(true);
-			$topSearchRunOnEnter(e);
+			$CFG.buttonToggle(true);
+			$TOP.searchRunOnEnter(e);
 			return;
 		}
 		if(!_keyRow) {
@@ -362,13 +359,13 @@ const $L = {
 			else if(_hotKeyMap[e.code])
 				_hotKeyMap[e.code](rows[_keyRow], e);
 			else if((match=e.code.match(/^(Digit|Numpad)([0-9])$/)))
-				$setSortStageData(parseInt(match[2]));
+				$DAT.setStageSort(parseInt(match[2]));
 			else if((match=e.code.match(/^Key([A-Z])$/))) {
-				$setURLFormat(match[1], e.shiftKey);
-				$onclick(rows[_keyRow]);
+				$DAT.setURLFormat(match[1], e.shiftKey);
+				$EVT.click(rows[_keyRow]);
 			}
 			else if(e.code)
-				$marqueeFlash(`The &quot;<i>${e.code}</i>&quot; key is not mapped, type &quot;<i>?</i>&quot; to see the supported hotkeys.`);
+				$MRQ.flash(`The &quot;<i>${e.code}</i>&quot; key is not mapped, type &quot;<i>?</i>&quot; to see the supported hotkeys.`);
 		}
 		if(_keyRow < 0)
 			_keyRow = 0;
@@ -387,43 +384,43 @@ const $L = {
 		if(_keyRow > 0)
 			rows[_keyRow].scrollIntoView({behavior:'smooth', block:'center'});
 	},
-	onkeypress: e => $topSearchRunOnEnter(e),
-	onkeyup: e => $contentTableRoll(e.shiftKey),
-	onvisibilitychange: e => {
+	keypress: e => $TOP.searchRunOnEnter(e),
+	keyup: e => $GUI.contentTableRoll(e.shiftKey),
+	visibilitychange: e => {
 		_frameData = null;
 		if(!$isVisible()) return;
 		$updateTitleWithPrefix('');
-		$notifyRequestWakeLock();
+		$NFY.requestWakeLock();
 		while(_notifications.length > 0)
 			(_notifications.shift()).close();
 		if(_topMode)
-			$marqueeUpdate();
+			$MRQ.update();
 		else if(_marqueeInterval) {
-			$marqueeUpdate(true);
-			$animationsProgressReset();
+			$MRQ.update(true);
+			$ANI.progressReset();
 		}
 	},
-	onresize: e => {
+	resize: e => {
 		if($isMobile(false)) return;
-		$settingsButtonToggle(false);
-		$contentTableUpdateRowCountThatAreInView();
-		$contentTableUpdate();
+		$CFG.buttonToggle(false);
+		$GUI.contentTableUpdateRowCountThatAreInView();
+		$GUI.contentTableUpdate();
 	},
-	onscroll: e => {
+	scroll: e => {
 		const scrolledDown=$E(_naId) || (($W.pageYOffset||$D.documentElement.scrollTop) > $E('l_fixed').offsetHeight);
 		const percent=($D.documentElement.scrollTop||$D.body.scrollTop) / (($D.documentElement.scrollHeight||$D.body.scrollHeight) - $D.documentElement.clientHeight) * 100;
 		if(percent > 50 && _contentTableSoftLimit > 0) {
 			_contentTableSoftLimit = -_contentTableSoftLimit;
-			$contentTableUpdate();
+			$GUI.contentTableUpdate();
 		}
 		$E('l_fixed').className = scrolledDown ? 'l_scrolled' : 'l_not_scrolled';
 	},
-	oncontextmenu: e => {
+	contextmenu: e => {
 		e.preventDefault();
-		$onclick(e);
+		$EVT.click(e);
 	},
-	ontouchstart: e => { _swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY, -1]; },
-	ontouchmove: e => {
+	touchstart: e => { _swipeStartPosition = [e.changedTouches[0].clientX, e.changedTouches[0].clientY, -1]; },
+	touchmove: e => {
 		const height=$W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight, yDiff=e.changedTouches[0].clientY-_swipeStartPosition[2];
 		if($W.pageYOffset || !_animationsComplete || !_swipeStartPosition || _topMode || height < 1)
 			return;
@@ -432,7 +429,7 @@ const $L = {
 		else if($E('l_fixed_highlight'))
 			_E.style.opacity = String(Math.min(1, yDiff*2/height));
 	},
-	ontouchend: e => {
+	touchend: e => {
 		if($E('l_fixed_highlight') && _E.style.opacity)
 			_E.style.opacity = 0;
 		if(!_swipeStartPosition || _topMode) return;
@@ -442,22 +439,22 @@ const $L = {
 			movementPercent = [Math.abs(swipeMovement[0])/width*100, Math.abs(swipeMovement[1])/height*100, swipeMovement[2]/height*100],
 			movementWeighting = (movementPercent[0]+1) / (movementPercent[1]+1);
 		if(movementPercent[0] > 25 && movementWeighting >= 1)
-			$gotoStageDataHistory(swipeMovement[0]);
+			$HST.gotoStageData(swipeMovement[0]);
 		else if(movementPercent[2] > 25 && movementWeighting <= 1 && _swipeStartPosition[2] > 0)
-			$forceNextStagePoll();
+			$POL.forceNextStage();
 		_swipeStartPosition = null;
 	},
-	onpopstate: e => {
-		$settingsButtonToggle(false);
+	popstate: e => {
+		$CFG.buttonToggle(false);
 		if(!e || !e.state) {
 			if(!_topMode)
-				$gotoStageDataHistory(1);
+				$HST.gotoStageData(1);
 			return;
 		}
 		if(_stageDataHistorySessionId < 0) {
 			if(!e.state.session || e.state.root) {
 				if(_stageDataHistoryNext) {
-					$toggleStageMode(_stageDataHistoryNext);
+					$DAT.toggleStage(_stageDataHistoryNext);
 					_stageDataHistoryNext = '';
 				}
 				_stageDataHistorySessionId = -_stageDataHistorySessionId;
@@ -467,51 +464,56 @@ const $L = {
 			return;
 		}
 		else if(_topMode && e.state.items)
-			$parseStageData(e.state, {'fromPopState':true,'updateView':true});
+			$NET.parseStageData(e.state, {'fromPopState':true,'updateView':true});
 		else if(typeof(e.state.toggle) == 'boolean' || e.state.root)
-			$toggleStageMode(e.state.root || e.state.toggle);
+			$DAT.toggleStage(e.state.root || e.state.toggle);
 		else if(_topMode === (typeof(e.state.fixed) != 'undefined'))
-			$toggleStageMode(_topMode);
+			$DAT.toggleStage(_topMode);
 		else if(typeof(e.state.fixed) == 'number') {
 			$W.history.go(e.state.fixed);
-			$gotoStageDataHistory(e.state.fixed);
+			$HST.gotoStageData(e.state.fixed);
 		}
 		else if(typeof(e.state.fixed) != 'undefined')
 			$W.history.replaceState(e.state, null, '/');
+	}
+}, /**********************************************************************************************\
+   \*******  ANIMATION LOGIC  ***********************************************  [ $ANI.* ]  *******/
+ANI: {
+	setup: () => {
+		$ANI.disableIfUnderFPS(6000, 30, 2);
+		setTimeout($ANI.complete, 5750);
 	},
-
-	/* [$] FUNCTIONS */
-	animationsComplete: fastSplash => {
+	complete: fastSplash => {
 		if(_animationsComplete) return;
 		_animationsComplete = true;
 		if(!fastSplash && $E(_naId))
 			_E.className = _naId;
 		$E('l_root').classList.add('l_animations_complete');
-		$E('l_menu').className = (_stageData && !$isWeekend() ? $getThemeMode('l_') : 'l_default');
+		$E('l_menu').className = (_stageData && !$isWeekend() ? $GUI.getThemeMode('l_') : 'l_default');
 		if(!_topMode)
-			$setNextStagePoll(!_stageData||!_stageData['items'] ? _nextStagePollShort : $getSynchronizedNext());
-		else if($topSearchCriteria())
-			$settingsButtonToggle(true);
+			$POL.setNextStage(!_stageData||!_stageData['items'] ? _nextStagePollShort : $POL.getNextSync());
+		else if($TOP.searchCriteria())
+			$CFG.buttonToggle(true);
 		if($hasSettings() && _stageData && _stageData['marquee'] && _stageData['marquee'].length > 1)
-			$marqueeUpdate();
+			$MRQ.update();
 		else
-			$marqueeInitiate();
-		$marqueeIntervalReset();
+			$MRQ.initiate();
+		$MRQ.intervalReset();
 		if($isVisible())
-			$notifyPlayAudio(_audioTest);
-		$contentTableUpdate(true);
+			$NFY.playAudio(_audioTest);
+		$GUI.contentTableUpdate(true);
 		if($isMobile(true) || _settings[_naId])
-			$animationsToggle(false, null);
+			$ANI.toggle(false, null);
 	},
-	animationsFastSplash: () => {
+	fastSplash: () => {
 		if(_animationsComplete || !_stageData) return;
-		$animationsReset('l_logo', 'l_logo 0.5s ease 1 normal 0.5s forwards');
-		$animationsReset('l_fixed', 'l_fixed 0.5s ease 1 normal forwards');
-		$animationsReset('l_marquee_container', 'l_marquee_container 0.5s ease forwards');
-		$animationsComplete(true);
-		$animationsUpdateFlash();
+		$ANI.reset('l_logo', 'l_logo 0.5s ease 1 normal 0.5s forwards');
+		$ANI.reset('l_fixed', 'l_fixed 0.5s ease 1 normal forwards');
+		$ANI.reset('l_marquee_container', 'l_marquee_container 0.5s ease forwards');
+		$ANI.complete(true);
+		$ANI.updateFlash();
 	},
-	animationsUpdateFlash: nextPollMS => {
+	updateFlash: nextPollMS => {
 		if(!_animationsComplete || !$T('path')) return;
 		for(let t=0,i=0; t < _T.length; t++) {
 			const path=_T[t], animate=path.lastElementChild, flashable=path.classList.contains('l_logo_worm_flashable');
@@ -527,37 +529,37 @@ const $L = {
 			animate.beginElementAt(i);
 		}
 		if(nextPollMS && nextPollMS > 0) {
-			$setNextStagePoll(nextPollMS, true);
+			$POL.setNextStage(nextPollMS, true);
 			$scrollToTop();
 		}
 	},
-	animationsToggle: (explicit, saveSettings) => {
+	toggle: (explicit, saveSettings) => {
 		const animations = (typeof explicit == 'boolean' ? explicit : !!$E(_naId));
 		if(saveSettings)
-			$settings(_naId, !animations);
+			$CFG.set(_naId, !animations);
 		$D.body.id = animations ? 'l_n' : _naId;
 		if(_animationsComplete)
 			$D.body.className = $D.body.id;
 		if(_stageDataHistoryIndex >= 0)
-			$updateStageDataHistory();
+			$HST.updateStageData();
 		else if(animations)
-			$marqueeFlash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
-		$animationsProgressReset();
+			$MRQ.flash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
+		$ANI.progressReset();
 		$keyModeReset();
 		$scrollToTop();
-		$onscroll();
+		$EVT.scroll();
 	},
-	animationsProgressReset: force => {
+	progressReset: force => {
 		if(_nextStagePollCompleteEpoch || force)
-			$setNextStagePoll(_nextStagePollCompleteEpoch - $epochNow()); 
+			$POL.setNextStage(_nextStagePollCompleteEpoch - $epochNow()); 
 	},
-	animationsReset: (idOrElement, animation) => {
+	reset: (idOrElement, animation) => {
 		const el=(typeof idOrElement=='string' ? $E(idOrElement) : idOrElement);
 		el.style.animation = 'none';
 		void el.offsetHeight;
 		el.style.animation = animation;
 	},
-	animationsDisableIfUnderFPS: (ms, fps, attempt) => {
+	disableIfUnderFPS: (ms, fps, attempt) => {
 		if(!_frameData) {
 			if(!fps || $E(_naId) || _settings[_naId] || $isMobile(true) || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
 				return($removeFunction('animationsDisableIfUnderFPS'));
@@ -568,48 +570,193 @@ const $L = {
 		else
 			return;
 		if(_frameData.stop > ms)
-			$W.requestAnimationFrame($animationsDisableIfUnderFPS);
+			$W.requestAnimationFrame($ANI.disableIfUnderFPS);
 		else if(_frameData.duration > 0 && (_frameData.frames/_frameData.duration) < _frameData.fps) {
-			$animationsToggle(false, null);
-			$marqueeFlash('Slow graphics detected, disabling most animations.  Use the <i>backslash</i> key to re-enable.');
+			$ANI.toggle(false, null);
+			$MRQ.flash('Slow graphics detected, disabling most animations.  Use the <i>backslash</i> key to re-enable.');
 			$removeFunction('animationsDisableIfUnderFPS');
 		}
 		else if(--_frameData.attempt > 0) {
 			_frameData.frames = 0;
 			_frameData.stop = performance.now() + (_frameData.duration * 1000);
-			$W.requestAnimationFrame($animationsDisableIfUnderFPS);
+			$W.requestAnimationFrame($ANI.disableIfUnderFPS);
 		}
 		else
 			_frameData = null;
-	},
-	keyMapSetup: () => {
-		if(!(_keyMapIndex=_settings['l_keymap_index']))
-			_keyMapIndex = _keyMapIndexDefault;
-		for(let key in _keyMap) {
-			for(let type of [$KCRP,$KFTR,$KCUR]) {
-				if(!_keyMap[key][type])
-					_keyMap[key][type] = _keyMap[_keyMapIndexDefault][type];
-			}
+	}
+}, /**********************************************************************************************\
+   \*******  SETTINGS & GENERAL USER CONFIGURATION  *************************  [ $CFG.* ]  *******/
+CFG: {
+	setup: () => $CFG.load(false),
+	load: passive => {
+		_naId = $isMobile(true) ? 'l_nam' : 'l_na';
+		let now=new Date(), exs=null, settings=null;
+		if(!passive)
+			$CFG.buttonToggle(false, true);
+		if(_topMode && $E('l_settings_button')) {
+			_E.innerHTML = _E.innerHTML.replace('settings','search');
+			$TOP.searchFromURL(location.hash?location.hash:location.pathname);
 		}
+		if(!Object.keys(_settingsBase).length)
+			_settingsBase = $cloneObject(_settings);
+		if(!passive && localStorage.getItem('larval') && (settings=JSON.parse(localStorage.getItem('larval')))) {
+			if(settings['l_version'] == _settings['l_version'])
+				_settings = settings;
+			else 
+				$CFG.clear('Version change.');
+		}
+		if((exs=_settings['l_exceptions']) && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
+			_notifyExceptions = exs.filter(Boolean);
+		else
+			$CFG.set('l_exceptions', '', true);
+		$DAT.getSymbolsOnTop();
+		if(!$hasSettings() && $isWeekend(now)) {
+			$CFG.set('l_show', false, true, 'l_stocks_ah');
+			$CFG.set('l_show', false, true, 'l_etfs');
+			$CFG.set('l_show', true, true, 'l_crypto');
+			$CFG.tabUpdateUI();
+		}
+		for(let key of Object.keys(_settings)) {
+			if($E(key) && _E.type == 'checkbox')
+				_E.checked = _settings[key];
+		}
+		for(let key of Object.keys(_settingsSelectedTab)) {
+			if(!$E(key) || !_E['type'])
+				continue;
+			else if(_E.type == 'checkbox')
+				_E.checked = _settingsSelectedTab[key];
+			else if(_E.type == 'range')
+				_E.value = (typeof _settingsSelectedTab[key]=='number' ? _settingsSelectedTab[key] : 0);
+		}
+		for(let id of ['l_range_up','l_range_down','l_range_volume'])
+			$CFG.updateRange(id);
 	},
-	keyModeReset: () => _keyRow ? $onkeydown(false) : null,
-	getSynchronizedNext: () => {
-		if(!_stageData || !_stageData['next'])
-			return(_nextStagePollLong);
-		let next = Math.floor(_stageData['next'] - (new Date().getTime() / 1000)) + Math.floor(Math.random() * 10);
-		if(next < 0 || next > _nextStagePollLong + _nextStagePollShort)
-			next = _nextStagePollLong;
-		return(next);
+	set: (name, value, passive, tab) => {
+		if(tab)
+			_settings[tab][name] = value;
+		else if(_settingsSelectedTab && typeof _settingsSelectedTab[name] != 'undefined')
+			_settingsSelectedTab[name] = value;
+		else
+			_settings[name] = value;
+		if(!passive || $hasSettings())
+			localStorage.setItem('larval', JSON.stringify(_settings));
 	},
-	vpmToggle: () => {
-		if(!_stageData || (_settings['l_vpm'] === null && !confirm('Toggle from "volume per day" to the average "volume per minute" (VPM)?')))
-			return;
-		$settings('l_vpm', !_settings['l_vpm']);
-		_stageData = $vpmStageData(_stageData);
-		$updateRangeDisplay('l_range_volume');
-		$contentTableUpdate();
+	clear: message => {
+		$MRQ.flash('Clearing local settings'+(message?`: <i class="l_marquee_alt_padded">${message}</i>`:'...'));
+		localStorage.clear();
+		_settings = $cloneObject(_settingsBase);
+		$CFG.load(true);
+		$CFG.tabUpdateUI();
+		$GUI.contentTableUpdate(false);
 	},
-	vpmStageData: stageData => {
+	change: e => { 
+		const context = (e&&e.target) ? e.target : null;
+		for(let inputs=$T('input'), i=0; i < inputs.length; i++) {
+			let input=inputs[i];
+			if(input.type == 'checkbox')
+				$CFG.set(input.id, input.checked);
+			else if(input.type == 'range' && !input.disabled)
+				$CFG.set(input.id, parseInt(input.value,10));
+		}
+		if(context && context.id == 'l_audible' && context.checked)
+			$NFY.playAudio(_audioTest);
+		$CFG.tabUpdateUI();
+		$GUI.contentTableUpdate(false);
+	},
+	updateRange: idOrEvent => {
+		let id='';
+		if(typeof idOrEvent == 'string')
+			id = idOrEvent;
+		else if(typeof idOrEvent == 'object' && idOrEvent.target && idOrEvent.target.id)
+			id = idOrEvent.target.id;
+		const input=$E(id), display=$E(`${id}_display`);
+		if(!input || !display) return;
+		if(id == 'l_range_volume') {
+			if(!(input.disabled=typeof _settingsSelectedTab['l_range_volume']!='number'))
+				display.innerHTML = (_settings['l_vpm'] ? $multiplierExplicit(input.value*_multipliers[_settingsSelectedTab['multiplier']] / _settingsSelectedTab['vpm_shift'],'K',_settingsSelectedTab['vpm_precision']) : ((input.value / _settingsSelectedTab['volume_shift']).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['volume_shift']))) + _settingsSelectedTab['multiplier']));
+			else
+				display.innerHTML = 'N/A';
+		}
+		else
+			display.innerHTML = (input.value / _settingsSelectedTab['percent_shift'] * (id=='l_range_down'?-1:1)).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['percent_shift'])))
+		if(_settings['l_vpm'] !== null)
+			$E('l_range_volume_type').innerHTML = (_settings['l_vpm'] ? 'vpm' : 'vol');
+	},
+	tabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
+	tabSelect: el => {
+		const id=(el?el.id:_settingsSelectedTabName);
+		if(!id || _topMode) return;
+		if($E(_settingsSelectedTabName))
+			_E.classList.remove('l_tab_selected');
+		if($E(id))
+			_E.classList.add('l_tab_selected');
+		_settingsSelectedTab = _settings[_settingsSelectedTabName=id];
+		$CFG.load(true);
+		$CFG.tabUpdateUI();
+	},
+	buttonTextToggle: closed => $E('l_settings_button').innerHTML = (closed?`&#9660; ${_topMode?'search':'settings'} &#9660;`:`&#9650; ${_topMode?'search':'settings'} &#9650;`),
+	buttonToggle: (direction, force) => {
+		if(!$E('l_control') && (_stageData||force))
+			return(false);
+		else if(typeof _E.dataset.opened == 'undefined' || !_animationsComplete)
+			return($E('l_control').dataset.opened='');
+		const isOpen=!!$E('l_control').dataset.opened, forceDirection=(typeof direction=='boolean' ? direction : !isOpen);
+		if(typeof forceDirection=='boolean' && forceDirection === isOpen && !force)
+			return(false);
+		_E.dataset.opened = (isOpen? '' : 'true');
+		_E.style.height = (isOpen?'0':(_topMode?'80':'250'))+'px';
+		$CFG.buttonTextToggle(!isOpen);
+		return(true);
+	}
+}, /**********************************************************************************************\
+   \*******  MODEL & DATA "STAGE" LOGIC  ************************************  [ $DAT.* ]  *******/
+DAT: {
+	setup: () => $GUI.setStage(location.href.match(/top/i) ? 'top' : 'stage'),
+	setStage: stageData => { 
+		_stageData = $DAT.vpmStage(stageData);
+		_contentTableSoftLimit = Math.abs(_contentTableSoftLimit);
+		if($GUI.setTheme($GUI.getThemeMode()) !== false && $Q('meta[name="theme-color"]'))
+			_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
+	},
+	sortStage: updateView => {
+		if(_stageData && _stageDataSortByColumn) {
+			if(!_stageData.itemsImmutable)
+				_stageData.itemsImmutable = $cloneObject(_stageData.items);
+			_stageData.items = _stageData.items.sort((a, b) => {
+				let column = Math.abs(_stageDataSortByColumn) - 1;
+				if(_topMode&&column==$TSYM) column = $THST;
+				if(a[column] === null || a[column] === false || a[column] === undefined)
+					return 1;
+				else if(b[column] === null || b[column] === false || b[column] === undefined)
+					return -1;
+				else if(typeof a[column] != typeof b[column])
+					return _stageDataSortByColumn < 0 ? (typeof a[column]=='number'?1:-1) : (typeof a[column]=='number'?1:-1);
+				else if(typeof a[column] == 'object' && Array.isArray(a[column]))
+					return _stageDataSortByColumn < 0 ? a[column].length-b[column].length : b[column].length-a[column].length;
+				else if(typeof a[column] == 'string')
+					return _stageDataSortByColumn < 0 ? b[column].toUpperCase().localeCompare(a[column].toUpperCase()) : a[column].toUpperCase().localeCompare(b[column].toUpperCase());
+				else if(typeof a[column] == 'number')
+					return _stageDataSortByColumn < 0 ? a[column]-b[column] : b[column]-a[column];
+			});
+		}
+		if(updateView)
+			$GUI.contentTableUpdate(false);
+	},
+	setStageSort: column => {
+		if(_stageDataSortByColumn == -column || !column || column > $E('l_content_table').getElementsByTagName('th').length) {
+			if(_stageData.itemsImmutable)
+				_stageData.items = $cloneObject(_stageData.itemsImmutable);
+			_stageDataSortByColumn = 0;
+		}
+		else if(_stageDataSortByColumn == column)
+			_stageDataSortByColumn = -column;
+		else
+			_stageDataSortByColumn = column;
+		$DAT.sortStage(true);
+		if(!$isSafari())
+			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
+	},
+	vpmStage: stageData => {
 		const vpm=_settings['l_vpm'];
 		if(!stageData || !(stageData['vpm'] ^ vpm))
 			return(stageData);
@@ -638,118 +785,328 @@ const $L = {
 		stageData['vpm'] = vpm;
 		return(stageData);
 	},
-	getData: (jsonFile, jsonCallback, args) => {
-		fetch(_stageDataFetching=(_stageURL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
-		.then(resp => resp.json())
-		.then(json => (_stageDataFetching=null) || jsonCallback(json, args))
-		.catch(err => (_stageDataFetching=null) || jsonCallback(null, args));
+	toggleStage: e => {
+		const explicit=(typeof(e)=='boolean'), topUrl=(e&&typeof(e)=='string'?e:'');
+		if(!explicit && !topUrl && (!e||!e.code||e.code!='Tab'||_stageDataFetching))
+			return(!_animationsComplete || !_stageData);
+		if(e.preventDefault)
+			e.preventDefault();
+		if(topUrl)
+			$HST.push({'toggle':false, 'path':'/'});
+		[_marqueeInterval, _notifyTitleInterval].forEach(i => i&&clearInterval(i));
+		[_marqueeFlashTimeout, _nextStagePollTimeout].forEach(t => t&&clearTimeout(t));
+		[_stageDataHistory, _stageDataHistorySwap] = [_stageDataHistorySwap, _stageDataHistory];
+		$CFG.buttonToggle(false);
+		$GUI.setStage(_topMode ? 'stage' : 'top');
+		$CFG.buttonTextToggle(false);
+		if(_stageDataHistory.length > 0)
+			$DAT.setStage(_stageDataHistory[0]);
+		if(!_topMode || !_stageDataHistory.length)
+			$NET.getStageData(true);
+		else if(_topMode && topUrl)
+			$TOP.searchFromURL(topUrl, true);
+		else if(explicit === false)
+			$TOP.searchRun('');
+		else
+			$GUI.contentTableUpdate();
+		$HST.gotoStageData(_stageDataHistoryIndex=0);
+		$MRQ.flash(`Toggling site mode to: <i>${_topMode?'Top market players':'Volatility'}</i>`);
+		$scrollToTop();
+		if(!explicit)
+			$HST.push({'toggle':_topMode, 'path':topUrl?topUrl:'/'});
+		return(true);
 	},
-	setStageData: stageData => { 
-		_stageData = $vpmStageData(stageData);
-		_contentTableSoftLimit = Math.abs(_contentTableSoftLimit);
-		if($setTheme($getThemeMode()) !== false && $Q('meta[name="theme-color"]'))
-			_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
-	},
-	getStageData: updateView => $getData(`/${_stageMode}.json`, $parseStageData, $X({'updateView':updateView,'search':_topMode?$topSearchCriteria():''})),
-	parseStageData: (json, args) => {
-		let retry=false;
-		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
-			retry = true;
-		else if(_stageDataHistoryIndex >= 0 && !_topMode)
-			_stageDataHistory.push($cloneObject(json));
-		else {
-			if(_topMode && json['search'])
-				json['items'].forEach((r,i) => json['items'][i][$TSYM] = $historyToSummaryString(json['items'][i][$THST]));
-			if(!args || !args['fromPopState'])
-				$historyPushWithPath(json);
-			$setStageData(json);
-			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=_stageData['ts']);
-			if(!$hasSettings() && _stageDataHistory.length==0) {
-				if(_stageData['afterhours']=='idle')
-					$settings('l_show', true, true, 'l_crypto');
-				else if(_stageData['afterhours']=='futures') {
-					$settings('l_show', true, true, 'l_futures');
-					$settings('l_show', true, true, 'l_currency');
-				}
-				$settingsTabUpdateUI();
-			}
-			_stageDataHistory.push($cloneObject(_stageData));
-			$sortStageData(false);
-			if(args && args['updateView']) {
-				$contentTableUpdate(true);
-				$marqueeUpdate(true, true);
-			}
-			if(_stageData['notify'] && $hasSettings())
-				$marqueeFlash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${_stageData['notify']}</span>${_F}`, false, 8000);
-			$animationsUpdateFlash();
-		}
-		if(_topMode) {
-			if(_stageDataHistory.length==1 && json['search'])
-				_stageDataHistory.unshift({'top':true,'items':[],'marquee':[],'next':0,'highlight':0,'ts':0});
-			else if(!_stageData['search']) {
-				if(_stageDataHistory.length > 1 && !json['search'])
-					_stageDataHistory.pop();
-				_stageDataHistory[0] = $cloneObject(_stageData);
-			}
-			$E('l_top_search').disabled = false;
-			if(typeof json['search'] == 'string') {
-				_E.value = json['search'];
-				if(json['search'])
-					$settingsButtonToggle(true);
-			}
-			if(json['search'])
-				$updateStageDataHistory(_stageDataHistoryIndex=-2);
-			if($topSearchCriteria()) $animationsFastSplash();
-			else if(!args || !args['fromPopState']) $getHistoryData();
-		}
-		else {
-			if(_stageDataHistory.length==1 && $W.history && $W.history.pushState) {
-				[1,null,-1].forEach(state => $historyPush({'fixed':state}));
-				$W.history.go(-1);
-			}
-			$setNextStagePoll(retry ? _nextStagePollShort : $getSynchronizedNext());
-		}
-	},
-	getHistoryData: args => (_stageDataHistoryIndex>-1||--_stageDataHistoryIndex<-1) ? $getData(`/${_stageMode}-history.json`, $parseHistoryData, args) : null,
-	parseHistoryData: (json, args) => {
-		const dropDownMode=(args&&typeof args['dropDownIndex']!='undefined');
-		if(!json || json.length < 2) return;
-		else if(_topMode) {
-			_stageData['items'].forEach((row, i) => {
-				if(!json['items'][row[0]]) return;
-				_stageData['items'][i][$TSYM] = $historyToSummaryString(json['items'][row[0]]);
-				_stageData['items'][i].push(json['items'][row[0]]);
-			});
-			if(!_stageData['search']) {
-				_stageData['search'] = '';
-				_stageData['path'] = '/';
-				_stageDataHistory[0] = $cloneObject(_stageData);
-				$historyPushWithPath(_stageDataHistory[0]);
-			}
-			if(dropDownMode)
-				$historyDropDown(args['dropDownIndex'])
-			$contentTableUpdate();
+	editSymbolsOnTop: () => {
+		let symbols=_settings['l_symbols_on_top'];
+		if((symbols=prompt("Enter symbols you would like to have sticky on top: \n[NOTE: alt-click rows to individually add or remove]", symbols?symbols:'')) === null)
 			return;
+		$DAT.setSymbolsOnTop(null, true, false);
+		$DAT.setSymbolsOnTop(symbols, false, true);
+	},
+	delSymbolFromTop: sym => [sym,sym+'+',sym+'-'].forEach(sym => delete _symbolsOnTop[sym]),
+	addSymbolToTop: sym => sym[0]==_char['currency'] ? (_symbolsOnTop[sym]=_symbolsOnTop[sym+'+']=_symbolsOnTop[sym+'-']=sym) : _symbolsOnTop[sym]=sym,
+	getSymbolsOnTop: () => {
+		if(Object.keys(_symbolsOnTop).length)
+			return(_symbolsOnTop);
+		_symbolsOnTop = {};
+		let savedSymbols=_settings['l_symbols_on_top'];
+		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*\$\~\@]?[A-Z0-9]+/ig)))
+			savedSymbols.forEach(sym => $DAT.addSymbolToTop(sym));
+		return(_symbolsOnTop);
+	},
+	setSymbolsOnTop: (symbols, removeOrToggle, updateView) => {
+		if(_topMode) return;
+		const remove=(removeOrToggle===true), toggle=(removeOrToggle===null);
+		let msg='', orderedTopListStr='', orderedTopList, savedSymbols, onTopDiff=$U(Object.values(_symbolsOnTop)).length;
+		if(!symbols && remove)
+			_symbolsOnTop = {};
+		else if(symbols && (savedSymbols=(_topMode?symbols:symbols.toUpperCase()).match(/[\^\*\$\~\@]?[A-Z0-9]+/ig)))
+			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? $DAT.delSymbolFromTop(sym) : $DAT.addSymbolToTop(sym));
+		orderedTopList = $U(Object.values(_symbolsOnTop)).sort((a, b) => a.localeCompare(b));
+		orderedTopListStr = orderedTopList.join(', ').trim(', ');
+		$CFG.set('l_symbols_on_top', orderedTopListStr);
+		if(!updateView) return;
+		onTopDiff -= orderedTopList.length;
+		if(!orderedTopListStr)
+			msg = 'Your on top list is empty, alt-click a row below to add a symbol.';
+		else if((savedSymbols && savedSymbols.length > 1) || Math.abs(onTopDiff) != 1)
+			msg = 'Symbols on top: ';
+		else if(onTopDiff > 0)
+			msg = `<i>${symbols}</i> removed from top: `;
+		else
+			msg = `<i>${symbols}</i> added to top: `;
+		if(orderedTopListStr)
+			msg += `<i class="l_marquee_alt_padded">${orderedTopListStr}</i>`;
+		$MRQ.flash(msg);
+		$GUI.contentTableUpdate(false);
+	},
+	setURLFormat: (key, saveSettings) => {
+		if(!_keyMap[key]) return;
+		_keyMapIndex = key;
+		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain&&domain.hostname?domain.hostname:url);
+		if(saveSettings) {
+			$CFG.set('l_keymap_index', _keyMapIndex);
+			$MRQ.flash(`Links will now permanently direct to <i>${display}</i> by default.`);
 		}
-		_stageDataHistoryFirst = true;
-		let h = json.length;
-		while(--h > 0) {
-			if(json[h]['ts'] == _stageDataHistory[0]['ts'])
-				break;
-		}
-		if(h > 0) {
-			json.length = h;
-			_stageDataHistory = json.concat(_stageDataHistory);
-			if(dropDownMode)
-				$historyDropDown(args['dropDownIndex']);
-			else {
-				$marqueeFlash('Sorry, no additional history is available to rewind to at this time.');
-				_stageDataHistoryIndex = h - 1;
-				$updateStageDataHistory();
+		else
+			$MRQ.flash(`Links will now direct to <i>${display}</i> for this session, hold down <i>shift</i> to make it permanent.`);
+	}
+}, /**********************************************************************************************\
+   \*******  GUI & GENERAL VIEW LOGIC  **************************************  [ $GUI.* ]  *******/
+GUI: {
+	setup: () => {
+		if(!(_keyMapIndex=_settings['l_keymap_index']))
+			_keyMapIndex = _keyMapIndexDefault;
+		for(let key in _keyMap) {
+			for(let type of [$KCRP,$KFTR,$KCUR]) {
+				if(!_keyMap[key][type])
+					_keyMap[key][type] = _keyMap[_keyMapIndexDefault][type];
 			}
 		}
 	},
-	getHistoryForSymbol: (sym, ts) => {
+	setStage: set => {
+		_topMode = (set=='top');
+		_title = document.title = (_topMode?'Larval - Top market players':'Larval - Live market volatility dashboard');
+		_dataMap = $W[`_${_stageMode=set}DataMap`];
+		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^_topMode?'remove':'add'](cn));
+	},
+	forceRedraw: el => el && (el.style.transform='translateZ(0)') && void el.offsetHeight,
+	setTheme: name => (_theme!=name && _themes[name] && _themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color))),
+	getThemeMode: prefix => _stageData ? ((prefix?prefix:'') + (['afterhours','bloodbath','top'].find(key => _stageData[key]) || 'default')) : null,
+	setThemeRandom: message => {
+		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
+		$GUI.setTheme('random');
+		$MRQ.flash(message, false, 20000);
+	},
+	broadBehaviorToggle: topMode => {
+		if(!_animationsComplete)
+			$ANI.fastSplash(true);
+		else if(topMode) {
+			if($E('l_top_search').disabled) return;
+			else if($CFG.buttonToggle(false)) $TOP.searchRun('');
+			else $CFG.buttonToggle(true);
+			$MRQ.update();
+		}
+		else if($scrollToTop() || $CFG.buttonToggle(false) || $HST.gotoStageData(0)) return;
+		else $POL.forceNextStage();		
+	},
+	vpmToggle: () => {
+		if(!_stageData || (_settings['l_vpm'] === null && !confirm('Toggle from "volume per day" to the average "volume per minute" (VPM)?')))
+			return;
+		$CFG.set('l_vpm', !_settings['l_vpm']);
+		_stageData = $DAT.vpmStage(_stageData);
+		$CFG.updateRange('l_range_volume');
+		$GUI.contentTableUpdate();
+	},
+	cellRollover: (row, primary, secondary, staticPrimary) => {
+		let cell='<div class="l_hover_container">', hasSecondary=(row[secondary]||staticPrimary);
+		if(hasSecondary)
+			cell += (row[secondary] ? `<i class="l_hover_active">${$GUI.cell(row,secondary)}</i><i class="l_hover_inactive">` : `<i class="l_hover_inactive">`);
+		cell += $GUI.cell(row, !row[primary] ? secondary : primary);
+		if(hasSecondary)
+			cell += '</i>';
+		cell += '</div>';
+		return(cell);
+	},
+	cellTopRollover: (row, primary, secondary) => {
+		let cell='<div class="l_hover_container">', hasSecondary=(row[$THST]&&row[$THST][0][secondary]);
+		if(hasSecondary)
+			cell += `<i class="l_hover_active">${$GUI.cell(row[$THST][0],secondary)}</i><i class="l_hover_inactive">`;
+		cell += $GUI.cell(row, !row[primary]&&secondary==$HMOD ? '0%' : primary);
+		if(hasSecondary)
+			cell += '</i>';
+		cell += '</div>';
+		return(cell);
+	},
+	cell: (row, type, idx) => row[type] && _dataMap[type] ? _dataMap[type]({'val':row[type], 'row':row, 'type':type, 'idx':typeof(idx)=='number'?idx:-1}) : (typeof type=='string'?type:$F('f_empty_cell')),
+	contentTableRoll: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
+	contentTableRowPopout: row => {
+		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
+			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:_keyMapIndexDefault), `&#128200;&nbsp;${_taMap[row[$TAN]][1]}`]);
+		else if(row[$ERN] && row[$NWS])
+			$F('f_class_title_display', ['l_notify_popout l_news', `News and earnings on ${$GUI.cell(row,$ERN)}`, `&#128197;&nbsp;${$GUI.cell(row,$ERN)}<i>&nbsp;+&nbsp;news</i>`]);
+		else if(row[$ERN])
+			$F('f_class_title_display', ['l_notify_popout', `Earnings on ${$GUI.cell(row,$ERN)}`, `&#128198;&nbsp;${$GUI.cell(row,$ERN)}<i>&nbsp;earnings</i>`]);
+		else if(row[$NWS])
+			$F('f_class_title_display', ['l_notify_popout l_news', 'Company news', '&#128197;&nbsp;<i>recent </i>news']);
+		else
+			$F('');
+		return(_F);
+	},
+	contentTableUpdateRowCountThatAreInView: () => {
+		let rows=$E('l_content_table').getElementsByTagName('tr'), total=-5;
+		for(let i=0; i < rows.length; i++) {
+			const box=rows[i].getBoundingClientRect();
+			if(box.top < $W.innerHeight && box.bottom >= 0)
+				total++;
+		}
+		if(total < 10)
+			total = 10;
+		_contentTableRowCountThatAreInView = total;
+		return(total);
+	},
+	contentTableUpdate: (doNotify, doNotResetKeyRow) => {
+		if(!_stageData || !_animationsComplete) return;
+		$E('l_menu').className = (_animationsComplete && !$isWeekend() ? $GUI.getThemeMode('l_') : 'l_default');
+		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
+		const columns = (_topMode ? ['user','symbols','bull','user%','real%','start','end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options']);
+		if(_assetTypes[0] != stockAssetType) {
+			if($E(_assetTypes[0]))
+				_E.id = stockAssetType;
+			if(_settingsSelectedTabName == _assetTypes[0])
+				_settingsSelectedTabName = stockAssetType;
+			_assetTypes[0] = stockAssetType;
+			$CFG.tabSelect();
+		}
+		if(!_settingsSelectedTabName) {
+			if(!(_settingsSelectedTabName=_assetTypes.find(assetType => _settings[assetType]['l_show'])))
+				_settingsSelectedTabName = _assetTypes[0];
+			$CFG.tabSelect();
+		}
+		for(let assetType of _assetTypes) {
+			const thisType=_settings[assetType];
+			rowRules[assetType] = {
+				'up': thisType['l_range_up'] / thisType['percent_shift'],
+				'down': -thisType['l_range_down'] / thisType['percent_shift'],
+				'volume': (thisType['l_range_volume']?thisType['l_range_volume']:0) * _multipliers[thisType['multiplier']] / thisType[_stageData['vpm']?'vpm_shift':'volume_shift']
+			}
+		}
+		for(let c=1,className=''; c <= columns.length; c++) {
+			className = 'l_content_table_header';
+			if(_stageDataSortByColumn == c)
+				className += ' l_content_table_header_selected';
+			else if(_stageDataSortByColumn == -c)
+				className += ' l_content_table_header_selected_reverse';
+			html += `<th id="l_content_table_header_${c}" class="${className}" data-ref="${c}" data-alt="none">${columns[c-1]}</th>`;
+		}
+		html += '</tr>';
+		if(doNotify)
+			$NFY.clear();
+		for(let i=0; i < _stageData['items'].length; i++) {
+			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_char['etf']?1:0)], isStock=(_I<0), notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
+			let rowClass=rowType, notifyControl='';
+			if(_topMode) {
+				if(isOnTop) {
+					notifyControl = $F('f_class_title_display', ['l_notify_disable', `Remove ${$GUI.cell(row,$SYM)} from top`, 'x']);
+					rowClass = ' l_top_highlight';
+				}
+				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
+					<td class="l_top_user">${notifyControl}<i>${$GUI.cell(row,$TUSR)}</i></td>
+					<td class="l_history_toggle${row[$TTWT]?' l_twit':''}">${$GUI.cellRollover(row,$TSYM,$TTWT)}</td>
+					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TRAT,$HMOD)}</td>
+					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TPCT,$HPCT)}</td>
+					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TPCR,$HPCR)}</td>
+					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TSTR,$HSTR)}</td>
+					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TEND,$HEND)}</td>
+					</tr>`;
+			}
+			else if($isHaltRow(row)) {
+				if(notifyExcept || !$isShowing(rowType))
+					continue;
+				notify = _settings['l_notify_halts'] && (!_settings['l_options_only']||row[$OPT]);
+				rowClass = (notify ? 'l_notify_halt' : 'l_halt');
+				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
+					<td>
+					 ${$F('f_class_title_display', ['l_notify_disable', `Disable ${$GUI.cell(row,$SYM)} notifications for today`, 'x'])}
+					 ${$GUI.cell(row,$SYM)}
+					</td>
+					<td class="${row[$NWS]?'l_news':''}">${$GUI.cellRollover(row,$NAM,$NWS)}</td>
+					<td colspan="4">HALT: ${$GUI.cell(row,$HLT)}</td>
+					<td>${$GUI.contentTableRowPopout(row)}${$GUI.cellRollover(row,$OPT,$OIV)}</td>
+					</tr>`;
+			}
+			else {
+				if(!isOnTop && !$isShowing(rowType))
+					continue;
+				notify=( !notifyExcept && ((((rowRules[rowType]['up']&&row[$PCT5]>=rowRules[rowType]['up'])||(rowRules[rowType]['down']&&rowRules[rowType]['down']>=row[$PCT5])) && (!row[$VOL]||typeof row[$VOL]=='string'||row[$VOL]>=rowRules[rowType]['volume']) && (!_settings['l_options_only']||row[$OPT])) ));
+				if(notify) {
+					rowClass += ` l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
+					notifyControl = $F('f_class_title_display', ['l_notify_disable', `Disable ${$GUI.cell(row,$SYM)} notifications for today`, 'x']);
+				}
+				else {
+					if(isOnTop)
+						rowClass += ' l_top_highlight';
+					if(notifyExcept)
+						notifyControl = $F('f_class_title_display', ['l_notify_enable', `Re-enable ${$GUI.cell(row,$SYM)} notifications`, '&#10003;']);
+					else if(isOnTop)
+						notifyControl = $F('f_class_title_display', ['l_notify_disable', `Remove ${$GUI.cell(row,$SYM)} from top`, 'x']);
+				}
+				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
+					<td>${notifyControl}${$GUI.cell(row,$SYM)}</td>
+					<td class="${row[$NWS]?'l_news':'l_static'}">${$GUI.cellRollover(row,$NAM,$NWS,true)}</td>
+					<td class="l_history_toggle">${$GUI.cellRollover(row,$PCT5,$PCTM)}</td>
+					<td class="l_history_toggle">${$GUI.cellRollover(row,$PCT,$PCTY)}</td>
+					<td class="l_history_toggle">${$GUI.cellRollover(row,$PRC,$PRC5)}</td>
+					<td class="l_history_toggle">${$GUI.cellRollover(row,$VOL,$VOL5)}</td>
+					<td class="l_history_toggle">${$GUI.contentTableRowPopout(row)}${$GUI.cellRollover(row,$OPT,$OIV)}</td>
+					</tr>`;
+			}
+			if(visibleRows >= 0 && _contentTableSoftLimit > 0 && ++visibleRows >= _contentTableSoftLimit)
+				visibleRows = -1;
+			if(isOnTop)
+				onTop[row[$SYM]] = htmlRow;
+			else if(notify) {
+				htmlPriority += htmlRow;
+				notifyRows.push(row);
+			}
+			else if(visibleRows >= 0)
+				htmlNormal += htmlRow;
+		}
+		if(visibleRows >= 0 && _contentTableSoftLimit > 0)
+			_contentTableSoftLimit = -_contentTableSoftLimit;
+		if(_assetTypes.every(type => !_settings[type]['l_show']))
+			html += $F('f_no_results_row', ['No asset types are set to show in your settings.']);
+		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
+			html += $F('f_no_results_row', [_topMode?'No results found: If applicable, your query will be added to the queue.':'No results found.']);
+		else {
+			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
+				html += onTop[key];
+			html += htmlPriority + htmlNormal;
+		}
+		$E('l_more').className = _contentTableSoftLimit > 0 ? 'l_more' : 'l_no_more';
+		$E('l_content_table').className = $E('l_awaiting_data') ? '' : 'l_content_tr_fade_in';
+		if(doNotify && !$isSafari())
+			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
+		$E('l_content_table').innerHTML = html;
+		$GUI.contentTableUpdateRowCountThatAreInView();
+		if(!doNotResetKeyRow)
+			_keyRow = 0;
+		else
+			$EVT.keydown(null);
+		if(doNotify && notifyRows.length > 0)
+			$NFY.notify(notifyRows);
+		if(typeof _stageData['highlight']=='number')
+			$HST.dropDownToggle(_stageData['highlight']);
+	}
+}, /**********************************************************************************************\
+   \*******  HISTORY & NAVIGATION LOGIC  ************************************  [ $HST.* ]  *******/
+HST: {
+	setup: () => {
+		if(_stageDataHistorySessionId) return;
+		$HST.push({'root':true});
+		_stageDataHistorySessionId = Date.now();
+	},
+	getForSymbol: (sym, ts) => {
 		return _stageDataHistory.filter(stageData => stageData['ts'] <= ts).map(history => {
 			const epoch=$epochNow();
 			for(row of history['items']) {
@@ -758,7 +1115,7 @@ const $L = {
 			}
 		}).reverse();
 	},
-	historyToSummaryString: history => {
+	toSummaryString: history => {
 		if(typeof history!='object' || !Array.isArray(history)) return;
 		let symbols=[];
 		for(let h=0; h < history.length; h++) {
@@ -767,21 +1124,16 @@ const $L = {
 		}
 		return('[<u>'+('0'+history.length).slice(-2)+'</u>] '+symbols.slice(0,_topSymbolsToDisplay).join(', '));
 	},
-	historySetup: () => {
-		if(_stageDataHistorySessionId) return;
-		$historyPush({'root':true});
-		_stageDataHistorySessionId = Date.now();
-	},
-	historyPush: obj => {
+	push: obj => {
 		if(typeof(obj)!='object' || !$W['history'] || !$W['history']['pushState']) return;
 		obj['session'] = _stageDataHistorySessionId;
 		$W.history.pushState(obj, _title, obj['path']?obj['path']:'');
 	},
-	historyPushWithPath: obj => obj['path'] ? $historyPush(obj) : null,
-	historyDropDownToggle: idx => (!_stageDataHistoryFirst&&!_topMode&&_stageDataHistoryIndex>=-1) ? $getHistoryData({'dropDownIndex':idx}) : $historyDropDown(idx),
-	historyDropDown: idx => {
+	pushWithPath: obj => obj['path'] ? $HST.push(obj) : null,
+	dropDownToggle: idx => (!_stageDataHistoryFirst&&!_topMode&&_stageDataHistoryIndex>=-1) ? $NET.getHistoryData({'dropDownIndex':idx}) : $HST.dropDown(idx),
+	dropDown: idx => {
 		const types=(_topMode?[$TSYM,$TRAT,$TPCT,$TPCR,$TSTR,$TEND]:[$PCT5,$PCT,$PRC,$VOL,$AGE]), stageRow=(_stageData&&_stageData['items']&&_stageData['items'][idx]?_stageData['items'][idx]:null);
-		let stageDataForSymbols=(_topMode?stageRow[$THST]:$getHistoryForSymbol(stageRow[$SYM],_stageData['ts'])), hadHistoryDisplays=[];
+		let stageDataForSymbols=(_topMode?stageRow[$THST]:$HST.getForSymbol(stageRow[$SYM],_stageData['ts'])), hadHistoryDisplays=[];
 		if(!stageDataForSymbols) return;
 		if($A('.l_history_active'))
 			hadHistoryDisplays = Array.from(_A).map(e => e.remove() || e.id);
@@ -797,20 +1149,20 @@ const $L = {
 				if(lastItem == $F('f_blank_line') && isLast)
 					htmlItems.pop();
 				else if(row && (_topMode||row[$PCT5]))
-					htmlItems.push(lastItem=`<div class="l_hover_container${row[$HILT]?' l_top_searched_symbol':''}">${isAge?row.slice(-1)[0]:$cell(row,type,idx)}</div>`);
+					htmlItems.push(lastItem=`<div class="l_hover_container${row[$HILT]?' l_top_searched_symbol':''}">${isAge?row.slice(-1)[0]:$GUI.cell(row,type,idx)}</div>`);
 				else if(lastItem != _F && !isLast)
 					htmlItems.push(lastItem=_F);
 			});
 			if(htmlItems.length == 0)
-				htmlItems.push(`<div class="l_hover_container">${$cell(stageRow,type)}</div>`);
+				htmlItems.push(`<div class="l_hover_container">${$GUI.cell(stageRow,type)}</div>`);
 			_Q.classList[hadHistoryDisplay?'remove':'add']('l_history');
 			if(!hadHistoryDisplay)
 				_Q.insertAdjacentHTML('beforeend', `<div id="${historyId}" class="l_history_active">${htmlItems.join('')}</div>`);
 		}
 		if($isSafari())
-			$forceRedraw($E('l_content_table'));
+			$GUI.forceRedraw($E('l_content_table'));
 	},
-	gotoStageDataHistory: direction => {
+	gotoStageData: direction => {
 		const lastIndex=_stageDataHistoryIndex;
 		if(!direction) {
 			_keyRow = 0;
@@ -819,7 +1171,7 @@ const $L = {
 		}
 		else if(direction < 0) {
 			if(_stageDataHistory.length < 2 || _stageDataHistoryIndex < 0)
-				$marqueeFlash('You are already viewing live data, use the <i>&#8656;</i> key to rewind.');
+				$MRQ.flash('You are already viewing live data, use the <i>&#8656;</i> key to rewind.');
 			else if(_stageDataHistoryIndex + 2 >= _stageDataHistory.length)
 				_stageDataHistoryIndex = -1;
 			else
@@ -827,246 +1179,39 @@ const $L = {
 		}
 		else if(direction > 0) {
 			if(!_stageDataHistoryFirst && _stageDataHistoryIndex >= -1 && _stageDataHistoryIndex == (_stageDataHistory.length < 2 ? -1 : 0)) {
-				$marqueeFlash('Attempting to gather recent history from the server...');
-				$getHistoryData();
+				$MRQ.flash('Attempting to gather recent history from the server...');
+				$NET.getHistoryData();
 			}
 			else if(_stageDataHistoryIndex < 0)
 				_stageDataHistoryIndex = _stageDataHistory.length - 2;
 			else if(_stageDataHistoryIndex > 0)
 				_stageDataHistoryIndex--;
 			else
-				$marqueeFlash('End of history, use <i>&#8658;</i> to move forward or <i>escape</i> to exit.', true);
+				$MRQ.flash('End of history, use <i>&#8658;</i> to move forward or <i>escape</i> to exit.', true);
 		}
 		if(lastIndex !== _stageDataHistoryIndex) {
-			$updateStageDataHistory();
+			$HST.updateStageData();
 			return(true);
 		}
 		return(false);
 	},
-	updateStageDataHistory: quiet => {
+	updateStageData: quiet => {
 		const historyTotal=_stageDataHistory.length-1, historyIndex=_stageDataHistoryIndex<0?historyTotal:_stageDataHistoryIndex;
 		const stageData=$cloneObject(_stageDataHistory[_stageDataHistoryIndex >= 0 ? _stageDataHistoryIndex : historyTotal]);
-		$setStageData(stageData);
-		$sortStageData(true);
+		$DAT.setStage(stageData);
+		$DAT.sortStage(true);
 		if(quiet || !_stageData) return;
 		const minutesAgo=Math.round(($epochNow()-_stageData['ts'])/60,0);
 		if(historyIndex == historyTotal)
-			$marqueeFlash('All caught up, exiting history mode...', true);
+			$MRQ.flash('All caught up, exiting history mode...', true);
 		else
-			$marqueeFlash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${!_stageDataHistoryFirst?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
-	},
-	setNextStagePoll: (seconds, marqueeInitiate) => {
-		if(_animationsComplete)
-			$animationsReset('l_progress_display', `l_progress ${seconds}s linear forwards`);
-		if(_nextStagePollTimeout)
-			clearTimeout(_nextStagePollTimeout);
-		_nextStagePollTimeout = setTimeout(() => $setNextStagePollComplete(marqueeInitiate), seconds * 1000);
-		_nextStagePollCompleteEpoch = $epochNow() + seconds;
-	},
-	setNextStagePollComplete: marqueeInitiate => {
-		if(_nextStagePollTimeout)
-			clearTimeout(_nextStagePollTimeout);
-		_nextStagePollTimeout = null;
-		if(marqueeInitiate)
-			$marqueeInitiate();
-		$getStageData(true);
-	},
-	multiplierFormat: (number, digits, approx) => {
-		if(typeof number != 'number')
-			return(number);
-		for(let prefix in _multipliers) {
-			if(number >= _multipliers[prefix])
-				return((number/_multipliers[prefix]).toFixed(digits) + prefix);
-		}
-		return(approx ? '~'+(Math.ceil(number/100)*100).toString() : number.toString());
-	},
-	broadBehaviorToggle: topMode => {
-		if(!_animationsComplete)
-			$animationsFastSplash(true);
-		else if(topMode) {
-			if($E('l_top_search').disabled) return;
-			else if($settingsButtonToggle(false)) $topSearchRun('');
-			else $settingsButtonToggle(true);
-			$marqueeUpdate();
-		}
-		else if($scrollToTop() || $settingsButtonToggle(false) || $gotoStageDataHistory(0)) return;
-		else $forceNextStagePoll();		
-	},
-	multiplierExplicit: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
-	htmlPercent: (number, precision) => number ? ($N(Math.abs(number), precision) + $F(number>0?'f_l_up':'f_l_down')) : $F('f_empty_cell'),
-	scrollToTop: smooth => ($W.scrollY ? $W.scrollTo({top: 0, behavior: smooth?'smooth':'auto'}) : false) !== false,
-	forceNextStagePoll: force => (_topMode&&!force) ? $settingsButtonToggle() : $animationsUpdateFlash(0.75),
-	epochNow: () => Math.floor(Date.now() / 1000),
-	epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
-	cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
-	updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' && !_topMode ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
-	removeFunction: fn => $W['$'+fn] = $L[fn] = () => {},
-	forceRedraw: el => el && (el.style.transform='translateZ(0)') && void el.offsetHeight,
-	setTheme: name => (_theme!=name && _themes[name] && _themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color))),
-	getThemeMode: prefix => _stageData ? ((prefix?prefix:'') + (['afterhours','bloodbath','top'].find(key => _stageData[key]) || 'default')) : null,
-	setThemeRandom: message => {
-		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
-		$setTheme('random');
-		$marqueeFlash(message, false, 20000);
-	},
-	setStageMode: set => {
-		_topMode = (set=='top');
-		_title = document.title = (_topMode?'Larval - Top market players':'Larval - Live market volatility dashboard');
-		_dataMap = $W[`_${_stageMode=set}DataMap`];
-		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^_topMode?'remove':'add'](cn));
-	},
-	toggleStageMode: e => {
-		const explicit=(typeof(e)=='boolean'), topUrl=(e&&typeof(e)=='string'?e:'');
-		if(!explicit && !topUrl && (!e||!e.code||e.code!='Tab'||_stageDataFetching))
-			return(!_animationsComplete || !_stageData);
-		if(e.preventDefault)
-			e.preventDefault();
-		if(topUrl)
-			$historyPush({'toggle':false, 'path':'/'});
-		[_marqueeInterval, _notifyTitleInterval].forEach(i => i&&clearInterval(i));
-		[_marqueeFlashTimeout, _nextStagePollTimeout].forEach(t => t&&clearTimeout(t));
-		[_stageDataHistory, _stageDataHistorySwap] = [_stageDataHistorySwap, _stageDataHistory];
-		$settingsButtonToggle(false);
-		$setStageMode(_topMode ? 'stage' : 'top');
-		$settingsButtonTextToggle(false);
-		if(_stageDataHistory.length > 0)
-			$setStageData(_stageDataHistory[0]);
-		if(!_topMode || !_stageDataHistory.length)
-			$getStageData(true);
-		else if(_topMode && topUrl)
-			$topSearchFromURL(topUrl, true);
-		else if(explicit === false)
-			$topSearchRun('');
-		else
-			$contentTableUpdate();
-		$gotoStageDataHistory(_stageDataHistoryIndex=0);
-		$marqueeFlash(`Toggling site mode to: <i>${_topMode?'Top market players':'Volatility'}</i>`);
-		$scrollToTop();
-		if(!explicit)
-			$historyPush({'toggle':_topMode, 'path':topUrl?topUrl:'/'});
-		return(true);
-	},
-	settingsTabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
-	settingsTabSelect: el => {
-		const id=(el?el.id:_settingsSelectedTabName);
-		if(!id || _topMode) return;
-		if($E(_settingsSelectedTabName))
-			_E.classList.remove('l_tab_selected');
-		if($E(id))
-			_E.classList.add('l_tab_selected');
-		_settingsSelectedTab = _settings[_settingsSelectedTabName=id];
-		$settingsLoad(true);
-		$settingsTabUpdateUI();
-	},
-	settingsButtonTextToggle: closed => $E('l_settings_button').innerHTML = (closed?`&#9660; ${_topMode?'search':'settings'} &#9660;`:`&#9650; ${_topMode?'search':'settings'} &#9650;`),
-	settingsButtonToggle: (direction, force) => {
-		if(!$E('l_control') && (_stageData||force))
-			return(false);
-		else if(typeof _E.dataset.opened == 'undefined' || !_animationsComplete)
-			return($E('l_control').dataset.opened='');
-		const isOpen=!!$E('l_control').dataset.opened, forceDirection=(typeof direction=='boolean' ? direction : !isOpen);
-		if(typeof forceDirection=='boolean' && forceDirection === isOpen && !force)
-			return(false);
-		_E.dataset.opened = (isOpen? '' : 'true');
-		_E.style.height = (isOpen?'0':(_topMode?'80':'250'))+'px';
-		$settingsButtonTextToggle(!isOpen);
-		return(true);
-	},
-	settingsChange: e => { 
-		const context = (e&&e.target) ? e.target : null;
-		for(let inputs=$T('input'), i=0; i < inputs.length; i++) {
-			let input=inputs[i];
-			if(input.type == 'checkbox')
-				$settings(input.id, input.checked);
-			else if(input.type == 'range' && !input.disabled)
-				$settings(input.id, parseInt(input.value,10));
-		}
-		if(context && context.id == 'l_audible' && context.checked)
-			$notifyPlayAudio(_audioTest);
-		$settingsTabUpdateUI();
-		$contentTableUpdate(false);
-	},
-	settings: (name, value, passive, tab) => {
-		if(tab)
-			_settings[tab][name] = value;
-		else if(_settingsSelectedTab && typeof _settingsSelectedTab[name] != 'undefined')
-			_settingsSelectedTab[name] = value;
-		else
-			_settings[name] = value;
-		if(!passive || $hasSettings())
-			localStorage.setItem('larval', JSON.stringify(_settings));
-	},
-	settingsLoad: passive => {
-		_naId = $isMobile(true) ? 'l_nam' : 'l_na';
-		let now=new Date(), exs=null, settings=null;
-		if(!passive)
-			$settingsButtonToggle(false, true);
-		if(_topMode && $E('l_settings_button')) {
-			_E.innerHTML = _E.innerHTML.replace('settings','search');
-			$topSearchFromURL(location.hash?location.hash:location.pathname);
-		}
-		if(!Object.keys(_settingsBase).length)
-			_settingsBase = $cloneObject(_settings);
-		if(!passive && localStorage.getItem('larval') && (settings=JSON.parse(localStorage.getItem('larval')))) {
-			if(settings['l_version'] == _settings['l_version'])
-				_settings = settings;
-			else 
-				$settingsClear('Version change.');
-		}
-		if((exs=_settings['l_exceptions']) && (exs=exs.split(/\s+/)) && exs.shift()==now.toLocaleDateString())
-			_notifyExceptions = exs.filter(Boolean);
-		else
-			$settings('l_exceptions', '', true);
-		$getSymbolsOnTop();
-		if(!$hasSettings() && $isWeekend(now)) {
-			$settings('l_show', false, true, 'l_stocks_ah');
-			$settings('l_show', false, true, 'l_etfs');
-			$settings('l_show', true, true, 'l_crypto');
-			$settingsTabUpdateUI();
-		}
-		for(let key of Object.keys(_settings)) {
-			if($E(key) && _E.type == 'checkbox')
-				_E.checked = _settings[key];
-		}
-		for(let key of Object.keys(_settingsSelectedTab)) {
-			if(!$E(key) || !_E['type'])
-				continue;
-			else if(_E.type == 'checkbox')
-				_E.checked = _settingsSelectedTab[key];
-			else if(_E.type == 'range')
-				_E.value = (typeof _settingsSelectedTab[key]=='number' ? _settingsSelectedTab[key] : 0);
-		}
-		for(let id of ['l_range_up','l_range_down','l_range_volume'])
-			$updateRangeDisplay(id);
-	},
-	settingsClear: message => {
-		$marqueeFlash('Clearing local settings'+(message?`: <i class="l_marquee_alt_padded">${message}</i>`:'...'));
-		localStorage.clear();
-		_settings = $cloneObject(_settingsBase);
-		$settingsLoad(true);
-		$settingsTabUpdateUI();
-		$contentTableUpdate(false);
-	},
-	updateRangeDisplay: idOrEvent => {
-		let id='';
-		if(typeof idOrEvent == 'string')
-			id = idOrEvent;
-		else if(typeof idOrEvent == 'object' && idOrEvent.target && idOrEvent.target.id)
-			id = idOrEvent.target.id;
-		const input=$E(id), display=$E(`${id}_display`);
-		if(!input || !display) return;
-		if(id == 'l_range_volume') {
-			if(!(input.disabled=typeof _settingsSelectedTab['l_range_volume']!='number'))
-				display.innerHTML = (_settings['l_vpm'] ? $multiplierExplicit(input.value*_multipliers[_settingsSelectedTab['multiplier']] / _settingsSelectedTab['vpm_shift'],'K',_settingsSelectedTab['vpm_precision']) : ((input.value / _settingsSelectedTab['volume_shift']).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['volume_shift']))) + _settingsSelectedTab['multiplier']));
-			else
-				display.innerHTML = 'N/A';
-		}
-		else
-			display.innerHTML = (input.value / _settingsSelectedTab['percent_shift'] * (id=='l_range_down'?-1:1)).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['percent_shift'])))
-		if(_settings['l_vpm'] !== null)
-			$E('l_range_volume_type').innerHTML = (_settings['l_vpm'] ? 'vpm' : 'vol');
-	},
-	marqueeInitiate: html => {
+			$MRQ.flash(`Rewound to ${$epochToDate(_stageData['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${!_stageDataHistoryFirst?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
+	}
+}, /**********************************************************************************************\
+   \*******  MARQUEE LOGIC  *************************************************  [ $MRQ.* ]  *******/
+MRQ: {
+	setup: () => void(0),
+	initiate: html => {
 		const marquee=$E('l_marquee'), marqueeContent=$E('l_marquee_content'), marqueeContentClone=$E('l_marquee_content_clone');
 		if(html) marqueeContent.innerHTML = html;
 		marqueeContentClone.innerHTML = '';
@@ -1075,19 +1220,19 @@ const $L = {
 		marqueeContentClone.innerHTML = marqueeContent.innerHTML;
 		$D.documentElement.style.setProperty('--l-marquee-start', `-${viewWidthPreClone}px`);
 		$D.documentElement.style.setProperty('--l-marquee-end', `-${fullWidthPreClone}px`);
-		$animationsReset(marquee, `l_marquee ${$marqueeLengthToSeconds()}s linear infinite`);
-		const secsToHighlight = $marqueeSecondsToLastHighlight();
+		$ANI.reset(marquee, `l_marquee ${$MRQ.lengthToSeconds()}s linear infinite`);
+		const secsToHighlight = $MRQ.secondsToLastHighlight();
 		if(secsToHighlight > 0 && _animationsComplete && !_marqueeFlashMessage && _stageDataLastUpdate > _marqueeLastHighlight) {
 			if(!$isVisible())
 				$updateTitleWithPrefix(_char['updown']);
 			else {
 				const repeatCount=Math.floor(secsToHighlight/3), highlightElement=($isMobile(false)?'l_menu':'l_marquee_container');
-				$animationsReset(highlightElement, `${highlightElement}_highlight 3s ease-in forwards ${repeatCount<3?3:repeatCount}`);
+				$ANI.reset(highlightElement, `${highlightElement}_highlight 3s ease-in forwards ${repeatCount<3?3:repeatCount}`);
 				_marqueeLastHighlight = _stageDataLastUpdate;
 			}
 		}
 	},
-	marqueeUpdate: (resetInterval, passive) => {
+	update: (resetInterval, passive) => {
 		if(!_animationsComplete || !_stageData || !_stageData['marquee'] || _stageData['marquee'].length < 2 || (!_topMode&&passive&&$E('l_marquee_about')))
 			return;
 		let html=$F('f_marquee_blink_wide'), itemHtml='', rank=0, maxRank=20, topType='', lastTopType='';
@@ -1130,49 +1275,49 @@ const $L = {
 			if(topType == 'break') break;
 			lastTopType = topType;
 		}
-		$marqueeInitiate(html);
+		$MRQ.initiate(html);
 		if(resetInterval)
-			$marqueeIntervalReset();
+			$MRQ.intervalReset();
 	},
-	marqueeLengthToSeconds: useMS => ((($E('l_marquee_content')&&_E.clientWidth) ? (_E.clientWidth/85) : ((_E.textContent.length||100)/6)) * (useMS?1000:1)),
-	marqueeSecondsToLastHighlight: useMS => {
+	lengthToSeconds: useMS => ((($E('l_marquee_content')&&_E.clientWidth) ? (_E.clientWidth/85) : ((_E.textContent.length||100)/6)) * (useMS?1000:1)),
+	secondsToLastHighlight: useMS => {
 		if(!$A('#l_marquee_content .l_marquee_highlight') || _A.length < 1)
 			return(0);
 		else {
 			const marquee=$E('l_marquee'), lastHighlightedElement=_A[_A.length-1], pixelsToLastHighlight=Math.round(lastHighlightedElement.getBoundingClientRect().x - marquee.offsetLeft + (marquee.clientWidth/2), 0);
-			const pixelsPerSeconds=$E('l_marquee_content').clientWidth/$marqueeLengthToSeconds(), secondsToLastHighlight=Math.round(pixelsToLastHighlight/pixelsPerSeconds,0);
+			const pixelsPerSeconds=$E('l_marquee_content').clientWidth/$MRQ.lengthToSeconds(), secondsToLastHighlight=Math.round(pixelsToLastHighlight/pixelsPerSeconds,0);
 			return(secondsToLastHighlight * (useMS?1000:1));
 		}
 	},
-	marqueeFlash: (message, priority, duration) => {
+	flash: (message, priority, duration) => {
 		if(_marqueeFlashTimeout)
 			_marqueeFlashTimeout = clearTimeout(_marqueeFlashTimeout);
 		if(_stageDataHistoryIndex >= 0 && (!message || !priority))
 			return;
 		_marqueeFlashMessage = message;
 		if($E('l_marquee_container').style.animationName == 'l_marquee_container_highlight')
-			$animationsReset('l_marquee_container', 'l_marquee_container_normal 0s linear forwards');
+			$ANI.reset('l_marquee_container', 'l_marquee_container_normal 0s linear forwards');
 		$E('l_marquee_container').classList[$E(_naId)?'add':'remove']('l_na_marquee_container_override');
 		$E('l_marquee_flash').innerHTML = _marqueeFlashMessage ? _marqueeFlashMessage : '';
 		$E('l_marquee').style.display = _marqueeFlashMessage ? 'none' : 'inline-block';
 		$E('l_marquee_flash').style.display = _marqueeFlashMessage ? 'inline-block' : 'none';
 		if(_marqueeFlashMessage) {
 			$scrollToTop();
-			$marqueeIntervalReset();
-			_marqueeFlashTimeout = setTimeout($marqueeFlash, duration?duration:5000);
-			$animationsReset('l_marquee_flash', 'l_fade_in 1s ease forwards');
+			$MRQ.intervalReset();
+			_marqueeFlashTimeout = setTimeout($MRQ.flash, duration?duration:5000);
+			$ANI.reset('l_marquee_flash', 'l_fade_in 1s ease forwards');
 		}
 		else {
 			$E('l_marquee_container').classList.remove('l_na_marquee_container_override');
-			$marqueeUpdate();
+			$MRQ.update();
 		}
 	},
-	marqueeIntervalReset: () => {
+	intervalReset: () => {
 		if(_marqueeInterval)
 			clearInterval(_marqueeInterval);
-		_marqueeInterval = setInterval($marqueeUpdate, $marqueeLengthToSeconds(true));
+		_marqueeInterval = setInterval($MRQ.update, $MRQ.lengthToSeconds(true));
 	},
-	marqueeHotKeyHelp: () => {
+	hotKeyHelp: () => {
 		let key, match, html=`${$F('f_marquee_blink')} The following hotkeys and gestures are available: ${_F} Use the <i class="l_marquee_alt">tab</i> key to toggle the site mode. ${_F} Use the <i class="l_marquee_alt">backslash</i> key to alternate animation modes. ${_F} Alt-click rows or use the <i class="l_marquee_alt">~</i> key to keep specific symbols on top. ${_F} Swipe or use <i class="l_marquee_alt">&#8644;</i> arrow keys to rewind and navigate your backlog history. ${_F} Use <i class="l_marquee_alt">&#8645;</i> arrow keys to navigate to a row followed by selecting one of these hotkeys: `;
 		for(let key in _keyMap) {
 			if((match=_keyMap[key][$KSTK].match(/([a-z]+)\.[a-z]+\//i)))
@@ -1180,11 +1325,135 @@ const $L = {
 		}
 		html += `${_F} Hold down the <i class="l_marquee_alt">shift</i> key to make your selection permanent. ${_F} The keys <i class="l_marquee_alt">1-7</i> can be used to sort by each column.`;
 		$scrollToTop();
-		$marqueeInitiate(html);
-		$marqueeIntervalReset();
+		$MRQ.initiate(html);
+		$MRQ.intervalReset();
+	}
+}, /**********************************************************************************************\
+   \*******  FETCH & NETWORK PARSING LOGIC  *********************************  [ $NET.* ]  *******/
+NET: {
+	setup: () => $NET.getStageData(false),
+	get: (jsonFile, jsonCallback, args) => {
+		fetch(_stageDataFetching=(_stageURL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
+		.then(resp => resp.json())
+		.then(json => (_stageDataFetching=null) || jsonCallback(json, args))
+		.catch(err => (_stageDataFetching=null) || jsonCallback(null, args));
+	},
+	getStageData: updateView => $NET.get(`/${_stageMode}.json`, $NET.parseStageData, $X({'updateView':updateView,'search':_topMode?$TOP.searchCriteria():''})),
+	parseStageData: (json, args) => {
+		let retry=false;
+		if(!json || !json['ts'] || (_stageDataHistory.length > 0 && _stageDataHistory[_stageDataHistory.length-1]['ts'] == json['ts']))
+			retry = true;
+		else if(_stageDataHistoryIndex >= 0 && !_topMode)
+			_stageDataHistory.push($cloneObject(json));
+		else {
+			if(_topMode && json['search'])
+				json['items'].forEach((r,i) => json['items'][i][$TSYM] = $HST.toSummaryString(json['items'][i][$THST]));
+			if(!args || !args['fromPopState'])
+				$HST.pushWithPath(json);
+			$DAT.setStage(json);
+			$E('l_last_update').innerHTML = $epochToDate(_stageDataLastUpdate=_stageData['ts']);
+			if(!$hasSettings() && _stageDataHistory.length==0) {
+				if(_stageData['afterhours']=='idle')
+					$CFG.set('l_show', true, true, 'l_crypto');
+				else if(_stageData['afterhours']=='futures') {
+					$CFG.set('l_show', true, true, 'l_futures');
+					$CFG.set('l_show', true, true, 'l_currency');
+				}
+				$CFG.tabUpdateUI();
+			}
+			_stageDataHistory.push($cloneObject(_stageData));
+			$DAT.sortStage(false);
+			if(args && args['updateView']) {
+				$GUI.contentTableUpdate(true);
+				$MRQ.update(true, true);
+			}
+			if(_stageData['notify'] && $hasSettings())
+				$MRQ.flash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${_stageData['notify']}</span>${_F}`, false, 8000);
+			$ANI.updateFlash();
+		}
+		if(_topMode) {
+			if(_stageDataHistory.length==1 && json['search'])
+				_stageDataHistory.unshift({'top':true,'items':[],'marquee':[],'next':0,'highlight':0,'ts':0});
+			else if(!_stageData['search']) {
+				if(_stageDataHistory.length > 1 && !json['search'])
+					_stageDataHistory.pop();
+				_stageDataHistory[0] = $cloneObject(_stageData);
+			}
+			$E('l_top_search').disabled = false;
+			if(typeof json['search'] == 'string') {
+				_E.value = json['search'];
+				if(json['search'])
+					$CFG.buttonToggle(true);
+			}
+			if(json['search'])
+				$HST.updateStageData(_stageDataHistoryIndex=-2);
+			if($TOP.searchCriteria()) $ANI.fastSplash();
+			else if(!args || !args['fromPopState']) $NET.getHistoryData();
+		}
+		else {
+			if(_stageDataHistory.length==1 && $W.history && $W.history.pushState) {
+				[1,null,-1].forEach(state => $HST.push({'fixed':state}));
+				$W.history.go(-1);
+			}
+			$POL.setNextStage(retry ? _nextStagePollShort : $POL.getNextSync());
+		}
+	},
+	getHistoryData: args => (_stageDataHistoryIndex>-1||--_stageDataHistoryIndex<-1) ? $NET.get(`/${_stageMode}-history.json`, $NET.parseHistoryData, args) : null,
+	parseHistoryData: (json, args) => {
+		const dropDownMode=(args&&typeof args['dropDownIndex']!='undefined');
+		if(!json || json.length < 2) return;
+		else if(_topMode) {
+			_stageData['items'].forEach((row, i) => {
+				if(!json['items'][row[0]]) return;
+				_stageData['items'][i][$TSYM] = $HST.toSummaryString(json['items'][row[0]]);
+				_stageData['items'][i].push(json['items'][row[0]]);
+			});
+			if(!_stageData['search']) {
+				_stageData['search'] = '';
+				_stageData['path'] = '/';
+				_stageDataHistory[0] = $cloneObject(_stageData);
+				$HST.pushWithPath(_stageDataHistory[0]);
+			}
+			if(dropDownMode)
+				$HST.dropDown(args['dropDownIndex'])
+			$GUI.contentTableUpdate();
+			return;
+		}
+		_stageDataHistoryFirst = true;
+		let h = json.length;
+		while(--h > 0) {
+			if(json[h]['ts'] == _stageDataHistory[0]['ts'])
+				break;
+		}
+		if(h > 0) {
+			json.length = h;
+			_stageDataHistory = json.concat(_stageDataHistory);
+			if(dropDownMode)
+				$HST.dropDown(args['dropDownIndex']);
+			else {
+				$MRQ.flash('Sorry, no additional history is available to rewind to at this time.');
+				_stageDataHistoryIndex = h - 1;
+				$HST.updateStageData();
+			}
+		}
+	}
+}, /**********************************************************************************************\
+   \*******  AUDIO & BROWSER API NOTIFY LOGIC  ******************************  [ $NFY.* ]  *******/
+NFY: {
+	setup: disableFutureRequests => {
+		if(disableFutureRequests)
+			$removeFunction('notifySetup');
+		if(typeof _audioTest == 'string')
+			_audioTest = new Audio(_audioTest);
+		if(typeof _audioAlert == 'string') {
+			_audioAlert = new Audio(_audioAlert);
+			_audioAlert.load();
+		}
+		$NFY.requestPermission();
+		$NFY.requestWakeLock();
 	},
 	notify: notifyRows => {
-		$notifyClear();
+		$NFY.clear();
 		if(_stageDataHistory.length < 2) return;
 		if(!$isVisible() && typeof Notification != 'undefined' && Notification.permission == 'granted') {
 			_notifications.push(new Notification('Larval - Market volatility found!', {
@@ -1193,11 +1462,11 @@ const $L = {
 			}));
 		}
 		else 
-			$notifyRequestPermission();
+			$NFY.requestPermission();
 		notifyRows.push([]);
 		_notifyTitleInterval = setInterval(() => {
 			if(!$D.hidden || !_notifyTitleInterval)
-				$notifyClear();
+				$NFY.clear();
 			else if(!notifyRows[0] || !notifyRows[0][0])
 				$updateTitleWithPrefix();
 			else if($isHaltRow(notifyRows[0]))
@@ -1206,60 +1475,60 @@ const $L = {
 				$D.title = notifyRows[0][$SYM] + ' | ' + _char[notifyRows[0][$PCT5]<0?'down':'up'] + $N(Math.abs(notifyRows[0][$PCT5]),2) + '% | ' + _char[notifyRows[0][$PCT]<0?'down':'up'] + $N(Math.abs(notifyRows[0][$PCT]),2) + '%';
 			notifyRows.push(notifyRows.shift());
 		}, 1000);
-		$notifyPlayAudio(_audioAlert, true);
+		$NFY.playAudio(_audioAlert, true);
 		$scrollToTop();
 	},
-	notifyClear: () => {
+	clear: () => {
 		if(_notifyTitleInterval) {
 			clearInterval(_notifyTitleInterval);
 			_notifyTitleInterval = null;
 		}
 		$updateTitleWithPrefix('');
 	},
-	notifyException: (symbol, disable) => {
+	exception: (symbol, disable) => {
 		if(disable) {
 			if(_symbolsOnTop[symbol])
-				$setSymbolsOnTop(symbol, true, false);
+				$DAT.setSymbolsOnTop(symbol, true, false);
 			else if($I(_notifyExceptions, symbol) < 0)
 				_notifyExceptions.push(symbol);
 		}
 		else if($I(_notifyExceptions, symbol) >= 0)
 			_notifyExceptions.splice(_I, 1);
-		$settings('l_exceptions', (new Date()).toLocaleDateString() + ' ' + _notifyExceptions.join(' '));
-		$contentTableUpdate(false, true);
+		$CFG.set('l_exceptions', (new Date()).toLocaleDateString() + ' ' + _notifyExceptions.join(' '));
+		$GUI.contentTableUpdate(false, true);
 	},
-	notifyVibrate: pattern => {
+	vibrate: pattern => {
 		if(navigator.vibrate)
 			navigator.vibrate(pattern ? pattern : _vibrateAlert);
 	},
-	notifyPlayAudio: (audio, vibrateFallback, disableWarning) => {
+	playAudio: (audio, vibrateFallback, disableWarning) => {
 		if(typeof audio == 'object' && audio.play && _settings['l_audible'])
 			audio.play()
-			.then(() => $notifyPlayAudioCallback(null, vibrateFallback, disableWarning))
-			.catch(err => $notifyPlayAudioCallback(err, vibrateFallback, disableWarning));
+			.then(() => $NFY.playAudioCallback(null, vibrateFallback, disableWarning))
+			.catch(err => $NFY.playAudioCallback(err, vibrateFallback, disableWarning));
 		else if(vibrateFallback)
-			$notifyVibrate();
+			$NFY.vibrate();
 	},
-	notifyPlayAudioCallback: (error, vibrateFallback, disableWarning) => {
+	playAudioCallback: (error, vibrateFallback, disableWarning) => {
 		if(disableWarning)
 			_warnings[$WAUD] = error = false;
 		else if((error ^ _warnings[$WAUD]) || _warnings[$WAUD] === false)
 			return;
 		$updateTitleWithPrefix(error ? _char['warning'] : '');
 		_warnings[$WAUD] = (error ? 'Audible notifications are enabled but your browser failed to play, interaction may be required: <span class="l_warning_audio">click here to attempt to resolve this automatically</span>.' : false);
-		$marqueeUpdate(true, true);	
+		$MRQ.update(true, true);	
 		if(error === false && disableWarning === true)
-			$marqueeFlash('If you did not hear a sound you likely need to manually resolve this.');
+			$MRQ.flash('If you did not hear a sound you likely need to manually resolve this.');
 		else if(vibrateFallback)
-			$notifyVibrate();
+			$NFY.vibrate();
 	},
-	notifyRequestPermission: neverAskAgain => {
+	requestPermission: neverAskAgain => {
 		if(_notifyAllowed || typeof Notification == 'undefined' || _settings['l_no_notifications'] || _warnings[$WNOT] === false)
 			return;
 		else if(neverAskAgain) {
-			$settings('l_no_notifications', true);
+			$CFG.set('l_no_notifications', true);
 			_warnings[$WNOT] = false;
-			$marqueeFlash('Updated settings to no longer mention your notification status.');
+			$MRQ.flash('Updated settings to no longer mention your notification status.');
 		}
 		Promise.resolve(Notification.requestPermission()).then(status => {
 			if(status == 'denied') {
@@ -1271,341 +1540,105 @@ const $L = {
 				_notifyAllowed = true;
 		}).catch(() => _notifyAllowed = null);
 	},
-	notifyRequestWakeLock: () => {
+	requestWakeLock: () => {
 		if(!navigator.wakeLock || _wakeLock)
 			return;
 		navigator.wakeLock.request('screen').then(wakeLock => {
 			_wakeLock = wakeLock;
 			_wakeLock.addEventListener('release', () => {
 				_wakeLock = null;
-				$notifyRequestWakeLock();
+				$NFY.requestWakeLock();
 			});
 		}).catch(() => _wakeLock = null);
+	}
+}, /**********************************************************************************************\
+   \*******  DATA & MARQUEE POLLING LOGIC  **********************************  [ $POL.* ]  *******/
+POL: {
+	setup: () => void(0),
+	forceNextStage: force => (_topMode&&!force) ? $CFG.buttonToggle() : $ANI.updateFlash(0.75),
+	getNextSync: () => {
+		if(!_stageData || !_stageData['next'])
+			return(_nextStagePollLong);
+		let next = Math.floor(_stageData['next'] - (new Date().getTime() / 1000)) + Math.floor(Math.random() * 10);
+		if(next < 0 || next > _nextStagePollLong + _nextStagePollShort)
+			next = _nextStagePollLong;
+		return(next);
 	},
-	notifySetup: disableFutureRequests => {
-		if(disableFutureRequests)
-			$removeFunction('notifySetup');
-		if(typeof _audioTest == 'string')
-			_audioTest = new Audio(_audioTest);
-		if(typeof _audioAlert == 'string') {
-			_audioAlert = new Audio(_audioAlert);
-			_audioAlert.load();
-		}
-		$notifyRequestPermission();
-		$notifyRequestWakeLock();
+	setNextStage: (seconds, marqueeInitiate) => {
+		if(_animationsComplete)
+			$ANI.reset('l_progress_display', `l_progress ${seconds}s linear forwards`);
+		if(_nextStagePollTimeout)
+			clearTimeout(_nextStagePollTimeout);
+		_nextStagePollTimeout = setTimeout(() => $POL.setNextStageComplete(marqueeInitiate), seconds * 1000);
+		_nextStagePollCompleteEpoch = $epochNow() + seconds;
 	},
-	createURL: (symbol, type) => {
-		let keyMap = _keyMap[_keyMapIndex];
-		if(!keyMap)
-			keyMap = _keyMap[_keyMapIndexDefault];
-		return(keyMap[type].replace('@', symbol));
-	},
-	setURLFormat: (key, saveSettings) => {
-		if(!_keyMap[key]) return;
-		_keyMapIndex = key;
-		const domain=new URL(_keyMap[_keyMapIndex][$KSTK]), display=(domain&&domain.hostname?domain.hostname:url);
-		if(saveSettings) {
-			$settings('l_keymap_index', _keyMapIndex);
-			$marqueeFlash(`Links will now permanently direct to <i>${display}</i> by default.`);
-		}
-		else
-			$marqueeFlash(`Links will now direct to <i>${display}</i> for this session, hold down <i>shift</i> to make it permanent.`);
-	},
-	topTimeFormat: str => str + (str.match(/[0-9]{2}\/[0-9]{2}$/)?'@[<u>TBD</u>]':''),
-	topSearchCriteria: set => typeof set=='string' ? ($E('l_top_search').value=set) : $E('l_top_search').value,
-	topSearchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $topSearchRun(),
-	topSearchRun: value => {
+	setNextStageComplete: marqueeInitiate => {
+		if(_nextStagePollTimeout)
+			clearTimeout(_nextStagePollTimeout);
+		_nextStagePollTimeout = null;
+		if(marqueeInitiate)
+			$MRQ.initiate();
+		$NET.getStageData(true);
+	}
+}, /**********************************************************************************************\
+   \*******  TOP MODE LOGIC (top.larval.com & tab key)  *********************  [ $TOP.* ]  *******/
+TOP: { 
+	setup: () => void(0),
+	timeFormat: str => str + (str.match(/[0-9]{2}\/[0-9]{2}$/)?'@[<u>TBD</u>]':''),
+	searchCriteria: set => typeof set=='string' ? ($E('l_top_search').value=set) : $E('l_top_search').value,
+	searchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $TOP.searchRun(),
+	searchRun: value => {
 		if($E('l_top_search').disabled) return;
 		if(typeof value=='string')
 			_E.value = value;
 		if(!_E.value && _stageDataHistory.length && _stageDataHistory[0]['items'].length>0) {
 			_stageDataHistoryIndex = 0;
-			$updateStageDataHistory(true);
+			$HST.updateStageData(true);
 		}
 		else {
 			_E.disabled = true;
 			_E.blur();
-			$forceNextStagePoll(true);
+			$POL.forceNextStage(true);
 		}
 	},
-	topSearchFromURL: (str, run) => {
+	searchFromURL: (str, run) => {
 		let args=[];
 		Object.entries(_topURLMap).find(kv => $M(kv[1],str) ? kv[0].split('').forEach((c,i) => args.push(c+_M[i+1])) : null);
 		if($E('l_top_search') && args.length > 0)
 			_E.value = args.join(' ');
 		if(!run) return;
 		else if(!_topMode)
-			$toggleStageMode(str);
+			$DAT.toggleStage(str);
 		else
-			$topSearchRun();
-	},
-	editSymbolsOnTop: () => {
-		let symbols=_settings['l_symbols_on_top'];
-		if((symbols=prompt("Enter symbols you would like to have sticky on top: \n[NOTE: alt-click rows to individually add or remove]", symbols?symbols:'')) === null)
-			return;
-		$setSymbolsOnTop(null, true, false);
-		$setSymbolsOnTop(symbols, false, true);
-	},
-	delSymbolFromTop: sym => [sym,sym+'+',sym+'-'].forEach(sym => delete _symbolsOnTop[sym]),
-	addSymbolToTop: sym => sym[0]==_char['currency'] ? (_symbolsOnTop[sym]=_symbolsOnTop[sym+'+']=_symbolsOnTop[sym+'-']=sym) : _symbolsOnTop[sym]=sym,
-	getSymbolsOnTop: () => {
-		if(Object.keys(_symbolsOnTop).length)
-			return(_symbolsOnTop);
-		_symbolsOnTop = {};
-		let savedSymbols=_settings['l_symbols_on_top'];
-		if(savedSymbols && (savedSymbols=savedSymbols.match(/[\^\*\$\~\@]?[A-Z0-9]+/ig)))
-			savedSymbols.forEach(sym => $addSymbolToTop(sym));
-		return(_symbolsOnTop);
-	},
-	setSymbolsOnTop: (symbols, removeOrToggle, updateView) => {
-		if(_topMode) return;
-		const remove=(removeOrToggle===true), toggle=(removeOrToggle===null);
-		let msg='', orderedTopListStr='', orderedTopList, savedSymbols, onTopDiff=$U(Object.values(_symbolsOnTop)).length;
-		if(!symbols && remove)
-			_symbolsOnTop = {};
-		else if(symbols && (savedSymbols=(_topMode?symbols:symbols.toUpperCase()).match(/[\^\*\$\~\@]?[A-Z0-9]+/ig)))
-			savedSymbols.forEach(sym => (remove||(toggle&&_symbolsOnTop[sym])) ? $delSymbolFromTop(sym) : $addSymbolToTop(sym));
-		orderedTopList = $U(Object.values(_symbolsOnTop)).sort((a, b) => a.localeCompare(b));
-		orderedTopListStr = orderedTopList.join(', ').trim(', ');
-		$settings('l_symbols_on_top', orderedTopListStr);
-		if(!updateView) return;
-		onTopDiff -= orderedTopList.length;
-		if(!orderedTopListStr)
-			msg = 'Your on top list is empty, alt-click a row below to add a symbol.';
-		else if((savedSymbols && savedSymbols.length > 1) || Math.abs(onTopDiff) != 1)
-			msg = 'Symbols on top: ';
-		else if(onTopDiff > 0)
-			msg = `<i>${symbols}</i> removed from top: `;
-		else
-			msg = `<i>${symbols}</i> added to top: `;
-		if(orderedTopListStr)
-			msg += `<i class="l_marquee_alt_padded">${orderedTopListStr}</i>`;
-		$marqueeFlash(msg);
-		$contentTableUpdate(false);
-	},
-	setSortStageData: column => {
-		if(_stageDataSortByColumn == -column || !column || column > $E('l_content_table').getElementsByTagName('th').length) {
-			if(_stageData.itemsImmutable)
-				_stageData.items = $cloneObject(_stageData.itemsImmutable);
-			_stageDataSortByColumn = 0;
-		}
-		else if(_stageDataSortByColumn == column)
-			_stageDataSortByColumn = -column;
-		else
-			_stageDataSortByColumn = column;
-		$sortStageData(true);
-		if(!$isSafari())
-			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
-	},
-	sortStageData: updateView => {
-		if(_stageData && _stageDataSortByColumn) {
-			if(!_stageData.itemsImmutable)
-				_stageData.itemsImmutable = $cloneObject(_stageData.items);
-			_stageData.items = _stageData.items.sort((a, b) => {
-				let column = Math.abs(_stageDataSortByColumn) - 1;
-				if(_topMode&&column==$TSYM) column = $THST;
-				if(a[column] === null || a[column] === false || a[column] === undefined)
-					return 1;
-				else if(b[column] === null || b[column] === false || b[column] === undefined)
-					return -1;
-				else if(typeof a[column] != typeof b[column])
-					return _stageDataSortByColumn < 0 ? (typeof a[column]=='number'?1:-1) : (typeof a[column]=='number'?1:-1);
-				else if(typeof a[column] == 'object' && Array.isArray(a[column]))
-					return _stageDataSortByColumn < 0 ? a[column].length-b[column].length : b[column].length-a[column].length;
-				else if(typeof a[column] == 'string')
-					return _stageDataSortByColumn < 0 ? b[column].toUpperCase().localeCompare(a[column].toUpperCase()) : a[column].toUpperCase().localeCompare(b[column].toUpperCase());
-				else if(typeof a[column] == 'number')
-					return _stageDataSortByColumn < 0 ? a[column]-b[column] : b[column]-a[column];
-			});
-		}
-		if(updateView)
-			$contentTableUpdate(false);
-	},
-	contentTableUpdateRowCountThatAreInView: () => {
-		let rows=$E('l_content_table').getElementsByTagName('tr'), total=-5;
-		for(let i=0; i < rows.length; i++) {
-			const box=rows[i].getBoundingClientRect();
-			if(box.top < $W.innerHeight && box.bottom >= 0)
-				total++;
-		}
-		if(total < 10)
-			total = 10;
-		_contentTableRowCountThatAreInView = total;
-		return(total);
-	},
-	cellTopRollover: (row, primary, secondary) => {
-		let cell='<div class="l_hover_container">', hasSecondary=(row[$THST]&&row[$THST][0][secondary]);
-		if(hasSecondary)
-			cell += `<i class="l_hover_active">${$cell(row[$THST][0],secondary)}</i><i class="l_hover_inactive">`;
-		cell += $cell(row, !row[primary]&&secondary==$HMOD ? '0%' : primary);
-		if(hasSecondary)
-			cell += '</i>';
-		cell += '</div>';
-		return(cell);
-	},
-	cellRollover: (row, primary, secondary, staticPrimary) => {
-		let cell='<div class="l_hover_container">', hasSecondary=(row[secondary]||staticPrimary);
-		if(hasSecondary)
-			cell += (row[secondary] ? `<i class="l_hover_active">${$cell(row,secondary)}</i><i class="l_hover_inactive">` : `<i class="l_hover_inactive">`);
-		cell += $cell(row, !row[primary] ? secondary : primary);
-		if(hasSecondary)
-			cell += '</i>';
-		cell += '</div>';
-		return(cell);
-	},
-	cell: (row, type, idx) => row[type] && _dataMap[type] ? _dataMap[type]({'val':row[type], 'row':row, 'type':type, 'idx':typeof(idx)=='number'?idx:-1}) : (typeof type=='string'?type:$F('f_empty_cell')),
-	hasSettings: () => localStorage && localStorage.getItem('larval'),
-	isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
-	isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
-	isVisible: el => (el ? $W.getComputedStyle(el).visibility : $D.visibilityState) == 'visible',
-	isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
-	isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
-	isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string',
-	contentTableRoll: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
-	contentTableRowPopout: row => {
-		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
-			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:_keyMapIndexDefault), `&#128200;&nbsp;${_taMap[row[$TAN]][1]}`]);
-		else if(row[$ERN] && row[$NWS])
-			$F('f_class_title_display', ['l_notify_popout l_news', `News and earnings on ${$cell(row,$ERN)}`, `&#128197;&nbsp;${$cell(row,$ERN)}<i>&nbsp;+&nbsp;news</i>`]);
-		else if(row[$ERN])
-			$F('f_class_title_display', ['l_notify_popout', `Earnings on ${$cell(row,$ERN)}`, `&#128198;&nbsp;${$cell(row,$ERN)}<i>&nbsp;earnings</i>`]);
-		else if(row[$NWS])
-			$F('f_class_title_display', ['l_notify_popout l_news', 'Company news', '&#128197;&nbsp;<i>recent </i>news']);
-		else
-			$F('');
-		return(_F);
-	},
-	contentTableUpdate: (doNotify, doNotResetKeyRow) => {
-		if(!_stageData || !_animationsComplete) return;
-		$E('l_menu').className = (_animationsComplete && !$isWeekend() ? $getThemeMode('l_') : 'l_default');
-		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=(_stageData['afterhours']?'l_stocks_ah':'l_stocks');
-		const columns = (_topMode ? ['user','symbols','bull','user%','real%','start','end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',_stageData['vpm']?'vpm':'volume','options']);
-		if(_assetTypes[0] != stockAssetType) {
-			if($E(_assetTypes[0]))
-				_E.id = stockAssetType;
-			if(_settingsSelectedTabName == _assetTypes[0])
-				_settingsSelectedTabName = stockAssetType;
-			_assetTypes[0] = stockAssetType;
-			$settingsTabSelect();
-		}
-		if(!_settingsSelectedTabName) {
-			if(!(_settingsSelectedTabName=_assetTypes.find(assetType => _settings[assetType]['l_show'])))
-				_settingsSelectedTabName = _assetTypes[0];
-			$settingsTabSelect();
-		}
-		for(let assetType of _assetTypes) {
-			const thisType=_settings[assetType];
-			rowRules[assetType] = {
-				'up': thisType['l_range_up'] / thisType['percent_shift'],
-				'down': -thisType['l_range_down'] / thisType['percent_shift'],
-				'volume': (thisType['l_range_volume']?thisType['l_range_volume']:0) * _multipliers[thisType['multiplier']] / thisType[_stageData['vpm']?'vpm_shift':'volume_shift']
-			}
-		}
-		for(let c=1,className=''; c <= columns.length; c++) {
-			className = 'l_content_table_header';
-			if(_stageDataSortByColumn == c)
-				className += ' l_content_table_header_selected';
-			else if(_stageDataSortByColumn == -c)
-				className += ' l_content_table_header_selected_reverse';
-			html += `<th id="l_content_table_header_${c}" class="${className}" data-ref="${c}" data-alt="none">${columns[c-1]}</th>`;
-		}
-		html += '</tr>';
-		if(doNotify)
-			$notifyClear();
-		for(let i=0; i < _stageData['items'].length; i++) {
-			const row=_stageData['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_char['etf']?1:0)], isStock=(_I<0), notifyExcept=($I(_notifyExceptions,row[$SYM])>=0), isOnTop=!!_symbolsOnTop[row[$SYM]];
-			let rowClass=rowType, notifyControl='';
-			if(_topMode) {
-				if(isOnTop) {
-					notifyControl = $F('f_class_title_display', ['l_notify_disable', `Remove ${$cell(row,$SYM)} from top`, 'x']);
-					rowClass = ' l_top_highlight';
-				}
-				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
-					<td class="l_top_user">${notifyControl}<i>${$cell(row,$TUSR)}</i></td>
-					<td class="l_history_toggle${row[$TTWT]?' l_twit':''}">${$cellRollover(row,$TSYM,$TTWT)}</td>
-					<td class="l_history_toggle">${$cellTopRollover(row,$TRAT,$HMOD)}</td>
-					<td class="l_history_toggle">${$cellTopRollover(row,$TPCT,$HPCT)}</td>
-					<td class="l_history_toggle">${$cellTopRollover(row,$TPCR,$HPCR)}</td>
-					<td class="l_history_toggle">${$cellTopRollover(row,$TSTR,$HSTR)}</td>
-					<td class="l_history_toggle">${$cellTopRollover(row,$TEND,$HEND)}</td>
-					</tr>`;
-			}
-			else if($isHaltRow(row)) {
-				if(notifyExcept || !$isShowing(rowType))
-					continue;
-				notify = _settings['l_notify_halts'] && (!_settings['l_options_only']||row[$OPT]);
-				rowClass = (notify ? 'l_notify_halt' : 'l_halt');
-				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
-					<td>
-					 ${$F('f_class_title_display', ['l_notify_disable', `Disable ${$cell(row,$SYM)} notifications for today`, 'x'])}
-					 ${$cell(row,$SYM)}
-					</td>
-					<td class="${row[$NWS]?'l_news':''}">${$cellRollover(row,$NAM,$NWS)}</td>
-					<td colspan="4">HALT: ${$cell(row,$HLT)}</td>
-					<td>${$contentTableRowPopout(row)}${$cellRollover(row,$OPT,$OIV)}</td>
-					</tr>`;
-			}
-			else {
-				if(!isOnTop && !$isShowing(rowType))
-					continue;
-				notify=( !notifyExcept && ((((rowRules[rowType]['up']&&row[$PCT5]>=rowRules[rowType]['up'])||(rowRules[rowType]['down']&&rowRules[rowType]['down']>=row[$PCT5])) && (!row[$VOL]||typeof row[$VOL]=='string'||row[$VOL]>=rowRules[rowType]['volume']) && (!_settings['l_options_only']||row[$OPT])) ));
-				if(notify) {
-					rowClass += ` l_notify_${isOnTop?'top_':''}${row[$PCT5]<0?'down':'up'}`;
-					notifyControl = $F('f_class_title_display', ['l_notify_disable', `Disable ${$cell(row,$SYM)} notifications for today`, 'x']);
-				}
-				else {
-					if(isOnTop)
-						rowClass += ' l_top_highlight';
-					if(notifyExcept)
-						notifyControl = $F('f_class_title_display', ['l_notify_enable', `Re-enable ${$cell(row,$SYM)} notifications`, '&#10003;']);
-					else if(isOnTop)
-						notifyControl = $F('f_class_title_display', ['l_notify_disable', `Remove ${$cell(row,$SYM)} from top`, 'x']);
-				}
-				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
-					<td>${notifyControl}${$cell(row,$SYM)}</td>
-					<td class="${row[$NWS]?'l_news':'l_static'}">${$cellRollover(row,$NAM,$NWS,true)}</td>
-					<td class="l_history_toggle">${$cellRollover(row,$PCT5,$PCTM)}</td>
-					<td class="l_history_toggle">${$cellRollover(row,$PCT,$PCTY)}</td>
-					<td class="l_history_toggle">${$cellRollover(row,$PRC,$PRC5)}</td>
-					<td class="l_history_toggle">${$cellRollover(row,$VOL,$VOL5)}</td>
-					<td class="l_history_toggle">${$contentTableRowPopout(row)}${$cellRollover(row,$OPT,$OIV)}</td>
-					</tr>`;
-			}
-			if(visibleRows >= 0 && _contentTableSoftLimit > 0 && ++visibleRows >= _contentTableSoftLimit)
-				visibleRows = -1;
-			if(isOnTop)
-				onTop[row[$SYM]] = htmlRow;
-			else if(notify) {
-				htmlPriority += htmlRow;
-				notifyRows.push(row);
-			}
-			else if(visibleRows >= 0)
-				htmlNormal += htmlRow;
-		}
-		if(visibleRows >= 0 && _contentTableSoftLimit > 0)
-			_contentTableSoftLimit = -_contentTableSoftLimit;
-		if(_assetTypes.every(type => !_settings[type]['l_show']))
-			html += $F('f_no_results_row', ['No asset types are set to show in your settings.']);
-		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
-			html += $F('f_no_results_row', [_topMode?'No results found: If applicable, your query will be added to the queue.':'No results found.']);
-		else {
-			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
-				html += onTop[key];
-			html += htmlPriority + htmlNormal;
-		}
-		$E('l_more').className = _contentTableSoftLimit > 0 ? 'l_more' : 'l_no_more';
-		$E('l_content_table').className = $E('l_awaiting_data') ? '' : 'l_content_tr_fade_in';
-		if(doNotify && !$isSafari())
-			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs(_stageDataSortByColumn));
-		$E('l_content_table').innerHTML = html;
-		$contentTableUpdateRowCountThatAreInView();
-		if(!doNotResetKeyRow)
-			_keyRow = 0;
-		else
-			$onkeydown(null);
-		if(doNotify && notifyRows.length > 0)
-			$notify(notifyRows);
-		if(typeof _stageData['highlight']=='number')
-			$historyDropDownToggle(_stageData['highlight']);
+			$TOP.searchRun();
 	}
-}
+}, 
+/*************************************************************************************************\
+\*******  MISCELLANEOUS HELPERS  ************************************************  [ $* ]  *******/
+multiplierFormat: (number, digits, approx) => {
+	if(typeof number != 'number')
+		return(number);
+	for(let prefix in _multipliers) {
+		if(number >= _multipliers[prefix])
+			return((number/_multipliers[prefix]).toFixed(digits) + prefix);
+	}
+	return(approx ? '~'+(Math.ceil(number/100)*100).toString() : number.toString());
+},
+multiplierExplicit: (value, multiplier, precision) => _multipliers[multiplier] ? ((value/_multipliers[multiplier]).toFixed(precision) + multiplier) : value,
+htmlPercent: (number, precision) => number ? ($N(Math.abs(number), precision) + $F(number>0?'f_l_up':'f_l_down')) : $F('f_empty_cell'),
+scrollToTop: smooth => ($W.scrollY ? $W.scrollTo({top: 0, behavior: smooth?'smooth':'auto'}) : false) !== false,
+keyModeReset: () => _keyRow ? $EVT.keydown(false) : null,
+epochNow: () => Math.floor(Date.now() / 1000),
+epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
+createURL: (symbol, type) => _keyMap[_keyMap[_keyMapIndex]?_keyMapIndex:_keyMapIndexDefault][type].replace('@',symbol),
+cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
+updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' && !_topMode ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
+removeFunction: fn => $W['$'+fn] = $L[fn] = () => void(0),
+hasSettings: () => localStorage && localStorage.getItem('larval'),
+isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
+isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
+isVisible: el => (el ? $W.getComputedStyle(el).visibility : $D.visibilityState) == 'visible',
+isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
+isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
+isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string'
+} /* EOF */
