@@ -1,10 +1,11 @@
 /*                       _                      
 | | __ _ _ ____   ____ _| |  ___ ___  _ __ ___  
 | |/ _` | '__\ \ / / _` | | / __/ _ \| '_ ` _ \ 
-| | (_| | |   \ V / (_| | || (_| (_) | | | | | |
+| | (_| | |   \ V / (_| | || (_| (_) | | | | | | A strange, hacky, and experimental barebones project to give me some nostalgia after too many years of the "by the book" day job.
 |_|\__,_|_|    \_/ \__,_|_(_)___\___/|_| |_| |*/
 
 const $L = {
+_components: ['EVT', 'HST', 'DAT', 'CFG', 'NFY', 'GUI', 'NET', 'ANI', 'MRQ', 'POL', 'TOP'],
 _stageURL: '//stage.larval.com/',
 _stageMode: 'stage',
 _stageData: null,
@@ -271,7 +272,7 @@ LOAD: e => {
 	}
 	$D.body.id = $D.body.className = 'l_n';
 	if($E('l_awaiting_data')) _E.innerText = _E.title;
-	['EVT','HST','DAT','CFG','NFY','GUI','NET','ANI','MRQ','POL','TOP'].forEach(m => $L[m].setup());
+	_components.forEach(c => $L[c].setup());
 },
 
 /*************************************************************************************************\
@@ -398,7 +399,7 @@ EVT: {
 			$MRQ.update();
 		else if(_marqueeInterval) {
 			$MRQ.update(true);
-			$ANI.progressReset();
+			$POL.progressReset();
 		}
 	},
 	resize: e => {
@@ -547,14 +548,10 @@ ANI: {
 			$HST.updateStageData();
 		else if(animations)
 			$MRQ.flash(`Full animation experience has been restored${saveSettings?' and saved':''}.`);
-		$ANI.progressReset();
+		$POL.progressReset();
 		$keyModeReset();
 		$scrollToTop();
 		$EVT.scroll();
-	},
-	progressReset: force => {
-		if(_nextStagePollCompleteEpoch || force)
-			$POL.setNextStage(_nextStagePollCompleteEpoch - $epochNow()); 
 	},
 	reset: (idOrElement, animation) => {
 		const el=(typeof idOrElement=='string' ? $E(idOrElement) : idOrElement);
@@ -724,6 +721,8 @@ DAT: {
 		_contentTableSoftLimit = Math.abs(_contentTableSoftLimit);
 		if($GUI.setTheme($GUI.getThemeMode()) !== false && $Q('meta[name="theme-color"]'))
 			_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
+		if(!_topMode && location.pathname.length > 1 && $W.history && $W.history.replaceState)
+			$W.history.replaceState({}, null, '/');
 	},
 	sortStage: updateView => {
 		if(_stageData && _stageDataSortByColumn) {
@@ -1598,6 +1597,10 @@ POL: {
 		if(marqueeInitiate)
 			$MRQ.initiate();
 		$NET.getStageData(true);
+	},
+	progressReset: force => {
+		if(_nextStagePollCompleteEpoch || force)
+			$POL.setNextStage(_nextStagePollCompleteEpoch - $epochNow()); 
 	}
 },
 
