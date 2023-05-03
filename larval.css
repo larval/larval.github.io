@@ -94,6 +94,10 @@
 	from { background-color: var(--l-color-11); }
 	to { background-color: var(--l-color-16); }
 }
+/*|___ ___ _ _ ___| |  A strange, hacky, and experimental barebones project that tracks various markets.
+| | .'|  _| | | .'| |  [ ..to give an old guy some nostalgia and escape after a decade of rigid work.. ]
+|_|__,|_|  \_/|__,|*/
+
 @keyframes l_notify_halt {
 	from { background-color: transparent; }
 	to { background-color: var(--l-color-10); }
