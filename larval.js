@@ -373,15 +373,15 @@ EVT: {
 		e.preventDefault();
 		$EVT.click(e);
 	},
-	touchstart: e => { $GUI.SWIPE_START = [e.changedTouches[0].clientX, e.changedTouches[0].clientY, -1]; },
+	touchstart: e => $GUI.SWIPE_START = [e.changedTouches[0].clientX, e.changedTouches[0].clientY, -1],
 	touchmove: e => {
-		const height=$W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight, yDiff=e.changedTouches[0].clientY-$GUI.SWIPE_START[2];
-		if($W.pageYOffset || !$ANI.COMPLETE || !$GUI.SWIPE_START || $TOP.ON || height < 1)
-			return;
+		const height=$W.innerHeight||$D.documentElement.clientHeight||$D.body.clientHeight;
+		if($W.pageYOffset || !$ANI.COMPLETE || !$GUI.SWIPE_START || $TOP.ON || height < 1 || (e.touches&&e.touches.length>1))
+			$GUI.SWIPE_START = null;
 		else if($GUI.SWIPE_START[2] < 0)
 			$GUI.SWIPE_START[2] = e.changedTouches[0].clientY;
 		else if($E('l_fixed_highlight'))
-			_E.style.opacity = String(Math.min(1, yDiff*2/height));
+			_E.style.opacity = String(Math.min(1, (e.changedTouches[0].clientY-$GUI.SWIPE_START[2])*2/height));
 	},
 	touchend: e => {
 		if($E('l_fixed_highlight') && _E.style.opacity)
@@ -659,8 +659,8 @@ CFG: {
 		const isOpen=!!$E('l_control').dataset.opened, forceDirection=(typeof direction=='boolean' ? direction : !isOpen);
 		if(typeof forceDirection=='boolean' && forceDirection === isOpen && !force)
 			return(false);
-		_E.dataset.opened = (isOpen? '' : 'true');
-		_E.style.height = (isOpen?'0':($TOP.ON?'80':'250'))+'px';
+		_E.dataset.opened = (isOpen?'':'true');
+		_E.style.height = (isOpen?'0':$E('l_control_table').offsetHeight)+'px';
 		$CFG.buttonTextToggle(!isOpen);
 		return(true);
 	}
