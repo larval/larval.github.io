@@ -1179,7 +1179,7 @@ HST: {
 				$MRQ.flash('End of history, use <i>&#8658;</i> to move forward or <i>escape</i> to exit.', true);
 		}
 		if(lastIndex !== $HST.IDX) {
-			$HST.updateStageData();
+			$HST.updateStageData(!$HST.FIRST);
 			return(true);
 		}
 		return(false);
