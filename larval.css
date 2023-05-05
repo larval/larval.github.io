@@ -369,6 +369,7 @@ i { font-style: normal !important; }
 	animation: l_marquee_container 0.5s ease forwards; 
 	border: 1px solid #444;
 }
+#l_marquee_container div { flex: 0 1 auto; }
 #l_marquee_container a { color: var(--l-color-0); }
 #l_marquee, #l_marquee_flash {
 	z-index: 0;
