@@ -516,7 +516,7 @@ ANI: {
 	disableIfUnderFPS: (ms, fps, attempt) => {
 		if(!$GUI.FRAMES) {
 			if(!fps || $E($ANI.ID) || _settings[$ANI.ID] || $isMobile(true) || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
-				return($removeFunction('animationsDisableIfUnderFPS'));
+				return($removeFunction('ANI', 'disableIfUnderFPS'));
 			$GUI.FRAMES = {'fps':fps, 'duration':ms/1000, 'stop':performance.now()+ms, 'frames':0, 'attempt':attempt>0?attempt:0};
 		}
 		else if(!fps)
@@ -528,7 +528,7 @@ ANI: {
 		else if($GUI.FRAMES.duration > 0 && ($GUI.FRAMES.frames/$GUI.FRAMES.duration) < $GUI.FRAMES.fps) {
 			$ANI.toggle(false, null);
 			$MRQ.flash('Slow graphics detected, disabling most animations.  Use the <i>backslash</i> key to re-enable.');
-			$removeFunction('animationsDisableIfUnderFPS');
+			$removeFunction('ANI', 'disableIfUnderFPS');
 		}
 		else if(--$GUI.FRAMES.attempt > 0) {
 			$GUI.FRAMES.frames = 0;
@@ -1441,7 +1441,7 @@ NFY: {
 
 	setup: disableFutureRequests => {
 		if(disableFutureRequests)
-			$removeFunction('notifySetup');
+			$removeFunction('NFY', 'setup');
 		if(typeof _audioTest == 'string')
 			_audioTest = new Audio(_audioTest);
 		if(typeof _audioAlert == 'string') {
@@ -1645,7 +1645,7 @@ epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekda
 createURL: (symbol, type) => _keyMap[_keyMap[$GUI.KEY_MAP_IDX]?$GUI.KEY_MAP_IDX:$GUI.KEY_MAP_IDX_DEFAULT][type].replace('@',symbol),
 cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
 updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' && !$TOP.ON ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
-removeFunction: fn => $W['$'+fn] = $L[fn] = () => void(0),
+removeFunction: (comp, func) => $W['$'+comp][func] = $L[comp][func] = () => void(0),
 hasSettings: () => localStorage && localStorage.getItem('larval'),
 isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
 isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
