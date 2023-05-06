@@ -1335,7 +1335,7 @@ NET: {
 	},
 	getStageData: updateView => $NET.get(`/${$DAT.MODE}.json`, $NET.parseStageData, $X({'updateView':updateView,'search':$TOP.ON?$TOP.searchCriteria():''})),
 	parseStageData: (json, args) => {
-		let retry=false;
+		let retry=false, minsOff=0;
 		if(!json || !json['ts'] || ($HST.DATA.length > 0 && $HST.DATA[$HST.DATA.length-1]['ts'] == json['ts']))
 			retry = true;
 		else if($HST.IDX >= 0 && !$TOP.ON)
@@ -1364,6 +1364,10 @@ NET: {
 			}
 			if($DAT.DATA['notify'] && $hasSettings())
 				$MRQ.flash(`${$F('f_marquee_blink')}<span id="l_marquee_notify">${$DAT.DATA['notify']}</span>${_F}`, false, 8000);
+			else if($DAT.LAST && !$TOP.ON && (minsOff=Math.floor(($DAT.LAST-Date.now()/1000)/60,0)) > 9)
+				$MRQ.flash(`Your local clock is <i>${minsOff}</i> minutes ahead of the server.`);
+			else if(minsOff < -9)
+				$MRQ.flash(`Server data is unexpectedly old: <i>${Math.abs(minsOff)}</i> minutes behind.`);
 			$ANI.updateFlash();
 		}
 		if($TOP.ON) {
