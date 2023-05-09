@@ -543,16 +543,16 @@ ANI: {
 /*************************************************************************************************\
 \*******  SETTINGS & GENERAL USER CONFIGURATION  ****************************  [ $CFG.* ]  *******/
 CFG: {
-	setup: () => $CFG.load(false),
+	setup: () => {
+		$GUI.setStage($TOP.searchFromURL(location.hash?location.hash:location.pathname) || location.href.match(/top/i) ? 'top' : 'stage');
+		if($TOP.ON) $CFG.buttonTextToggle(false);
+		$CFG.load(false);
+	},
 	load: passive => {
 		$ANI.ID = $isMobile(true) ? 'l_nam' : 'l_na';
 		let now=new Date(), exs=null, settings=null;
 		if(!passive)
 			$CFG.buttonToggle(false, true);
-		if($TOP.ON && $E('l_settings_button')) {
-			_E.innerHTML = _E.innerHTML.replace('settings','search');
-			$TOP.searchFromURL(location.hash?location.hash:location.pathname);
-		}
 		if(!Object.keys(_settingsBase).length)
 			_settingsBase = $cloneObject(_settings);
 		if(!passive && localStorage.getItem('larval') && (settings=JSON.parse(localStorage.getItem('larval')))) {
@@ -650,7 +650,7 @@ CFG: {
 		$CFG.load(true);
 		$CFG.tabUpdateUI();
 	},
-	buttonTextToggle: closed => $E('l_settings_button').innerHTML = (closed?`&#9660; ${$TOP.ON?'search':'settings'} &#9660;`:`&#9650; ${$TOP.ON?'search':'settings'} &#9650;`),
+	buttonTextToggle: opened => $E('l_settings_button').innerHTML = (opened?`&#9660; ${$TOP.ON?'search':'settings'} &#9660;`:`&#9650; ${$TOP.ON?'search':'settings'} &#9650;`),
 	buttonToggle: (direction, force) => {
 		if(!$E('l_control') && ($DAT.DATA||force))
 			return(false);
@@ -671,7 +671,7 @@ CFG: {
 DAT: {
 	URL: '//stage.larval.com/', MODE: 'stage', DATA: null, SORT: 0, LAST: 0, ON_TOP: {}, FETCHING: null, TIMEOUT: null,
 
-	setup: () => $GUI.setStage(location.href.match(/top/i) ? 'top' : 'stage'),
+	setup: () => void(0),
 	setStage: stageData => { 
 		$DAT.DATA = $DAT.vpmStage(stageData);
 		$GUI.TABLE_SOFT_LIMIT = Math.abs($GUI.TABLE_SOFT_LIMIT);
@@ -1621,7 +1621,7 @@ TOP: {
 		Object.entries(_topURLMap).find(kv => $M(kv[1],str) ? kv[0].split('').forEach((c,i) => args.push(c+_M[i+1])) : null);
 		if($E('l_top_search') && args.length > 0)
 			_E.value = args.join(' ');
-		if(!run) return;
+		if(!run) return(_E.value);
 		else if(!$TOP.ON)
 			$DAT.toggleStage(str);
 		else
