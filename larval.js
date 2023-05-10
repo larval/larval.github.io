@@ -1016,7 +1016,7 @@ GUI: {
 					 ${$GUI.cell(row,$SYM)}
 					</td>
 					<td class="${row[$NWS]?'l_news':''}">${$GUI.cellRollover(row,$NAM,$NWS)}</td>
-					<td colspan="4">HALT: ${$GUI.cell(row,$HLT)}</td>
+					<td colspan="4">${$GUI.cell(row,$HLT)}</td>
 					<td>${$GUI.contentTableRowPopout(row)}${$GUI.cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
