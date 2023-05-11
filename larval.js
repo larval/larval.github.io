@@ -1,5 +1,5 @@
 /*|___ ___ _ _ ___| |  A strange, hacky, and experimental barebones project that tracks various markets.
-| | .'|  _| | | .'| |  [ ..to give an old guy some nostalgia and escape after a decade of rigid work.. ]
+| | .'|  _| | | .'| |  (: An excuse to escape into the nostalgia of slapping something together agian :)
 |_|__,|_|  \_/|__,|*/
 
 const $L = { _components: ['EVT', 'CFG', 'GUI', 'HST', 'DAT', 'NFY', 'NET', 'ANI', 'MRQ', 'POL', 'TOP'],
@@ -215,6 +215,7 @@ LOAD: e => {
 	for(let k of Object.keys($L))
 		window[k[0]=='_'?k:('$'+k)] = $L[k];
 	_components.forEach(c => $L[c].setup());
+	$D.childNodes.forEach(c => c.nodeType==Node.COMMENT_NODE ? console.log(c.nodeValue) : null);
 },
 
 /*************************************************************************************************\
