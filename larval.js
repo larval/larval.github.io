@@ -670,7 +670,7 @@ CFG: {
 /*************************************************************************************************\
 \*******  MODEL & DATA "STAGE" LOGIC  ***************************************  [ $DAT.* ]  *******/
 DAT: {
-	URL: '//stage.larval.com/', MODE: 'stage', DATA: null, SORT: 0, LAST: 0, ON_TOP: {}, FETCHING: null, TIMEOUT: null,
+	MODE: 'stage', DATA: null, SORT: 0, LAST: 0, ON_TOP: {}, FETCHING: null, TIMEOUT: null,
 
 	setup: () => void(0),
 	setStage: stageData => { 
@@ -859,6 +859,7 @@ GUI: {
 		});
 		$GUI.MAP = $GUI.MAPS[$DAT.MODE];
 		$D.body.id = $D.body.className = 'l_n';
+		$E('l_root').classList.add('l_' + $D.domain.split('.').pop().toLowerCase());
 		if($E('l_awaiting_data'))
 			_E.innerText = _E.title;
 		if(!($GUI.KEY_MAP_IDX=_settings['l_keymap_index']))
@@ -1327,9 +1328,11 @@ MRQ: {
 /*************************************************************************************************\
 \*******  FETCH & NETWORK PARSING LOGIC  ************************************  [ $NET.* ]  *******/
 NET: {
+	URL: '//' + document.domain.replace(/com$/i,'net'),
+
 	setup: () => $NET.getStageData(false),
 	get: (jsonFile, jsonCallback, args) => {
-		fetch($DAT.FETCHING=($DAT.URL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
+		fetch($DAT.FETCHING=($NET.URL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
 		.then(resp => resp.json())
 		.then(json => ($DAT.FETCHING=null) || jsonCallback(json, args))
 		.catch(err => ($DAT.FETCHING=null) || jsonCallback(null, args));
