@@ -1328,7 +1328,7 @@ MRQ: {
 /*************************************************************************************************\
 \*******  FETCH & NETWORK PARSING LOGIC  ************************************  [ $NET.* ]  *******/
 NET: {
-	URL: '//' + document.domain.replace(/com$/i,'net'),
+	URL: '//' + document.domain.replace(/\w+$/,'net'),
 
 	setup: () => $NET.getStageData(false),
 	get: (jsonFile, jsonCallback, args) => {
