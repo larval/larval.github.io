@@ -545,7 +545,7 @@ ANI: {
 \*******  SETTINGS & GENERAL USER CONFIGURATION  ****************************  [ $CFG.* ]  *******/
 CFG: {
 	setup: () => {
-		$GUI.setStage($TOP.searchFromURL(location.hash?location.hash:location.pathname) || location.href.match(/top/i) ? 'top' : 'stage');
+		$GUI.setStage(($TOP.searchFromURL(location.hash?location.hash:location.pathname) || $D.domain.match(/top/i)) ? 'top' : 'stage');
 		if($TOP.ON) $CFG.buttonTextToggle(false);
 		$CFG.load(false);
 	},
