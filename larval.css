@@ -953,8 +953,8 @@ input[type="checkbox"] {
 #l_nam .l_notify_up, #l_nam .l_notify_top_up { background-color: var(--l-color-12) !important; }
 #l_nam .l_notify_down, #l_nam .l_notify_top_down { background-color: var(--l-color-16) !important; }
 #l_nam .l_notify_halt { background-color: var(--l-color-10) !important; }
-.l_net #l_afterhours_left, .l_net #l_afterhours_right { color: yellow !important; }
-.l_net #l_logo_worm_eye, .l_net .l_logo_letter_o  { fill: yellow !important; }
+.l_net #l_afterhours_left, .l_net #l_afterhours_right { color: #FFDE96 !important; }
+.l_net #l_logo_worm_eye, .l_net .l_logo_letter_o  { fill: #FFDE96 !important; }
 input[type=checkbox] + label {
 	display: inline-block;
 	cursor: pointer;

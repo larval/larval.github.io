@@ -102,7 +102,7 @@ _clickMap: {
 	'l_tab':_                   => $CFG.tabSelect(_.el),
 	'l_warning_audio':_         => $NFY.playAudio(_audioTest, false, true),
 	'l_warning_never_notify':_  => $NFY.requestPermission(true),
-	'shift_default':_           => _.raw ? $W.open('https://top.larval.com/'+($M(/[A-Z0-9_]+$/ig,_.raw)?_M[0]:_.raw), _.raw).focus() : $DAT.editSymbolsOnTop(),
+	'shift_default':_           => _.raw ? $TOP.searchFromURL('/symbol/'+($M(/[A-Z0-9_]+$/ig,_.raw)?_M[0]:_.raw), true) : $DAT.editSymbolsOnTop(),
 	'alt_default':_             => _.raw ? $DAT.setSymbolsOnTop(_.raw, null, true) : $DAT.editSymbolsOnTop(),
 	'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`, _extURLOptions)
 },
