@@ -212,6 +212,8 @@ Z: (str, ms) => {
 /*************************************************************************************************\
 \*******  APP ENTRY POINT (main)  ******************************************  [ $L.LOAD ]  *******/
 LOAD: e => {
+	if(location.protocol == 'http:')
+		location.protocol = 'https:';
 	for(let k of Object.keys($L))
 		window[k[0]=='_'?k:('$'+k)] = $L[k];
 	_components.forEach(c => $L[c].setup());
