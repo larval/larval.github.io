@@ -1606,10 +1606,11 @@ TOP: {
 
 	setup: () => void(0),
 	timeFormat: str => str + (str.match(/[0-9]{2}\/[0-9]{2}$/)?'@[<u>TBD</u>]':''),
-	searchCriteria: set => typeof set=='string' ? ($E('l_top_search').value=set) : $E('l_top_search').value,
-	searchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $TOP.searchRun(),
+	searchCriteria: set => (typeof set=='string'?($E('l_top_search').value=set):$E('l_top_search').value) + (_E.value&&_E.dataset.append?_E.dataset.append:''),
+	searchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $TOP.searchRun(false),
 	searchRun: value => {
 		if($E('l_top_search').disabled) return;
+		_E.dataset.append = (value===false?'!':'');
 		if(typeof value=='string')
 			_E.value = value;
 		if(!_E.value && $HST.DATA.length && $HST.DATA[0]['items'].length>0) {
