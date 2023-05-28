@@ -285,7 +285,7 @@ EVT: {
 	},
 	keydown: e => {
 		$ANI.fastSplash();
-		if(!$ANI.COMPLETE||!$DAT.DATA||(e&&(e.ctrlKey||e.altKey))||(e&&$DAT.toggleStage(e)))
+		if(!$ANI.COMPLETE||!$DAT.DATA||$TOP.LIVE||(e&&(e.ctrlKey||e.altKey))||(e&&$DAT.toggleStage(e)))
 			return;
 		$GUI.contentTableRoll(e&&e.shiftKey);
 		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=$GUI.KEY_ROW, match;
@@ -403,7 +403,7 @@ EVT: {
 	},
 	popstate: e => {
 		$CFG.buttonToggle(false);
-		if(!e || !e.state) {
+		if(!e || !e.state || $TOP.LIVE) {
 			if(!$TOP.ON)
 				$HST.gotoStageData(1);
 			return;
@@ -547,7 +547,7 @@ ANI: {
 \*******  SETTINGS & GENERAL USER CONFIGURATION  ****************************  [ $CFG.* ]  *******/
 CFG: {
 	setup: () => {
-		$GUI.setStage(($TOP.searchFromURL(location.hash?location.hash:location.pathname) || $D.domain.match(/top/i)) ? 'top' : 'stage');
+		$GUI.setStage(($TOP.searchFromURL(location.hash?location.hash:location.pathname) || $D.domain.match(/top|live/i)) ? 'top' : 'stage');
 		if($TOP.ON) $CFG.buttonTextToggle(false);
 		$CFG.load(false);
 	},
@@ -958,7 +958,7 @@ GUI: {
 		if(!$DAT.DATA || !$ANI.COMPLETE) return;
 		$E('l_menu').className = ($ANI.COMPLETE && !$isWeekend() ? $GUI.getThemeMode('l_') : 'l_default');
 		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=($DAT.DATA['afterhours']?'l_stocks_ah':'l_stocks');
-		const columns = ($TOP.ON ? ['user','symbols','bull','user%','real%','start','end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',$DAT.DATA['vpm']?'vpm':'volume','options']);
+		const columns = ($TOP.ON ? ['user',$TOP.LIVE?'post':'symbols','bull','user%','real%','start',$TOP.LIVE?'added':'end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',$DAT.DATA['vpm']?'vpm':'volume','options']);
 		if(_assetTypes[0] != stockAssetType) {
 			if($E(_assetTypes[0]))
 				_E.id = stockAssetType;
@@ -993,7 +993,7 @@ GUI: {
 			$NFY.clear();
 		for(let i=0; i < $DAT.DATA['items'].length; i++) {
 			const row=$DAT.DATA['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_char['etf']?1:0)], isStock=(_I<0), notifyExcept=($I($NFY.EXCEPTIONS,row[$SYM])>=0), isOnTop=!!$DAT.ON_TOP[row[$SYM]];
-			let rowClass=rowType, notifyControl='';
+			let rowClass=rowType, notifyControl='', historyClass=($TOP.LIVE?'':'l_history_toggle');
 			if($TOP.ON) {
 				if(isOnTop) {
 					notifyControl = $F('f_class_title_display', ['l_notify_disable', `Remove ${$GUI.cell(row,$SYM)} from top`, 'x']);
@@ -1001,12 +1001,12 @@ GUI: {
 				}
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td class="l_top_user">${notifyControl}<i>${$GUI.cell(row,$TUSR)}</i></td>
-					<td class="l_history_toggle${row[$TTWT]?' l_twit':''}">${$GUI.cellRollover(row,$TSYM,$TTWT)}</td>
-					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TRAT,$HMOD)}</td>
-					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TPCT,$HPCT)}</td>
-					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TPCR,$HPCR)}</td>
-					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TSTR,$HSTR)}</td>
-					<td class="l_history_toggle">${$GUI.cellTopRollover(row,$TEND,$HEND)}</td>
+					<td class="${historyClass}${row[$TTWT]?' l_twit':''}">${$GUI.cellRollover(row,$TSYM,$TTWT)}</td>
+					<td class="${historyClass}">${$GUI.cellTopRollover(row,$TRAT,$HMOD)}</td>
+					<td class="${historyClass}">${$GUI.cellTopRollover(row,$TPCT,$HPCT)}</td>
+					<td class="${historyClass}">${$GUI.cellTopRollover(row,$TPCR,$HPCR)}</td>
+					<td class="${historyClass}">${$GUI.cellTopRollover(row,$TSTR,$HSTR)}</td>
+					<td class="${historyClass}">${$GUI.cellTopRollover(row,$TEND,$HEND)}</td>
 					</tr>`;
 			}
 			else if($isHaltRow(row)) {
@@ -1066,7 +1066,7 @@ GUI: {
 		if(_assetTypes.every(type => !_settings[type]['l_show']))
 			html += $F('f_no_results_row', ['No asset types are set to show in your settings.']);
 		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
-			html += $F('f_no_results_row', [$TOP.ON?'No results found: If applicable, your query will be added to the queue.':'No results found.']);
+			html += $F('f_no_results_row', [$TOP.ON&&!$TOP.LIVE?'No results found: If applicable, your query will be added to the queue.':'No results found.']);
 		else {
 			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
 				html += onTop[key];
@@ -1230,7 +1230,7 @@ MRQ: {
 		}
 	},
 	update: (resetInterval, passive) => {
-		if(!$ANI.COMPLETE || !$DAT.DATA || !$DAT.DATA['marquee'] || $DAT.DATA['marquee'].length < 2 || (!$TOP.ON&&passive&&$E('l_marquee_about')))
+		if(!$ANI.COMPLETE || !$DAT.DATA || $TOP.LIVE || !$DAT.DATA['marquee'] || $DAT.DATA['marquee'].length < 2 || (!$TOP.ON&&passive&&$E('l_marquee_about')))
 			return;
 		let html=$F('f_marquee_blink_wide'), itemHtml='', rank=0, maxRank=20, topType='', lastTopType='';
 		if(!$TOP.ON) {
@@ -1301,7 +1301,8 @@ MRQ: {
 		if($MRQ.MESSAGE) {
 			$scrollToTop();
 			$MRQ.intervalReset();
-			$MRQ.TIMEOUT = setTimeout($MRQ.flash, duration?duration:5000);
+			if(duration >= 0)
+				$MRQ.TIMEOUT = setTimeout($MRQ.flash, duration?duration:5000);
 			$ANI.reset('l_marquee_flash', 'l_fade_in 1s ease forwards');
 		}
 		else {
@@ -1377,6 +1378,15 @@ NET: {
 			$ANI.updateFlash();
 		}
 		if($TOP.ON) {
+			if($TOP.LIVE) {
+				if(!($TOP.LIVE=$DAT.DATA['live']))
+					$MRQ.flash('Live support is currently not available, reverted to top mode.', true);
+				else {
+					$DAT.DATA.items = [];
+					$TOP.WS.connect();
+					return;
+				}
+			}
 			if($HST.DATA.length==1 && json['search'])
 				$HST.DATA.unshift({'top':true,'items':[],'marquee':[],'next':0,'highlight':0,'ts':0});
 			else if(!$DAT.DATA['search']) {
@@ -1602,9 +1612,15 @@ POL: {
 /*************************************************************************************************\
 \*******  TOP MODE LOGIC (top.larval.com & tab key)  ************************  [ $TOP.* ]  *******/
 TOP: {
-	ON: false,
+	ON: false, LIVE: false, INTERVAL: null, SOCKET: null,
 
-	setup: () => void(0),
+	setup: () => {
+		if(typeof WebSocket == 'undefined' || $TOP.INTERVAL || !($TOP.LIVE=!!$D.domain.match(/live/i)))
+			return;
+		$MRQ.flash('Live connection: <i>Initiating</i>', true, -1)
+		$E('l_root').classList.add('l_top_live');
+		$TOP.INTERVAL = setInterval($TOP.WS.connect, 30000);
+	},
 	timeFormat: str => str + (str.match(/[0-9]{2}\/[0-9]{2}$/)?'@[<u>TBD</u>]':''),
 	searchCriteria: set => (typeof set=='string'?($E('l_top_search').value=set):$E('l_top_search').value) + (_E.value&&_E.dataset.append?_E.dataset.append:''),
 	searchRunOnEnter: e => (!e||(e.keyCode!=13&&!(e.code&&e.code.match(/Enter$/)))) ? null : $TOP.searchRun(false),
@@ -1633,6 +1649,42 @@ TOP: {
 			$DAT.toggleStage(str);
 		else
 			$TOP.searchRun();
+	},
+	WS: {
+		connect: () => {
+			if(!$TOP.LIVE || ($TOP.SOCKET && $TOP.SOCKET.readyState !== WebSocket.CLOSED))
+				return;
+			$TOP.SOCKET = new WebSocket(`wss:${$NET.URL}:${$TOP.LIVE}`);
+			Object.keys($TOP.WS).forEach(n => `on${n}` in $TOP.SOCKET ? $TOP.SOCKET.addEventListener(n,$TOP.WS[n]) : null); 
+		},
+		message: e => {
+			try {
+				const row = JSON.parse(e.data);
+				if(!$DAT.LAST || !row)
+					return;
+				if($E('l_content_table').getElementsByTagName('tr').length==2 && (!$DAT.DATA||!$DAT.DATA.items.length))
+					_E.deleteRow(1);
+				$DAT.DATA.items.unshift(row);
+				_E.insertRow(1).innerHTML = `<tr class="l_stocks" data-ref="0">
+					<td class="l_top_user"><i>${$GUI.cell(row,$TUSR)}</i></td>
+					<td>${$GUI.cell(row,$TSYM)}</td>
+					<td>${$GUI.cell(row,$TRAT)}</td>
+					<td>${$GUI.cell(row,$TPCT)}</td>
+					<td>${$GUI.cell(row,$TPCR)}</td>
+					<td>${$GUI.cell(row,$TSTR)}</td>
+					<td>${$GUI.cell(row,$TEND)}</td>
+					</tr>`;
+				Array.from(_E.getElementsByTagName('tr')).forEach((tr,i) => tr.dataset.ref=i);
+			}
+			catch(e) { }
+		},
+		open: e => {
+			if($DAT.DATA)
+				$DAT.DATA.items = [];
+			$GUI.contentTableUpdate();
+			$MRQ.flash('Live connection: <i>Active</i>', true, -1)
+		},
+		close: e => $MRQ.flash('Live connection: <span class="l_marquee_highlight"><i>INACTIVE</i></span>', true, -1)
 	}
 },
 
