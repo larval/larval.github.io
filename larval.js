@@ -489,10 +489,13 @@ ANI: {
 				i += 0.1;
 			animate.beginElementAt(i);
 		}
-		if(nextPollMS && nextPollMS > 0) {
+		if($TOP.LIVE)
+			$TOP.WS.connect();
+		else if(nextPollMS && nextPollMS > 0)
 			$POL.setNextStage(nextPollMS, true);
-			$scrollToTop();
-		}
+		else
+			return;
+		$scrollToTop();
 	},
 	toggle: (explicit, saveSettings) => {
 		const animations = (typeof explicit == 'boolean' ? explicit : !!$E($ANI.ID));
@@ -892,6 +895,7 @@ GUI: {
 			$ANI.fastSplash(true);
 		else if(topMode) {
 			if($E('l_top_search').disabled) return;
+			else if($TOP.LIVE) $ANI.updateFlash();
 			else if($CFG.buttonToggle(false)) $TOP.searchRun('');
 			else $CFG.buttonToggle(true);
 			$MRQ.update();
@@ -1578,7 +1582,7 @@ POL: {
 	LONG: 300, SHORT: 30, EPOCH_COMPLETE: 0,
 
 	setup: () => void(0),
-	forceNextStage: force => ($TOP.ON&&!force) ? $CFG.buttonToggle() : $ANI.updateFlash(0.75),
+	forceNextStage: force => ($TOP.ON&&!$TOP.LIVE&&!force) ? $CFG.buttonToggle() : $ANI.updateFlash(0.75),
 	getNextSync: () => {
 		if(!$DAT.DATA || !$DAT.DATA['next'])
 			return($POL.LONG);
