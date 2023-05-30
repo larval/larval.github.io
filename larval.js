@@ -1680,7 +1680,7 @@ TOP: {
 					<td>${$GUI.cell(row,$TSTR)}</td>
 					<td>${$GUI.cell(row,$TEND)}</td>
 					</tr>`;
-				Array.from(_E.getElementsByTagName('tr')).forEach((tr,i) => tr.dataset.ref=i);
+				Array.from(_E.getElementsByTagName('tr')).forEach((tr,i) => i ? (tr.dataset.ref=i-1) : null);
 			}
 			catch(e) { }
 		},
