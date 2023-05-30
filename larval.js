@@ -1305,7 +1305,7 @@ MRQ: {
 		if($MRQ.MESSAGE) {
 			$scrollToTop();
 			$MRQ.intervalReset();
-			if(duration >= 0)
+			if(typeof duration != 'number' || duration >= 0)
 				$MRQ.TIMEOUT = setTimeout($MRQ.flash, duration?duration:5000);
 			$ANI.reset('l_marquee_flash', 'l_fade_in 1s ease forwards');
 		}
