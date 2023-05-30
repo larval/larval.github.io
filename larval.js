@@ -1081,6 +1081,8 @@ GUI: {
 		if(doNotify && !$isSafari())
 			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs($DAT.SORT));
 		$E('l_content_table').innerHTML = html;
+		if($TOP.ON)
+			Array.from($A('.l_top_user')).forEach(u => u.title = u.innerText);
 		$GUI.contentTableUpdateRowCountThatAreInView();
 		if(!doNotResetKeyRow)
 			$GUI.KEY_ROW = 0;
@@ -1670,7 +1672,7 @@ TOP: {
 					_E.deleteRow(1);
 				$DAT.DATA.items.unshift(row);
 				_E.insertRow(1).innerHTML = `<tr class="l_stocks" data-ref="0">
-					<td class="l_top_user"><i>${$GUI.cell(row,$TUSR)}</i></td>
+					<td class="l_top_user" title="${$H(row[$TUSR])}"><i>${$GUI.cell(row,$TUSR)}</i></td>
 					<td>${$GUI.cell(row,$TSYM)}</td>
 					<td>${$GUI.cell(row,$TRAT)}</td>
 					<td>${$GUI.cell(row,$TPCT)}</td>
