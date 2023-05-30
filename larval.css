@@ -661,7 +661,8 @@ i { font-style: normal !important; }
 	word-wrap: break-word;
 }
 .l_stage_only .l_content_table_notify_0 tr td:nth-child(3),
-.l_top_only .l_content_table_notify_0 tr td:nth-child(4),
+.l_top_only:not(.l_top_live) .l_content_table_notify_0 tr td:nth-child(4),
+.l_top_live .l_content_table_notify_0 tr td:nth-child(7),
 .l_content_table_notify_1 tr td:nth-child(1),
 .l_content_table_notify_2 tr td:nth-child(2),
 .l_content_table_notify_3 tr td:nth-child(3),
