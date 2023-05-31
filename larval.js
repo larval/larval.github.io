@@ -285,7 +285,7 @@ EVT: {
 	},
 	keydown: e => {
 		$ANI.fastSplash();
-		if(!$ANI.COMPLETE||!$DAT.DATA||$TOP.LIVE||(e&&(e.ctrlKey||e.altKey))||(e&&$DAT.toggleStage(e)))
+		if(!$ANI.COMPLETE||!$DAT.DATA||$TOP.LOG||(e&&(e.ctrlKey||e.altKey))||(e&&$DAT.toggleStage(e)))
 			return;
 		$GUI.contentTableRoll(e&&e.shiftKey);
 		let rows=$E('l_content_table').getElementsByTagName('tr'), lastKeyRow=$GUI.KEY_ROW, match;
@@ -403,7 +403,7 @@ EVT: {
 	},
 	popstate: e => {
 		$CFG.buttonToggle(false);
-		if(!e || !e.state || $TOP.LIVE) {
+		if(!e || !e.state || $TOP.LOG) {
 			if(!$TOP.ON)
 				$HST.gotoStageData(1);
 			return;
@@ -489,7 +489,7 @@ ANI: {
 				i += 0.1;
 			animate.beginElementAt(i);
 		}
-		if($TOP.LIVE)
+		if($TOP.LOG)
 			$TOP.WS.connect();
 		else if(nextPollMS && nextPollMS > 0)
 			$POL.setNextStage(nextPollMS, true);
@@ -521,7 +521,7 @@ ANI: {
 	},
 	disableIfUnderFPS: (ms, fps, attempt) => {
 		if(!$GUI.FRAMES) {
-			if(!fps || $E($ANI.ID) || _settings[$ANI.ID] || $isMobile(true) || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
+			if(!fps || $E($ANI.ID) || _settings[$ANI.ID] || $TOP.LOG || $isMobile(true) || !['requestAnimationFrame','performance'].every(fn=>$W[fn]))
 				return($removeFunction('ANI', 'disableIfUnderFPS'));
 			$GUI.FRAMES = {'fps':fps, 'duration':ms/1000, 'stop':performance.now()+ms, 'frames':0, 'attempt':attempt>0?attempt:0};
 		}
@@ -550,7 +550,7 @@ ANI: {
 \*******  SETTINGS & GENERAL USER CONFIGURATION  ****************************  [ $CFG.* ]  *******/
 CFG: {
 	setup: () => {
-		$GUI.setStage(($TOP.searchFromURL(location.hash?location.hash:location.pathname) || $D.domain.match(/top|live/i)) ? 'top' : 'stage');
+		$GUI.setStage(($TOP.searchFromURL(location.hash?location.hash:location.pathname) || $D.domain.match(/top|log/i)) ? 'top' : 'stage');
 		if($TOP.ON) $CFG.buttonTextToggle(false);
 		$CFG.load(false);
 	},
@@ -895,7 +895,7 @@ GUI: {
 			$ANI.fastSplash(true);
 		else if(topMode) {
 			if($E('l_top_search').disabled) return;
-			else if($TOP.LIVE) $ANI.updateFlash();
+			else if($TOP.LOG) $ANI.updateFlash();
 			else if($CFG.buttonToggle(false)) $TOP.searchRun('');
 			else $CFG.buttonToggle(true);
 			$MRQ.update();
@@ -962,7 +962,7 @@ GUI: {
 		if(!$DAT.DATA || !$ANI.COMPLETE) return;
 		$E('l_menu').className = ($ANI.COMPLETE && !$isWeekend() ? $GUI.getThemeMode('l_') : 'l_default');
 		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=($DAT.DATA['afterhours']?'l_stocks_ah':'l_stocks');
-		const columns = ($TOP.ON ? ['user',$TOP.LIVE?'post':'symbols','bull','user%','real%','start',$TOP.LIVE?'added':'end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',$DAT.DATA['vpm']?'vpm':'volume','options']);
+		const columns = ($TOP.ON ? ['user',$TOP.LOG?'post':'symbols','bull','user%','real%','start',$TOP.LOG?'added':'end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',$DAT.DATA['vpm']?'vpm':'volume','options']);
 		if(_assetTypes[0] != stockAssetType) {
 			if($E(_assetTypes[0]))
 				_E.id = stockAssetType;
@@ -997,7 +997,7 @@ GUI: {
 			$NFY.clear();
 		for(let i=0; i < $DAT.DATA['items'].length; i++) {
 			const row=$DAT.DATA['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_char['etf']?1:0)], isStock=(_I<0), notifyExcept=($I($NFY.EXCEPTIONS,row[$SYM])>=0), isOnTop=!!$DAT.ON_TOP[row[$SYM]];
-			let rowClass=rowType, notifyControl='', historyClass=($TOP.LIVE?'':'l_history_toggle');
+			let rowClass=rowType, notifyControl='', historyClass=($TOP.LOG?'':'l_history_toggle');
 			if($TOP.ON) {
 				if(isOnTop) {
 					notifyControl = $F('f_class_title_display', ['l_notify_disable', `Remove ${$GUI.cell(row,$SYM)} from top`, 'x']);
@@ -1070,7 +1070,7 @@ GUI: {
 		if(_assetTypes.every(type => !_settings[type]['l_show']))
 			html += $F('f_no_results_row', ['No asset types are set to show in your settings.']);
 		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
-			html += $F('f_no_results_row', [$TOP.ON&&!$TOP.LIVE?'No results found: If applicable, your query will be added to the queue.':'No results found.']);
+			html += $F('f_no_results_row', [$TOP.ON&&!$TOP.LOG?'No results found: If applicable, your query will be added to the queue.':'No results found.']);
 		else {
 			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
 				html += onTop[key];
@@ -1236,7 +1236,7 @@ MRQ: {
 		}
 	},
 	update: (resetInterval, passive) => {
-		if(!$ANI.COMPLETE || !$DAT.DATA || $TOP.LIVE || !$DAT.DATA['marquee'] || $DAT.DATA['marquee'].length < 2 || (!$TOP.ON&&passive&&$E('l_marquee_about')))
+		if(!$ANI.COMPLETE || !$DAT.DATA || $TOP.LOG || !$DAT.DATA['marquee'] || $DAT.DATA['marquee'].length < 2 || (!$TOP.ON&&passive&&$E('l_marquee_about')))
 			return;
 		let html=$F('f_marquee_blink_wide'), itemHtml='', rank=0, maxRank=20, topType='', lastTopType='';
 		if(!$TOP.ON) {
@@ -1384,9 +1384,9 @@ NET: {
 			$ANI.updateFlash();
 		}
 		if($TOP.ON) {
-			if($TOP.LIVE) {
-				if(!($TOP.LIVE=$DAT.DATA['live']))
-					$MRQ.flash('Live support is currently not available, reverted to top mode.', true);
+			if($TOP.LOG) {
+				if(!($TOP.LOG=$DAT.DATA['log']))
+					$MRQ.flash('Live log support is currently not available, reverted to top mode.', true, 20000);
 				else {
 					$DAT.DATA.items = [];
 					$TOP.WS.connect();
@@ -1584,7 +1584,7 @@ POL: {
 	LONG: 300, SHORT: 30, EPOCH_COMPLETE: 0,
 
 	setup: () => void(0),
-	forceNextStage: force => ($TOP.ON&&!$TOP.LIVE&&!force) ? $CFG.buttonToggle() : $ANI.updateFlash(0.75),
+	forceNextStage: force => ($TOP.ON&&!$TOP.LOG&&!force) ? $CFG.buttonToggle() : $ANI.updateFlash(0.75),
 	getNextSync: () => {
 		if(!$DAT.DATA || !$DAT.DATA['next'])
 			return($POL.LONG);
@@ -1616,15 +1616,15 @@ POL: {
 },
 
 /*************************************************************************************************\
-\*******  TOP MODE LOGIC (top.larval.com & tab key)  ************************  [ $TOP.* ]  *******/
+\*******  TOP MODE LOGIC (top.larval.com & log.larval.com)  *****************  [ $TOP.* ]  *******/
 TOP: {
-	ON: false, LIVE: false, INTERVAL: null, SOCKET: null,
+	ON: false, LOG: false, INTERVAL: null, SOCKET: null,
 
 	setup: () => {
-		if(typeof WebSocket == 'undefined' || $TOP.INTERVAL || !($TOP.LIVE=!!$D.domain.match(/live/i)))
+		if(typeof WebSocket == 'undefined' || $TOP.INTERVAL || !($TOP.LOG=!!$D.domain.match(/log/i)))
 			return;
-		$MRQ.flash('Live connection: <i>Initiating</i>', true, -1)
-		$E('l_root').classList.add('l_top_live');
+		$MRQ.flash('Live log connection: <i>Initiating</i>', true, -1)
+		$E('l_root').classList.add('l_top_log');
 		$TOP.INTERVAL = setInterval($TOP.WS.connect, 30000);
 	},
 	timeFormat: str => str + (str.match(/[0-9]{2}\/[0-9]{2}$/)?'@[<u>TBD</u>]':''),
@@ -1658,9 +1658,9 @@ TOP: {
 	},
 	WS: {
 		connect: () => {
-			if(!$TOP.LIVE || ($TOP.SOCKET && $TOP.SOCKET.readyState !== WebSocket.CLOSED))
+			if(!$TOP.LOG || ($TOP.SOCKET && $TOP.SOCKET.readyState !== WebSocket.CLOSED))
 				return;
-			$TOP.SOCKET = new WebSocket(`wss:${$NET.URL}:${$TOP.LIVE}`);
+			$TOP.SOCKET = new WebSocket(`wss:${$NET.URL}:${$TOP.LOG}`);
 			Object.keys($TOP.WS).forEach(n => `on${n}` in $TOP.SOCKET ? $TOP.SOCKET.addEventListener(n,$TOP.WS[n]) : null); 
 		},
 		message: e => {
@@ -1688,9 +1688,9 @@ TOP: {
 			if($DAT.DATA)
 				$DAT.DATA.items = [];
 			$GUI.contentTableUpdate();
-			$MRQ.flash('Live connection: <i>Active</i>', true, -1)
+			$MRQ.flash('Live log connection: <i>Active</i>', true, -1)
 		},
-		close: e => $MRQ.flash('Live connection: <span class="l_marquee_highlight"><i>INACTIVE</i></span>', true, -1)
+		close: e => $MRQ.flash('Live log connection: <span class="l_marquee_highlight"><i>INACTIVE</i></span>', true, -1)
 	}
 },
 
