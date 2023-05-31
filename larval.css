@@ -1,7 +1,6 @@
 /*|___ ___ _ _ ___| |  A strange, hacky, and experimental barebones project that tracks various markets.
 | | .'|  _| | | .'| |  (: An excuse to escape into the nostalgia of slapping something together agian :)
 |_|__,|_|  \_/|__,|*/
-
 @font-face {
 	font-family: Larval;
 	font-style: normal;
@@ -18,13 +17,17 @@
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(360deg); }
 }
+@keyframes l_fixed {
+	from { height: 100%; }
+	to { height: 121px; }
+}
 @keyframes l_fixed_bg {
 	0% { transform: translateX(-25%); }
 	100% { transform: translateX(25%); }
 }
-@keyframes l_fixed {
-	from { height: 100%; }
-	to { height: 121px; }
+@keyframes l_fixed_bg_coins {
+	0%{ opacity: 1; transform: translateY(0) rotate(0deg); }
+	100%{ opacity: 0; transform: translateY(-1000px) rotate(720deg); }
 }
 @keyframes l_logo {
 	to {
@@ -173,6 +176,39 @@ i { font-style: normal !important; }
 	overflow-x: hidden;
 }
 #l_fragments { display: none; }
+#l_fixed_bg0 {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+#l_fixed_bg0 i {
+	position: absolute;
+	display: block;
+	text-align: center;
+	background: rgba(255, 255, 255, 0.25);
+	border-radius: 100%;
+	animation: l_fixed_bg_coins 25s linear;
+	animation-duration: 1s;
+	bottom: -300px;
+	bottom: -3vmax;
+	width: 3vmax;
+	height: 3vmax;
+	font-size: 3vmax;
+	line-height: 3vmax;
+}
+#l_fixed_bg0 i:nth-child(1){ left: 15%; animation-delay: 4.9s; }
+#l_fixed_bg0 i:nth-child(2){ left: 25%; animation-delay: 5.1s; }
+#l_fixed_bg0 i:nth-child(3){ left: 35%; animation-delay: 5.3s; }
+#l_fixed_bg0 i:nth-child(4){ left: 75%; animation-delay: 5.5s; }
+#l_fixed_bg0 i:nth-child(5){ left: 85%; animation-delay: 5.7s; }
+#l_fixed_bg0 i:nth-child(6){ left: 10%; animation-delay: 5.5s; }
+#l_fixed_bg0 i:nth-child(7){ left: 20%; animation-delay: 5.3s; }
+#l_fixed_bg0 i:nth-child(8){ left: 70%; animation-delay: 5.1s; }
+#l_fixed_bg0 i:nth-child(9){ left: 75%; animation-delay: 4.9s; }
+#l_fixed_bg0 i:nth-child(10){ left: 80%; animation-delay: 4.7s; }
 #l_fixed_bg1, #l_fixed_bg2, #l_fixed_bg3 {
 	position: absolute;
 	animation: l_fixed_bg 60s ease-in-out infinite alternate;
@@ -325,7 +361,7 @@ i { font-style: normal !important; }
 	fill: var(--l-color-2) !important;
 	stroke: var(--l-color-2) !important;
 }
-.l_animations_complete #l_logo_tag { display: none !important; }
+.l_animations_complete #l_logo_tag, .l_animations_complete #l_fixed_bg0 { display: none !important; }
 .l_animations_complete #l_progress { display: block !important; }
 .l_animations_complete #l_logo * { animation-play-state: paused !important; }
 #l_progress {
