@@ -202,10 +202,8 @@ Z: (str, ms) => {
 		console.log(new Date(_Z=Date.now()).toLocaleTimeString('en-US',{hour:"numeric",minute:"numeric",second:'numeric'})+'-'.repeat(80));
 	try { throw new Error(); }
 	catch(e) {
-		if(e&&e.stack)
-			console.log($X(e.stack.split(/[\r\n]/g).map((x,i) => { let m=x.match(/\s*at\s+([^ ]+)/i); return !m||!m[1]||m[1].match(/[^A-Z0-9]/i)?null:m[1]; } )).splice(1).reverse().join(" \u279C ") + (typeof str=='undefined'?'':`  \u2588  ${str}`));
-		else
-			console.trace();
+		if(e&&e.stack) console.log($X(e.stack.split(/[\r\n]/g).map((x,i) => { let m=x.match(/\s*at\s+([^ ]+)/i); return !m||!m[1]||m[1].match(/[^A-Z0-9]/i)?null:m[1]; } )).splice(1).reverse().join(" \u279C ") + (typeof str=='undefined'?'':`  \u2588  ${str}`));
+		else console.trace();
 	}
 }, _Z: null,
 
@@ -770,6 +768,8 @@ DAT: {
 		$CFG.buttonTextToggle(false);
 		if($HST.DATA.length > 0)
 			$DAT.setStage($HST.DATA[0]);
+		else
+			$HST.FIRST = false;
 		if(!$TOP.ON || !$HST.DATA.length)
 			$NET.getStageData(true);
 		else if($TOP.ON && topUrl)
@@ -1162,8 +1162,10 @@ HST: {
 			$GUI.forceRedraw($E('l_content_table'));
 	},
 	gotoStageData: direction => {
-		const lastIndex = $HST.IDX;
-		if(!direction) {
+		let lastIndex=$HST.IDX, quiet=false;
+		if($DAT.FETCHING && $DAT.FETCHING.match('history'))
+			return(false);
+		else if(!direction) {
 			$GUI.KEY_ROW = 0;
 			if($HST.IDX >= 0)
 				$HST.IDX = -1;
@@ -1177,7 +1179,7 @@ HST: {
 				$HST.IDX++;
 		}
 		else if(direction > 0) {
-			if(!$HST.FIRST && $HST.IDX >= -1 && $HST.IDX == ($HST.DATA.length < 2 ? -1 : 0)) {
+			if(quiet=(!$HST.FIRST && $HST.IDX >= -1 && $HST.IDX == ($HST.DATA.length < 2 ? -1 : 0))) {
 				$MRQ.flash('Attempting to gather recent history from the server...');
 				$NET.getHistoryData();
 			}
@@ -1188,23 +1190,21 @@ HST: {
 			else
 				$MRQ.flash('End of history, use <i>&#8658;</i> to move forward or <i>escape</i> to exit.', true);
 		}
-		if(lastIndex !== $HST.IDX) {
-			$HST.updateStageData(!$HST.FIRST);
-			return(true);
-		}
-		return(false);
+		return(lastIndex !== $HST.IDX && $HST.updateStageData(quiet));
 	},
 	updateStageData: quiet => {
 		const historyTotal=$HST.DATA.length-1, historyIndex=$HST.IDX<0?historyTotal:$HST.IDX;
 		const stageData=$cloneObject($HST.DATA[$HST.IDX >= 0 ? $HST.IDX : historyTotal]);
 		$DAT.setStage(stageData);
 		$DAT.sortStage(true);
-		if(quiet || !$DAT.DATA) return;
+		if(quiet || !$DAT.DATA)
+			return(false);
 		const minutesAgo=Math.round(($epochNow()-$DAT.DATA['ts'])/60,0);
 		if(historyIndex == historyTotal)
 			$MRQ.flash('All caught up, exiting history mode...', true);
 		else
 			$MRQ.flash(`Rewound to ${$epochToDate($DAT.DATA['ts'])}: <i class='l_marquee_alt_padded'>${minutesAgo} minutes ago</i>${!$HST.FIRST?'':' ['+$P(historyTotal-historyIndex,historyTotal)+'%]'}`, true);
+		return(true);
 	}
 },
 
@@ -1419,7 +1419,7 @@ NET: {
 			$POL.setNextStage(retry ? $POL.SHORT : $POL.getNextSync());
 		}
 	},
-	getHistoryData: args => ($HST.IDX>-1||--$HST.IDX<-1) ? $NET.get(`/${$DAT.MODE}-history.json`, $NET.parseHistoryData, args) : null,
+	getHistoryData: args => ($HST.FIRST=($HST.IDX>-1||--$HST.IDX<-1)) ? $NET.get(`/${$DAT.MODE}-history.json`, $NET.parseHistoryData, args) : null,
 	parseHistoryData: (json, args) => {
 		const dropDownMode=(args&&typeof args['dropDownIndex']!='undefined');
 		if(!json || json.length < 2) return;
@@ -1440,7 +1440,6 @@ NET: {
 			$GUI.contentTableUpdate();
 			return;
 		}
-		$HST.FIRST = true;
 		let h = json.length;
 		while(--h > 0) {
 			if(json[h]['ts'] == $HST.DATA[0]['ts'])
