@@ -854,6 +854,12 @@ input[type="checkbox"] {
 .l_none {
 	text-align: center !important;
 }
+.l_none a, .l_none a:hover {
+	color: var(--l-color-5);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	text-decoration-thickness: 2px;
+}
 .l_up, .l_top_up { color: var(--l-color-13); }
 .l_down, .l_top_down { color: var(--l-color-15); }
 .l_top_up, .l_top_down { text-decoration: underline; }

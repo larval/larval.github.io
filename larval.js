@@ -84,7 +84,7 @@ _eventMap: {
 	}
 },
 _clickMap: {
-	'l_alt_link':_              => $DAT.toggleStage($TOP.ON),
+	'l_alt_link':_              => $TOP.LOG ? (location.href='//larval.com') : $DAT.toggleStage($TOP.ON),
 	'l_content_table_header':_  => $DAT.setStageSort(_.idx),
 	'l_fixed':_                 => $GUI.broadBehaviorToggle($TOP.ON),
 	'l_history_toggle':_        => $HST.dropDownToggle(_.idx),
@@ -1070,7 +1070,7 @@ GUI: {
 		if(_assetTypes.every(type => !_settings[type]['l_show']))
 			html += $F('f_no_results_row', ['No asset types are set to show in your settings.']);
 		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
-			html += $F('f_no_results_row', [$TOP.ON&&!$TOP.LOG?'No results found: If applicable, your query will be added to the queue.':'No results found.']);
+			html += $F('f_no_results_row', [$TOP.ON&&!$TOP.LOG?'No results found: If applicable, your query will be added to the queue. (see: <a href="//log.larval.com">log.larval.com</a>)':'No results found.']);
 		else {
 			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
 				html += onTop[key];
@@ -1666,11 +1666,10 @@ TOP: {
 		message: e => {
 			try {
 				const row = JSON.parse(e.data);
-				if(!$DAT.LAST || !row)
+				if(!$DAT.LAST || !row || !$DAT.DATA.items.unshift(row) || !$ANI.COMPLETE)
 					return;
 				if($E('l_content_table').getElementsByTagName('tr').length==2 && (!$DAT.DATA||!$DAT.DATA.items.length))
 					_E.deleteRow(1);
-				$DAT.DATA.items.unshift(row);
 				_E.insertRow(1).innerHTML = `<tr class="l_stocks" data-ref="0">
 					<td class="l_top_user" title="${$H(row[$TUSR])}"><i>${$GUI.cell(row,$TUSR)}</i></td>
 					<td>${$GUI.cell(row,$TSYM)}</td>
