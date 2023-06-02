@@ -1665,7 +1665,7 @@ TOP: {
 		message: e => {
 			try {
 				const row = JSON.parse(e.data);
-				if(!$DAT.LAST || !row || !$DAT.DATA.items.unshift(row) || !$ANI.COMPLETE)
+				if(!$DAT.LAST || !row || !row.length || !$DAT.DATA.items.unshift(row) || !$ANI.COMPLETE)
 					return;
 				if($E('l_content_table').getElementsByTagName('tr').length==2 && (!$DAT.DATA||!$DAT.DATA.items.length))
 					_E.deleteRow(1);
