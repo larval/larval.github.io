@@ -1337,7 +1337,7 @@ MRQ: {
 /*************************************************************************************************\
 \*******  FETCH & NETWORK PARSING LOGIC  ************************************  [ $NET.* ]  *******/
 NET: {
-	URL: '//' + document.domain.replace(/\w+$/,'net'),
+	URL: '//stage.larval.com',
 
 	setup: () => $NET.getStageData(false),
 	get: (jsonFile, jsonCallback, args) => {
