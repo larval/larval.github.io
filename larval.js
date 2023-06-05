@@ -189,10 +189,11 @@ E: id => (_E = $D.getElementById(id)), _E: null,
 F: (id, a) => (_F = (_fragments[id]?_fragments[id]:(_fragments[id]=($E(id)?_E.innerHTML:id).split('@'))).forEach((x,i)=>a&&a.splice(i*2,0,_fragments[id][i]))||(a?a:_fragments[id]).join('')), _F: null,
 H: string => (_H = (_H=$D.createElement('p'))&&((_H.textContent=string)) ? _H.innerHTML : ''), _H: null,
 I: (array, item) => (_I = array.indexOf(item)), _I: -1,
-M: (match, string) => (_M = (string.match(match))), _M: null,
+M: (match, string) => (_M = string.match(match)), _M: null,
 N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 P: (count, total) => Math.round(count / total * 100),
 Q: query => (_Q = $D.querySelector(query)), _Q: null,
+S: (array, match) => (_S = array.split(match)), _S: null,
 T: tagName => (_T = $D.getElementsByTagName(tagName)), _T: null,
 U: array => array.filter((x,i,a) => array.indexOf(x)==i),
 W: window,
@@ -450,7 +451,7 @@ ANI: {
 		$E('l_root').classList.add('l_animations_complete');
 		$E('l_menu').className = ($DAT.DATA && !$isWeekend() ? $GUI.getThemeMode('l_') : 'l_default');
 		if(!$TOP.ON)
-			$POL.setNextStage(!$DAT.DATA||!$DAT.DATA['items'] ? $POL.SHORT : $POL.getNextSync());
+			$POL.setNextStage(!$DAT.DATA||!$DAT.DATA['items'] ? (!$DAT.DATA?$POL.NOW:$POL.SHORT) : $POL.getNextSync());
 		else if($TOP.searchCriteria())
 			$CFG.buttonToggle(true);
 		if($hasSettings() && $DAT.DATA && $DAT.DATA['marquee'] && $DAT.DATA['marquee'].length > 1)
@@ -864,7 +865,8 @@ GUI: {
 		});
 		$GUI.MAP = $GUI.MAPS[$DAT.MODE];
 		$D.body.id = $D.body.className = 'l_n';
-		$E('l_root').classList.add('l_' + $D.domain.split('.').pop().toLowerCase());
+		if($D.domain.match(/stage|net/i))
+			$E('l_root').classList.add('l_stage_net');
 		if($E('l_awaiting_data'))
 			_E.innerText = _E.title;
 		if(!($GUI.KEY_MAP_IDX=_settings['l_keymap_index']))
@@ -963,6 +965,7 @@ GUI: {
 		$E('l_menu').className = ($ANI.COMPLETE && !$isWeekend() ? $GUI.getThemeMode('l_') : 'l_default');
 		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=($DAT.DATA['afterhours']?'l_stocks_ah':'l_stocks');
 		const columns = ($TOP.ON ? ['user',$TOP.LOG?'post':'symbols','bull','user%','real%','start',$TOP.LOG?'added':'end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',$DAT.DATA['vpm']?'vpm':'volume','options']);
+		$E('l_root').classList[$DAT.DATA['locked']?'add':'remove']('l_locked');
 		if(_assetTypes[0] != stockAssetType) {
 			if($E(_assetTypes[0]))
 				_E.id = stockAssetType;
@@ -1337,9 +1340,10 @@ MRQ: {
 /*************************************************************************************************\
 \*******  FETCH & NETWORK PARSING LOGIC  ************************************  [ $NET.* ]  *******/
 NET: {
-	URL: '//stage.larval.com',
+	URL: null, URLS: ['//stage.larval.com', '//larval.net', '//stage.larval.net'],
 
-	setup: () => $NET.getStageData(false),
+	setup: () => $NET.nextURL() && $NET.getStageData(false),
+	nextURL: () => $NET.URLS.push($NET.URL=$NET.URLS.shift()),
 	get: (jsonFile, jsonCallback, args) => {
 		fetch($DAT.FETCHING=($NET.URL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
 		.then(resp => resp.json())
@@ -1348,9 +1352,11 @@ NET: {
 	},
 	getStageData: updateView => $NET.get(`/${$DAT.MODE}.json`, $NET.parseStageData, $X({'updateView':updateView,'search':$TOP.ON?$TOP.searchCriteria():''})),
 	parseStageData: (json, args) => {
-		let retry=false, minsOff=0;
-		if(!json || !json['ts'] || ($HST.DATA.length > 0 && $HST.DATA[$HST.DATA.length-1]['ts'] == json['ts']))
-			retry = true;
+		let retry=0, minsOff=0;
+		if(!json)
+			retry = (!$DAT.DATA && $NET.nextURL()) ? $POL.NOW : $POL.SHORT;
+		else if(!json['ts'] || ($HST.DATA.length > 0 && $HST.DATA[$HST.DATA.length-1]['ts'] == json['ts']))
+			retry = $POL.SHORT;
 		else if($HST.IDX >= 0 && !$TOP.ON)
 			$HST.DATA.push($cloneObject(json));
 		else {
@@ -1383,7 +1389,7 @@ NET: {
 				$MRQ.flash(`Server data is unexpectedly old: <i>${Math.abs(minsOff)}</i> minutes behind.`);
 			$ANI.updateFlash();
 		}
-		if($TOP.ON) {
+		if($TOP.ON && !retry) {
 			if($TOP.LOG) {
 				if(!($TOP.LOG=$DAT.DATA['log']))
 					$MRQ.flash('Live log support is currently not available, reverted to top mode.', true, 20000);
@@ -1416,7 +1422,7 @@ NET: {
 				[1,null,-1].forEach(state => $HST.push({'fixed':state}));
 				$W.history.go(-1);
 			}
-			$POL.setNextStage(retry ? $POL.SHORT : $POL.getNextSync());
+			$POL.setNextStage(retry ? retry : $POL.getNextSync());
 		}
 	},
 	getHistoryData: args => ($HST.FIRST=($HST.IDX>-1||--$HST.IDX<-1)) ? $NET.get(`/${$DAT.MODE}-history.json`, $NET.parseHistoryData, args) : null,
@@ -1580,7 +1586,7 @@ NFY: {
 /*************************************************************************************************\
 \*******  DATA & MARQUEE POLLING LOGIC  *************************************  [ $POL.* ]  *******/
 POL: {
-	LONG: 300, SHORT: 30, EPOCH_COMPLETE: 0,
+	LONG: 300, SHORT: 30, NOW: 1, EPOCH_COMPLETE: 0,
 
 	setup: () => void(0),
 	forceNextStage: force => ($TOP.ON&&!$TOP.LOG&&!force) ? $CFG.buttonToggle() : $ANI.updateFlash(0.75),

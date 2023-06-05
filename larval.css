@@ -960,7 +960,7 @@ input[type="checkbox"] {
 #l_alt_link u, #l_alt_link i { text-decoration: none; display: none; }
 .l_top_only #l_alt_link u { display: inline; }
 .l_stage_only #l_alt_link i { display: inline; }
-.l_top_log #l_settings_button { display: none; }
+.l_top_log #l_settings_button, .l_locked.l_top_only #l_settings_button { display: none; }
 #l_last_update {
 	cursor: pointer;
 	font-size: 14px;
@@ -1002,8 +1002,8 @@ input[type="checkbox"] {
 #l_nam .l_notify_up, #l_nam .l_notify_top_up { background-color: var(--l-color-12) !important; }
 #l_nam .l_notify_down, #l_nam .l_notify_top_down { background-color: var(--l-color-16) !important; }
 #l_nam .l_notify_halt { background-color: var(--l-color-10) !important; }
-.l_net #l_afterhours_left, .l_net #l_afterhours_right { color: #FFDE96 !important; }
-.l_net #l_logo_worm_eye, .l_net .l_logo_letter_o  { fill: #FFDE96 !important; }
+.l_stage_net #l_afterhours_left, .l_stage_net #l_afterhours_right { color: #FFDE96 !important; }
+.l_stage_net #l_logo_worm_eye, .l_stage_net .l_logo_letter_o  { fill: #FFDE96 !important; }
 input[type=checkbox] + label {
 	display: inline-block;
 	cursor: pointer;
