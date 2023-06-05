@@ -118,6 +118,7 @@ _hotKeyMap: {
 	'Enter':e                   => $EVT.click(e),
 	'Escape':e                  => $GUI.broadBehaviorToggle($TOP.ON),
 	'F5':e                      => $CFG.clear('User requested.'),
+	'F8':e                      => $NET.nextURL(true) && $MRQ.flash(`Changed endpoint to: <i>${$NET.URL}</i>`),
 	'F12':e                     => $GUI.setThemeRandom('<i>Going under the hood?</i> Let\'s make the outside look as hideous as the inside first.'),
 	'Home':e                    => $GUI.KEY_ROW = 1,
 	'NumpadEnter':e             => $EVT.click(e),
@@ -1343,7 +1344,7 @@ NET: {
 	URL: null, URLS: ['//stage.larval.com', '//larval.net', '//stage.larval.net'],
 
 	setup: () => $NET.nextURL() && $NET.getStageData(false),
-	nextURL: () => $NET.URLS.push($NET.URL=$NET.URLS.shift()),
+	nextURL: updateNow => $NET.URLS.push($NET.URL=$NET.URLS.shift()) && (!updateNow||!$POL.forceNextStage()),
 	get: (jsonFile, jsonCallback, args) => {
 		fetch($DAT.FETCHING=($NET.URL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
 		.then(resp => resp.json())
