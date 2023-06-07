@@ -1343,7 +1343,8 @@ MRQ: {
 NET: {
 	URL: null, URLS: ['//stage.larval.com', '//larval.net', '//stage.larval.net'],
 
-	setup: () => $NET.nextURL() && $NET.getStageData(false),
+	setup: () => $NET.setPrimaryURLByDomain($D.domain) && $NET.nextURL() && $NET.getStageData(false),
+	setPrimaryURLByDomain: domain => $I($NET.URLS, `//${$D.domain}`) >= 0 ? $NET.URLS.unshift($NET.URLS.splice(_I,1)[0]) : -1,
 	nextURL: updateNow => $NET.URLS.push($NET.URL=$NET.URLS.shift()) && (!updateNow||!$POL.forceNextStage()),
 	get: (jsonFile, jsonCallback, args) => {
 		fetch($DAT.FETCHING=($NET.URL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
