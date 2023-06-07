@@ -288,6 +288,7 @@ i { font-style: normal !important; }
 .l_top_only.l_animations_complete #l_afterhours_left, .l_top_only.l_animations_complete #l_afterhours_right { display: block !important; }
 .l_animations_complete #l_afterhours_left, .l_animations_complete #l_afterhours_right { display: block !important; }
 .l_default #l_afterhours_left, .l_default #l_afterhours_right { display: none !important; }
+.l_animations_complete #l_logo.l_net_loading { opacity: 0.25 !important; }
 #l_logo {
 	position: relative;
 	z-index: 3;

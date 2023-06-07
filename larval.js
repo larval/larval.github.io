@@ -1346,12 +1346,14 @@ NET: {
 	setup: () => $NET.setPrimaryURLByDomain($D.domain) && $NET.nextURL() && $NET.getStageData(false),
 	setPrimaryURLByDomain: domain => $I($NET.URLS, `//${$D.domain}`) >= 0 ? $NET.URLS.unshift($NET.URLS.splice(_I,1)[0]) : -1,
 	nextURL: updateNow => $NET.URLS.push($NET.URL=$NET.URLS.shift()) && (!updateNow||!$POL.forceNextStage()),
-	get: (jsonFile, jsonCallback, args) => {
+	get: (jsonFile, callback, args) => {
+		$E('l_logo').classList.add('l_net_loading');
 		fetch($DAT.FETCHING=($NET.URL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
 		.then(resp => resp.json())
-		.then(json => ($DAT.FETCHING=null) || jsonCallback(json, args))
-		.catch(err => ($DAT.FETCHING=null) || jsonCallback(null, args));
+		.then(json => $NET.getCallback(callback, json, args))
+		.catch(err => $NET.getCallback(callback, null, args));
 	},
+	getCallback: (callback, json, args) => ($DAT.FETCHING=$E('l_logo').classList.remove('l_net_loading')) || callback(json, args),
 	getStageData: updateView => $NET.get(`/${$DAT.MODE}.json`, $NET.parseStageData, $X({'updateView':updateView,'search':$TOP.ON?$TOP.searchCriteria():''})),
 	parseStageData: (json, args) => {
 		let retry=0, minsOff=0;
