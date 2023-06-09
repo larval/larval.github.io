@@ -190,8 +190,7 @@ i { font-style: normal !important; }
 	text-align: center;
 	background: rgba(255, 255, 255, 0.25);
 	border-radius: 100%;
-	animation: l_fixed_bg_coins 25s linear;
-	animation-duration: 1s;
+	animation: l_fixed_bg_coins 1s linear;
 	bottom: -300px;
 	bottom: -3vmax;
 	width: 3vmax;
@@ -199,6 +198,8 @@ i { font-style: normal !important; }
 	font-size: 3vmax;
 	line-height: 3vmax;
 }
+.l_stage_only #l_fixed_bg0 i::before { content: '$'; }
+.l_top_only #l_fixed_bg0 i::before { content: '\2022'; }
 #l_fixed_bg0 i:nth-child(1){ left: 15%; animation-delay: 4.9s; }
 #l_fixed_bg0 i:nth-child(2){ left: 25%; animation-delay: 5.1s; }
 #l_fixed_bg0 i:nth-child(3){ left: 35%; animation-delay: 5.3s; }
