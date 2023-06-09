@@ -1348,7 +1348,7 @@ NET: {
 	URL: null, URLS: ['//stage.larval.com', '//larval.net', '//stage.larval.net'],
 
 	setup: () => $NET.orderURLSByURL(`//${$D.domain}`) && $NET.nextURL() && $NET.getStageData(false),
-	orderURLSByURL: url => $NET.URLS=($I($NET.URLS,url)>=0 ? $NET.URLS.concat($NET.URLS.splice(0,_I)) : $NET.URLS.sort(a => url.slice(-3)==a.slice(-3)?-1:0)),
+	orderURLSByURL: url => $NET.URLS=($I($NET.URLS,url)>=0 ? $NET.URLS.concat($NET.URLS.splice(0,_I)) : $NET.URLS.sort(a => url.slice(-1)!=a.slice(-1))),
 	nextURL: updateNow => $NET.URLS.push($NET.URL=$NET.URLS.shift()) && (!updateNow||!$POL.forceNextStage()),
 	get: (jsonFile, callback, args) => {
 		$E('l_logo').classList.add('l_net_loading');
