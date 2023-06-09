@@ -190,7 +190,7 @@ E: id => (_E = $D.getElementById(id)), _E: null,
 F: (id, a) => (_F = (_fragments[id]?_fragments[id]:(_fragments[id]=($E(id)?_E.innerHTML:id).split('@'))).forEach((x,i)=>a&&a.splice(i*2,0,_fragments[id][i]))||(a?a:_fragments[id]).join('')), _F: null,
 H: string => (_H = (_H=$D.createElement('p'))&&((_H.textContent=string)) ? _H.innerHTML : ''), _H: null,
 I: (array, item) => (_I = array.indexOf(item)), _I: -1,
-M: (match, string) => (_M = string.match(match)), _M: null,
+M: (match, string) => (_M = string && string.match(match)), _M: null,
 N: (number, digits) => number.toLocaleString(undefined, { minimumFractionDigits: digits,  maximumFractionDigits: digits }),
 P: (count, total) => Math.round(count / total * 100),
 Q: query => (_Q = $D.querySelector(query)), _Q: null,
@@ -1073,8 +1073,12 @@ GUI: {
 			$GUI.TABLE_SOFT_LIMIT = -$GUI.TABLE_SOFT_LIMIT;
 		if(_assetTypes.every(type => !_settings[type]['l_show']))
 			html += $F('f_no_results_row', ['No asset types are set to show in your settings.']);
-		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length)
-			html += $F('f_no_results_row', [$TOP.ON&&!$TOP.LOG?'No results found: If applicable, your query will be added to the queue. (see: <a href="//log.larval.com">log.larval.com</a>)':'No results found.']);
+		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length) {
+			let noResults='No results found', dataWithLog=($DAT.DATA['log']?$DAT.DATA:$HST.DATA.find(d=>d['log']));
+			if($TOP.ON && dataWithLog && $M(/#(.+)/,dataWithLog['log']))
+				noResults += `: If applicable, your query will be added to the queue. (see: <a href="//${_M[1]}">${_M[1]}</a>)`;
+			html += $F('f_no_results_row', [noResults]);
+		}
 		else {
 			for(let key of Object.keys(onTop).sort((a, b) => a.localeCompare(b)))
 				html += onTop[key];
@@ -1669,7 +1673,7 @@ TOP: {
 		connect: () => {
 			if(!$TOP.LOG || ($TOP.SOCKET && $TOP.SOCKET.readyState !== WebSocket.CLOSED))
 				return;
-			$TOP.SOCKET = new WebSocket($TOP.LOG);
+			$TOP.SOCKET = new WebSocket($TOP.LOG.replace(/#.*/,''));
 			Object.keys($TOP.WS).forEach(n => `on${n}` in $TOP.SOCKET ? $TOP.SOCKET.addEventListener(n,$TOP.WS[n]) : null); 
 		},
 		message: e => {
