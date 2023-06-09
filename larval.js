@@ -1343,8 +1343,8 @@ MRQ: {
 NET: {
 	URL: null, URLS: ['//stage.larval.com', '//larval.net', '//stage.larval.net'],
 
-	setup: () => $NET.setPrimaryURLByDomain($D.domain) && $NET.nextURL() && $NET.getStageData(false),
-	setPrimaryURLByDomain: domain => $I($NET.URLS, `//${$D.domain}`) >= 0 ? $NET.URLS.unshift($NET.URLS.splice(_I,1)[0]) : -1,
+	setup: () => $NET.orderURLSByURL(`//${$D.domain}`) && $NET.nextURL() && $NET.getStageData(false),
+	orderURLSByURL: url => $NET.URLS=($I($NET.URLS,url)>=0 ? $NET.URLS.concat($NET.URLS.splice(0,_I)) : $NET.URLS.sort(a => url.slice(-3)==a.slice(-3)?-1:0)),
 	nextURL: updateNow => $NET.URLS.push($NET.URL=$NET.URLS.shift()) && (!updateNow||!$POL.forceNextStage()),
 	get: (jsonFile, callback, args) => {
 		$E('l_logo').classList.add('l_net_loading');
