@@ -1669,7 +1669,7 @@ TOP: {
 		connect: () => {
 			if(!$TOP.LOG || ($TOP.SOCKET && $TOP.SOCKET.readyState !== WebSocket.CLOSED))
 				return;
-			$TOP.SOCKET = new WebSocket(`wss:${$NET.URL}:${$TOP.LOG}`);
+			$TOP.SOCKET = new WebSocket($TOP.LOG);
 			Object.keys($TOP.WS).forEach(n => `on${n}` in $TOP.SOCKET ? $TOP.SOCKET.addEventListener(n,$TOP.WS[n]) : null); 
 		},
 		message: e => {
