@@ -1436,7 +1436,8 @@ NET: {
 	getHistoryData: args => ($HST.FIRST=($HST.IDX>-1||--$HST.IDX<-1)) ? $NET.get(`/${$DAT.MODE}-history.json`, $NET.parseHistoryData, args) : null,
 	parseHistoryData: (json, args) => {
 		const dropDownMode=(args&&typeof args['dropDownIndex']!='undefined');
-		if(!json || json.length < 2) return;
+		if(!json || typeof json != 'object' || !Object.keys(json).length)
+			return($MRQ.flash('Unexpected error pulling history.'));
 		else if($TOP.ON) {
 			$DAT.DATA['items'].forEach((row, i) => {
 				if(!json['items'][row[0]]) return;
@@ -1465,11 +1466,12 @@ NET: {
 			if(dropDownMode)
 				$HST.dropDown(args['dropDownIndex']);
 			else {
-				$MRQ.flash('Sorry, no additional history is available to rewind to at this time.');
 				$HST.IDX = h - 1;
 				$HST.updateStageData();
 			}
 		}
+		else
+			$MRQ.flash('Sorry, no additional history is available to rewind to at this time.');
 	}
 },
 
