@@ -1075,7 +1075,9 @@ GUI: {
 			html += $F('f_no_results_row', ['No asset types are set to show in your settings.']);
 		else if(!htmlNormal && !htmlPriority && !Object.keys(onTop).length) {
 			let noResults='No results found', dataWithLog=($DAT.DATA['log']?$DAT.DATA:$HST.DATA.find(d=>d['log']));
-			if($TOP.ON && dataWithLog && $M(/#(.+)/,dataWithLog['log']))
+			if($TOP.LOG)
+				noResults += ': Log data will appear when it becomes available.';
+			else if($TOP.ON && dataWithLog && $M(/#(.+)/,dataWithLog['log']))
 				noResults += `: If applicable, your query will be added to the queue. (see: <a href="//${_M[1]}">${_M[1]}</a>)`;
 			html += $F('f_no_results_row', [noResults]);
 		}
@@ -1683,8 +1685,10 @@ TOP: {
 				const row = JSON.parse(e.data);
 				if(!$DAT.LAST || !row || !row.length || !$DAT.DATA.items.unshift(row) || !$ANI.COMPLETE)
 					return;
-				if($E('l_content_table').getElementsByTagName('tr').length==2 && (!$DAT.DATA||!$DAT.DATA.items.length))
-					_E.deleteRow(1);
+				if($DAT.DATA.items.length > 500)
+					$DAT.DATA.items.length--;
+				if($E('l_content_table').getElementsByTagName('tr').length==$DAT.DATA.items.length+1)
+					_E.deleteRow($DAT.DATA.items.length);
 				_E.insertRow(1).innerHTML = `<tr class="l_stocks" data-ref="0">
 					<td class="l_top_user" title="${$H(row[$TUSR])}"><i>${$GUI.cell(row,$TUSR)}</i></td>
 					<td>${$GUI.cell(row,$TSYM)}</td>
