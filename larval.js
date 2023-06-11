@@ -1685,11 +1685,7 @@ TOP: {
 				const row = JSON.parse(e.data);
 				if(!$DAT.LAST || !row || !row.length || !$DAT.DATA.items.unshift(row) || !$ANI.COMPLETE)
 					return;
-				if($DAT.DATA.items.length > 500)
-					$DAT.DATA.items.length--;
-				if($E('l_content_table').getElementsByTagName('tr').length==$DAT.DATA.items.length+1)
-					_E.deleteRow($DAT.DATA.items.length);
-				_E.insertRow(1).innerHTML = `<tr class="l_stocks" data-ref="0">
+				$E('l_content_table').insertRow(1).innerHTML = `<tr class="l_stocks" data-ref="0">
 					<td class="l_top_user" title="${$H(row[$TUSR])}"><i>${$GUI.cell(row,$TUSR)}</i></td>
 					<td>${$GUI.cell(row,$TSYM)}</td>
 					<td>${$GUI.cell(row,$TRAT)}</td>
@@ -1698,7 +1694,12 @@ TOP: {
 					<td>${$GUI.cell(row,$TSTR)}</td>
 					<td>${$GUI.cell(row,$TEND)}</td>
 					</tr>`;
-				Array.from(_E.getElementsByTagName('tr')).forEach((tr,i) => i ? (tr.dataset.ref=i-1) : null);
+				if($DAT.DATA.items.length > 500)
+					$DAT.DATA.items.length--;
+				Array.from($E('l_content_table').getElementsByTagName('tr')).forEach((tr,i) => {
+					if(i > $DAT.DATA.items.length) _E.deleteRow(i);
+					else if(i) tr.dataset.ref = i-1;
+				});
 			}
 			catch(e) { }
 		},
