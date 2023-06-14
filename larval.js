@@ -1472,6 +1472,8 @@ NET: {
 				$HST.updateStageData();
 			}
 		}
+		else if(dropDownMode)
+			$HST.dropDown(args['dropDownIndex']);
 		else
 			$MRQ.flash('Sorry, no additional history is available to rewind to at this time.');
 	}
