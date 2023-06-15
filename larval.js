@@ -116,11 +116,16 @@ _hotKeyMap: {
 	'Backspace':e               => $GUI.vpmToggle(),
 	'End':e                     => $GUI.KEY_ROW = e.parentElement.childElementCount - 1,
 	'Enter':e                   => $EVT.click(e),
+	'Equal':e                   => $CFG.updateAudioVolume(true),
 	'Escape':e                  => $GUI.broadBehaviorToggle($TOP.ON),
 	'F5':e                      => $CFG.clear('User requested.'),
 	'F8':e                      => $NET.nextURL(true) && $MRQ.flash(`Changed endpoint to: <i>${$NET.URL}</i>`),
 	'F12':e                     => $GUI.setThemeRandom('<i>Going under the hood?</i> Let\'s make the outside look as hideous as the inside first.'),
 	'Home':e                    => $GUI.KEY_ROW = 1,
+	'Minus':e                   => $CFG.updateAudioVolume(false),
+	'Pause':e                   => $CFG.updateAudio(!$E('l_audible').checked),
+	'NumpadAdd':e               => $CFG.updateAudioVolume(true),
+	'NumpadSubtract':e          => $CFG.updateAudioVolume(false),
 	'NumpadEnter':e             => $EVT.click(e),
 	'PageDown':e                => $GUI.KEY_ROW+=$GUI.TABLE_ROWS_IN_VIEW,
 	'PageUp':e                  => $GUI.KEY_ROW-=$GUI.TABLE_ROWS_IN_VIEW,
@@ -602,6 +607,7 @@ CFG: {
 			_settings[name] = value;
 		if(!passive || $hasSettings())
 			localStorage.setItem('larval', JSON.stringify(_settings));
+		return(value);
 	},
 	clear: message => {
 		$MRQ.flash('Clearing local settings'+(message?`: <i class="l_marquee_alt_padded">${message}</i>`:'...'));
@@ -643,6 +649,20 @@ CFG: {
 			display.innerHTML = (input.value / _settingsSelectedTab['percent_shift'] * (id=='l_range_down'?-1:1)).toFixed(Math.ceil(Math.log10(_settingsSelectedTab['percent_shift'])))
 		if(_settings['l_vpm'] !== null)
 			$E('l_range_volume_type').innerHTML = (_settings['l_vpm'] ? 'vpm' : 'vol');
+	},
+	updateAudio: on => $MRQ.flash(`Audible notifications: <i class="l_marquee_alt_padded">${$CFG.set('l_audible',($E('l_audible').checked=on))?'Enabled':'Disabled'}</i>`),
+	updateAudioVolume: boolOrInt => {
+		let audios=[_audioAlert,_audioTest], volume=audios[0].volume||0;
+		if(typeof boolOrInt=='boolean')
+			volume += (boolOrInt ? 0.1 : -0.1);
+		else if(typeof boolOrInt=='number')
+			volume = (boolOrInt > 1 ? boolOrInt/100 : boolOrInt);
+		if(volume > 1 || 0 > volume)
+			$MRQ.flash(`Volume is already set to its ${volume<0?'lowest':'highest'} value.`);
+		else {
+			audios.forEach(a => a.volume = volume);
+			$MRQ.flash(`Changed audio volume to: <i class="l_marquee_alt_padded">${Math.round(volume*100,0)}%</i>` + (!$E('l_audible').checked?' (audio is disabled)':''));
+		}
 	},
 	tabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
 	tabSelect: el => {
