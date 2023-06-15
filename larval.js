@@ -148,6 +148,7 @@ _enumMap: {
 		'VOL5':_  => '+' + $multiplierFormat(_.val,1),
 		'PCTM':_  => 'M=' + $htmlPercent(_.val,0),
 		'PCTY':_  => 'Y=' + $htmlPercent(_.val,0),
+		'REL':_   => $H(_.val),
 		'NWS':_   => $H(_.val),
 		'LNK':_   => _.val,
 		'KSTK':0, 'KETF':0, 'KCRP':1, 'KFTR':2, 'KCUR':3, 'KUSR':4,
