@@ -727,6 +727,10 @@ i { font-style: normal !important; }
 	text-align: center;
 	position: relative;
 }
+#l_content_table tr.l_linked {
+	background: linear-gradient(90deg, var(--l-color-9) 0%, var(--l-color-11) 1%) !important;
+	background-repeat: no-repeat !important;
+}
 .l_halt td:nth-child(3), .l_notify_halt td:nth-child(3) { text-align: left !important; }
 .l_halt td:nth-child(4), .l_notify_halt td:nth-child(4) { text-align: center !important; }
 .l_futures td:nth-child(6) { text-align: center !important; }
