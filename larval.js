@@ -93,10 +93,11 @@ _clickMap: {
 	'l_marquee_flash':_         => $HST.gotoStageData(0),
 	'l_marquee_info':_          => $DAT.setURLFormat(_.sym, false),
 	'l_marquee_talk':_          => $TOP.searchFromURL(_.raw, true),
-	'l_news':_                  => $W.open($DAT.DATA['items'][_.idx][$LNK], `l_news_${_.sym}`, _extURLOptions),
+	'l_news':_                  => typeof $DAT.DATA['items'][_.idx][$LNK]=='function' ? $DAT.DATA['items'][_.idx][$LNK](_.idx) : $W.open($DAT.DATA['items'][_.idx][$LNK], `l_news_${_.sym}`, _extURLOptions),
 	'l_notify_disable':_        => $NFY.exception(_.raw, true),
 	'l_notify_enable':_         => $NFY.exception(_.raw, false),
 	'l_range_volume_type':_     => $GUI.vpmToggle(),
+	'l_related':_               => $GUI.relatedToggle(_.idx),
 	'l_settings_button':_       => $CFG.buttonToggle(null, true),
 	'l_ta':_                    => $W.open(_keyMap[_.el.dataset.keymap?_.el.dataset.keymap:$GUI.KEY_MAP_IDX_DEFAULT][$KSTK].replace('@', _.sym), `l_ta_${_.sym}`, _extURLOptions),
 	'l_tab':_                   => $CFG.tabSelect(_.el),
@@ -148,11 +149,10 @@ _enumMap: {
 		'VOL5':_  => '+' + $multiplierFormat(_.val,1),
 		'PCTM':_  => 'M=' + $htmlPercent(_.val,0),
 		'PCTY':_  => 'Y=' + $htmlPercent(_.val,0),
-		'REL':_   => $H(_.val),
 		'NWS':_   => $H(_.val),
 		'LNK':_   => _.val,
 		'KSTK':0, 'KETF':0, 'KCRP':1, 'KFTR':2, 'KCUR':3, 'KUSR':4,
-		'WAUD':0, 'WNOT':1, 'HLT':2, 'AGE': 6, 'TAN':8
+		'WAUD':0, 'WNOT':1, 'HLT':2, 'AGE': 6, 'TAN':8, 'REL':8
 	},
 	'top': {
 		'TUSR':_   => $H(_.val),
@@ -709,6 +709,7 @@ DAT: {
 	},
 	sortStage: updateView => {
 		if($DAT.DATA && $DAT.SORT) {
+			$DAT.DATA.related = null;
 			if(!$DAT.DATA.itemsImmutable)
 				$DAT.DATA.itemsImmutable = $cloneObject($DAT.DATA.items);
 			$DAT.DATA.items = $DAT.DATA.items.sort((a, b) => {
@@ -927,6 +928,19 @@ GUI: {
 		else if($scrollToTop() || $CFG.buttonToggle(false) || $HST.gotoStageData(0)) return;
 		else $POL.forceNextStage();		
 	},
+	relatedToggle: idx => {
+		let mainRow=$DAT.DATA.items[idx], symbols=[mainRow[$SYM]].concat(mainRow[$REL]), indices=($DAT.DATA.related&&$DAT.DATA.related[0]==idx?null:[idx]);
+		if(indices) {
+			$DAT.DATA.items.forEach((row, idx) => {
+				if($I(symbols, row[$SYM]) > 0)
+					indices.push(idx);
+			});
+			if(indices.length < 2)
+				indices = null;
+		}
+		$DAT.DATA.related = indices;
+		$GUI.contentTableUpdate();
+	},
 	vpmToggle: () => {
 		if(!$DAT.DATA || (_settings['l_vpm'] === null && !confirm('Toggle from "volume per day" to the average "volume per minute" (VPM)?')))
 			return;
@@ -957,14 +971,16 @@ GUI: {
 	},
 	cell: (row, type, idx) => row[type] && $GUI.MAP[type] ? $GUI.MAP[type]({'val':row[type], 'row':row, 'type':type, 'idx':typeof(idx)=='number'?idx:-1}) : (typeof type=='string'?type:$F('f_empty_cell')),
 	contentTableRoll: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
-	contentTableRowPopout: row => {
-		if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
+	contentTableRowPopout: (row, passive) => {
+		if(row[$REL] && typeof row[$REL] == 'object' && !passive)
+			$F('f_class_title_display', ['l_notify_popout l_related', 'Related movers', '&#128279;&nbsp;<i>related </i>movers']);
+		else if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
 			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:$GUI.KEY_MAP_IDX_DEFAULT), `&#128200;&nbsp;${_taMap[row[$TAN]][1]}`]);
-		else if(row[$ERN] && row[$NWS])
+		else if(row[$ERN] && row[$NWS] && typeof row[$ERN] != 'object' && typeof row[$NWS] != 'object')
 			$F('f_class_title_display', ['l_notify_popout l_news', `News and earnings on ${$GUI.cell(row,$ERN)}`, `&#128197;&nbsp;${$GUI.cell(row,$ERN)}<i>&nbsp;+&nbsp;news</i>`]);
-		else if(row[$ERN])
+		else if(row[$ERN] && typeof row[$ERN] != 'object')
 			$F('f_class_title_display', ['l_notify_popout', `Earnings on ${$GUI.cell(row,$ERN)}`, `&#128198;&nbsp;${$GUI.cell(row,$ERN)}<i>&nbsp;earnings</i>`]);
-		else if(row[$NWS])
+		else if(row[$NWS] && typeof row[$NWS] != 'object')
 			$F('f_class_title_display', ['l_notify_popout l_news', 'Company news', '&#128197;&nbsp;<i>recent </i>news']);
 		else
 			$F('');
@@ -985,7 +1001,7 @@ GUI: {
 	contentTableUpdate: (doNotify, doNotResetKeyRow) => {
 		if(!$DAT.DATA || !$ANI.COMPLETE) return;
 		$E('l_menu').className = ($ANI.COMPLETE && !$isWeekend() ? $GUI.getThemeMode('l_') : 'l_default');
-		let rowRules={}, notifyRows=[], notify=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=($DAT.DATA['afterhours']?'l_stocks_ah':'l_stocks');
+		let i=-1, r=-1, rowRules={}, notifyRows=[], indices=[], notify=false, notifyRelated=false, visibleRows=0, onTop={}, htmlRow='', htmlPriority='', htmlNormal='', html='<tr>', stockAssetType=($DAT.DATA['afterhours']?'l_stocks_ah':'l_stocks');
 		const columns = ($TOP.ON ? ['user',$TOP.LOG?'post':'symbols','bull','user%','real%','start',$TOP.LOG?'added':'end'] : ['symbol','company','~5min<i>ute</i>%','total%','price',$DAT.DATA['vpm']?'vpm':'volume','options']);
 		$E('l_root').classList[$DAT.DATA['locked']?'add':'remove']('l_locked');
 		if(_assetTypes[0] != stockAssetType) {
@@ -1020,7 +1036,8 @@ GUI: {
 		html += '</tr>';
 		if(doNotify)
 			$NFY.clear();
-		for(let i=0; i < $DAT.DATA['items'].length; i++) {
+
+		while((indices.length > 0 && (i=r=indices.pop())) || ++i < $DAT.DATA['items'].length) {
 			const row=$DAT.DATA['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_char['etf']?1:0)], isStock=(_I<0), notifyExcept=($I($NFY.EXCEPTIONS,row[$SYM])>=0), isOnTop=!!$DAT.ON_TOP[row[$SYM]];
 			let rowClass=rowType, notifyControl='', historyClass=($TOP.LOG?'':'l_history_toggle');
 			if($TOP.ON) {
@@ -1069,6 +1086,21 @@ GUI: {
 					else if(isOnTop)
 						notifyControl = $F('f_class_title_display', ['l_notify_disable', `Remove ${$GUI.cell(row,$SYM)} from top`, 'x']);
 				}
+				if($DAT.DATA.related && $DAT.DATA.related[0] == i) {
+					indices = indices.concat($DAT.DATA.related.slice(1));
+					if(i+1 < $DAT.DATA['items'].length)
+						indices.unshift(i+1);
+					notifyRelated = notify || isOnTop;
+				}
+				if(indices.length > 0) {
+					rowClass += ' l_linked';
+					if(notifyRelated)
+						notify = notifyRelated;
+				}
+				else if(row[$REL] && typeof row[$REL]=='object' && !row[$LNK]) {
+					row[$NWS] = `Related movers: ${row[$REL].join(', ')}`;
+					row[$LNK] = $GUI.relatedToggle;
+				}
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$GUI.cell(row,$SYM)}</td>
 					<td class="${row[$NWS]?'l_news':'l_static'}">${$GUI.cellRollover(row,$NAM,$NWS,true)}</td>
@@ -1076,7 +1108,7 @@ GUI: {
 					<td class="l_history_toggle">${$GUI.cellRollover(row,$PCT,$PCTY)}</td>
 					<td class="l_history_toggle">${$GUI.cellRollover(row,$PRC,$PRC5)}</td>
 					<td class="l_history_toggle">${$GUI.cellRollover(row,$VOL,$VOL5)}</td>
-					<td class="l_history_toggle">${$GUI.contentTableRowPopout(row)}${$GUI.cellRollover(row,$OPT,$OIV)}</td>
+					<td class="l_history_toggle">${$GUI.contentTableRowPopout(row,i==r)}${$GUI.cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			if(visibleRows >= 0 && $GUI.TABLE_SOFT_LIMIT > 0 && ++visibleRows >= $GUI.TABLE_SOFT_LIMIT)
