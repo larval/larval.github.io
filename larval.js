@@ -93,7 +93,7 @@ _clickMap: {
 	'l_marquee_flash':_         => $HST.gotoStageData(0),
 	'l_marquee_info':_          => $DAT.setURLFormat(_.sym, false),
 	'l_marquee_talk':_          => $TOP.searchFromURL(_.raw, true),
-	'l_news':_                  => typeof $DAT.DATA['items'][_.idx][$LNK]=='function' ? $DAT.DATA['items'][_.idx][$LNK](_.idx) : $W.open($DAT.DATA['items'][_.idx][$LNK], `l_news_${_.sym}`, _extURLOptions),
+	'l_news':_                  => typeof $DAT.DATA['items'][_.idx][$LNK]=='number' ? $GUI.relatedToggle(_.idx) : $W.open($DAT.DATA['items'][_.idx][$LNK], `l_news_${_.sym}`, _extURLOptions),
 	'l_notify_disable':_        => $NFY.exception(_.raw, true),
 	'l_notify_enable':_         => $NFY.exception(_.raw, false),
 	'l_range_volume_type':_     => $GUI.vpmToggle(),
@@ -1097,9 +1097,9 @@ GUI: {
 					if(notifyRelated)
 						notify = notifyRelated;
 				}
-				else if(row[$REL] && typeof row[$REL]=='object' && !row[$LNK]) {
+				else if(row[$REL] && typeof row[$REL]=='object' && typeof row[$LNK]=='undefined') {
 					row[$NWS] = `Related movers: ${row[$REL].join(', ')}`;
-					row[$LNK] = $GUI.relatedToggle;
+					row[$LNK] = i;
 				}
 				htmlRow = `<tr class="${rowClass}" data-ref="${i}">
 					<td>${notifyControl}${$GUI.cell(row,$SYM)}</td>
