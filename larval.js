@@ -1400,7 +1400,7 @@ MRQ: {
 /*************************************************************************************************\
 \*******  FETCH & NETWORK PARSING LOGIC  ************************************  [ $NET.* ]  *******/
 NET: {
-	URL: null, URLS: ['//stage.larval.com', '//larval.net', '//stage.larval.net'],
+	URL: null, URLS: ['//stage.larval.com', '//stage.larval.net', '//key.larval.net'],
 
 	setup: () => $NET.orderURLSByURL(`//${$D.domain}`) && $NET.nextURL() && $NET.getStageData(false),
 	orderURLSByURL: url => $NET.URLS=($I($NET.URLS,url)>=0 ? $NET.URLS.concat($NET.URLS.splice(0,_I)) : $NET.URLS.sort((a,b) => Math.abs(a.slice(-1).charCodeAt(0)-url.slice(-1).charCodeAt(0)) - Math.abs(b.slice(-1).charCodeAt(0)-url.slice(-1).charCodeAt(0)))),
