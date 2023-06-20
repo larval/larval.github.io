@@ -450,15 +450,19 @@ i { font-style: normal !important; }
 	padding-left: 2px;
 }
 .l_marquee_blink_wide { padding-left: 15px !important; }
+.l_marquee_warning a { text-decoration: none !important; }
 .l_marquee_warning i {
 	padding-right: 10px;
 	color: var(--l-color-0);
 }
+.l_top_only .l_marquee_warning i { color: var(--l-color-16); }
+.l_top_only .l_marquee_warning a { color: var(--l-color-0) !important; }
+.l_top_only .l_marquee_warning span { color: var(--l-color-10); }
 .l_top_only .l_marquee_highlight_talk i { color: var(--l-color-0) !important; }
 .l_top_only .l_marquee_alt_padded_right_talk { color: var(--l-color-10) !important; }
 .l_stage_only .l_marquee_highlight_talk i { color: var(--l-color-10) !important; }
 .l_stage_only .l_marquee_alt_padded_right_talk { color: var(--l-color-0) !important; }
-.l_marquee_warning span {
+.l_stage_only .l_marquee_warning span {
 	color: var(--l-color-10);
 	border-bottom: 2px solid var(--l-color-10);
 	margin-left: 5px;
@@ -1057,7 +1061,8 @@ input[type=checkbox]:checked:disabled + label:before {
 		cursor: pointer;
 		border-bottom-color: var(--l-color-1) !important;
 	}
-	.l_marquee_warning span, .l_marquee_talk span { cursor: pointer; }
+	.l_top_only .l_marquee_warning a:hover { border-bottom: 2px solid var(--l-color-0); }
+	.l_stage_only .l_marquee_warning span, .l_marquee_talk span { cursor: pointer; }
 	#l_settings_button:hover { background: linear-gradient(180deg, var(--l-color-17) 75%, #333 90%); }
 	#l_content_table tr:hover:not(:first-child), #l_content_table .l_tr_keyrow_selected:not(:first-child) {
 		outline: none;

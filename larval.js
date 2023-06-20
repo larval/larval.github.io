@@ -1302,10 +1302,12 @@ MRQ: {
 		if(!$ANI.COMPLETE || !$DAT.DATA || $TOP.LOG || !$DAT.DATA['marquee'] || $DAT.DATA['marquee'].length < 2 || (!$TOP.ON&&passive&&$E('l_marquee_about')))
 			return;
 		let html=$F('f_marquee_blink_wide'), itemHtml='', rank=0, maxRank=20, topType='', lastTopType='';
-		if(!$TOP.ON) {
+		if($TOP.ON)
+			itemHtml = `<div class="l_marquee_warning"><i>${_char['warning']} LARVAL . TOP ${_char['warning']}</i> <a href="//top.larval.com" target="_blank">top.larval.com</a> is a sentiment tracker for <a href="//stocktwits.com" target="_blank">stocktwits.com</a>, you can change the <span>.com</span> to <span>.top</span> (<a href="//stocktwits.top" target="_blank">stocktwits.top</a>) with most urls to quickly view and automatically queue monitoring of a user's most recent applicable posts.</div>`;
+		else
 			_warnings.filter(Boolean).forEach(msg => itemHtml += `<div class="l_marquee_warning"><i>${_char['warning']} WARNING ${_char['warning']}</i>${msg}</div> `);
-			if(itemHtml) html = itemHtml + _F;
-		}
+		if(itemHtml)
+			html = itemHtml + _F;
 		for(let i=0; i < $DAT.DATA['marquee'].length; i++) {
 			let item=$DAT.DATA['marquee'][i];
 			if(item.length > 2 && typeof item[2]=='string' && typeof item[1]!='string') {
