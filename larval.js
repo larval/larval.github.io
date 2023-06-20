@@ -971,8 +971,8 @@ GUI: {
 	},
 	cell: (row, type, idx) => row[type] && $GUI.MAP[type] ? $GUI.MAP[type]({'val':row[type], 'row':row, 'type':type, 'idx':typeof(idx)=='number'?idx:-1}) : (typeof type=='string'?type:$F('f_empty_cell')),
 	contentTableRoll: roll => $E('l_content_table').classList[roll?'add':'remove']('l_content_table_alt_display'),
-	contentTableRowPopout: (row, passive) => {
-		if(row[$REL] && typeof row[$REL] == 'object' && !passive)
+	contentTableRowPopout: row => {
+		if(row[$REL] && typeof row[$REL] == 'object')
 			$F('f_class_title_display', ['l_notify_popout l_related', 'Related movers', '&#128279;&nbsp;<i>related </i>movers']);
 		else if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
 			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:$GUI.KEY_MAP_IDX_DEFAULT), `&#128200;&nbsp;${_taMap[row[$TAN]][1]}`]);
@@ -1108,7 +1108,7 @@ GUI: {
 					<td class="l_history_toggle">${$GUI.cellRollover(row,$PCT,$PCTY)}</td>
 					<td class="l_history_toggle">${$GUI.cellRollover(row,$PRC,$PRC5)}</td>
 					<td class="l_history_toggle">${$GUI.cellRollover(row,$VOL,$VOL5)}</td>
-					<td class="l_history_toggle">${$GUI.contentTableRowPopout(row,i==r)}${$GUI.cellRollover(row,$OPT,$OIV)}</td>
+					<td class="l_history_toggle">${i!=r?$GUI.contentTableRowPopout(row):''}${$GUI.cellRollover(row,$OPT,$OIV)}</td>
 					</tr>`;
 			}
 			if(visibleRows >= 0 && $GUI.TABLE_SOFT_LIMIT > 0 && ++visibleRows >= $GUI.TABLE_SOFT_LIMIT)
