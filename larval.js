@@ -790,6 +790,7 @@ DAT: {
 		$CFG.buttonToggle(false);
 		$GUI.setStage($TOP.ON ? 'stage' : 'top');
 		$CFG.buttonTextToggle(false);
+		$CFG.tabSelect();
 		if($HST.DATA.length > 0)
 			$DAT.setStage($HST.DATA[0]);
 		else
