@@ -662,7 +662,7 @@ CFG: {
 			$MRQ.flash(`Volume is already set to its ${volume<0?'lowest':'highest'} value.`);
 		else {
 			audios.forEach(a => a.volume = volume);
-			$MRQ.flash(`Changed audio volume to: <i class="l_marquee_alt_padded">${Math.round(volume*100,0)}%</i>` + (!$E('l_audible').checked?' (audio is disabled)':''));
+			$MRQ.flash(`Changed audio volume to: <i class="l_marquee_alt_padded">${Math.round(volume*100,0)}%</i>` + (!$E('l_audible').checked?' (audio is disabled)':$NFY.playAudio(_audioTest)||''));
 		}
 	},
 	tabUpdateUI: () => _assetTypes.forEach(type => $E(type).classList[_settings[type]['l_show']?'add':'remove']('l_show')),
@@ -1602,7 +1602,7 @@ NFY: {
 			navigator.vibrate(pattern ? pattern : _vibrateAlert);
 	},
 	playAudio: (audio, vibrateFallback, disableWarning) => {
-		if(typeof audio == 'object' && audio.play && _settings['l_audible'])
+		if(_settings['l_audible'] && typeof audio == 'object' && audio.play && !(audio.currentTime=0))
 			audio.play()
 			.then(() => $NFY.playAudioCallback(null, vibrateFallback, disableWarning))
 			.catch(err => $NFY.playAudioCallback(err, vibrateFallback, disableWarning));
