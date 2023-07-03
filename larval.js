@@ -1212,7 +1212,7 @@ HST: {
 				if(lastItem == $F('f_blank_line') && isLast)
 					htmlItems.pop();
 				else if(row && ($TOP.ON||row[$PCT5]))
-					htmlItems.push(lastItem=`<div class="l_hover_container${row[$HILT]?' l_top_searched_symbol':''}">${isAge?row.slice(-1)[0]:$GUI.cell(row,type,idx)}</div>`);
+					htmlItems.push(lastItem=`<div class="l_hover_container${$TOP.ON&&row[$HILT]?' l_top_searched_symbol':''}">${isAge?row.slice(-1)[0]:$GUI.cell(row,type,idx)}</div>`);
 				else if(lastItem != _F && !isLast)
 					htmlItems.push(lastItem=_F);
 			});
