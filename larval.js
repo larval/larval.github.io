@@ -889,8 +889,8 @@ GUI: {
 		});
 		$GUI.MAP = $GUI.MAPS[$DAT.MODE];
 		$D.body.id = $D.body.className = 'l_n';
-		if($D.domain.match(/stage|net/i))
-			$E('l_root').classList.add('l_stage_net');
+		if($D.domain.match(/stage/i))
+			$E('l_root').classList.add('l_stage');
 		if($E('l_awaiting_data'))
 			_E.innerText = _E.title;
 		if(!($GUI.KEY_MAP_IDX=_settings['l_keymap_index']))
