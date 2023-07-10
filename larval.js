@@ -1405,7 +1405,7 @@ MRQ: {
 NET: {
 	URL: null, URLS: ['//stage.larval.com', '//stage.larval.net', '//stage.larval.org'],
 
-	setup: () => $NET.orderURLSByURL(`//${$D.domain}`) && $NET.nextURL() && $NET.getStageData(false),
+	setup: () => ($M(/^[/#]*(https?|ipfs|ipns)[/=?]+([a-z0-9_.:-]+)\/?$/i,location.hash?location.hash:location.pathname) ? $NET.URLS.unshift($NET.URL=`${_M[1]}://${_M[2]}`) : $NET.orderURLSByURL(`//${$D.domain}`)) && $NET.nextURL() && $NET.getStageData(false),
 	orderURLSByURL: url => $NET.URLS=($I($NET.URLS,url)>=0 ? $NET.URLS.concat($NET.URLS.splice(0,_I)) : $NET.URLS.sort((a,b) => Math.abs(a.slice(-1).charCodeAt(0)-url.slice(-1).charCodeAt(0)) - Math.abs(b.slice(-1).charCodeAt(0)-url.slice(-1).charCodeAt(0)))),
 	nextURL: updateNow => $NET.URLS.push($NET.URL=$NET.URLS.shift()) && (!updateNow||!$POL.forceNextStage()),
 	get: (jsonFile, callback, args) => {
