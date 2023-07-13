@@ -27,7 +27,7 @@ _keyMap: {
 	'D': ['https://research.tdameritrade.com/grid/public/research/stocks/summary?symbol=@'],
 	'E': ['https://www.etrade.wallst.com/v1/stocks/snapshot/snapshot.asp?symbol=@'],
 	'F': ['https://www.finviz.com/quote.ashx?t=@', 'https://www.finviz.com/crypto_charts.ashx?t=@USD'],
-	'G': ['https://www.benzinga.com/quote/@', 'https://www.benzinga.com/quote/@-USD'],
+	'G': ['https://www.benzinga.com/quote/@/short-interest', 'https://www.benzinga.com/quote/@-USD'],
 	'H': ['https://www.stockcharts.com/h-sc/ui?s=@'],
 	'I': ['https://www.investing.com/search/?q=@'],
 	'J': ['https://www.wsj.com/market-data/quotes/@'],
@@ -49,27 +49,27 @@ _keyMap: {
 	'Z': ['https://www.zacks.com/stock/quote/@'],
 },
 _taMap: {
-	'AS': ['Ascending triangle', 'asc<i>&nbsp;triangle</i>', 'F'],
-	'CD': ['Channel down', 'c<i>hannel&nbsp;</i>down', 'F'],
-	'CH': ['Channel', 'chan<i>nel</i>', 'F'],
-	'CU': ['Channel up', 'c<i>hannel&nbsp;</i>up', 'F'],
-	'D1': ['Barchart directional top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
-	'DB': ['Double bottom', '2x&nbsp;bot<i>tom</i>', 'F'],
-	'DE': ['Descending triangle', 'desc<i>&nbsp;triangle</i>', 'F'],
-	'DT': ['Double top', '2x&nbsp;top', 'F'],
-	'HI': ['Inverse head and Ssoulders', 'inv<i>erse</i>&nbsp;h&amp;s', 'F'],
-	'HS': ['Head and shoulders', 'h&nbsp;&amp;&nbsp;s', 'F'],
-	'HZ': ['Horizontal S/R', 's&nbsp;&amp;&nbsp;r', 'F'],
-	'LF': ['Low float', '<i>low&nbsp;</i>float', 'M'],
-	'MB': ['Multiple bottoms', '&gt;2x&nbsp;bot<i>tom</i>s', 'F'],
-	'MT': ['Multiple tops', '&gt;2x&nbsp;tops', 'F'],
-	'S1': ['Barchart strength top 1%', '<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
-	'SI': ['High short interest', 'short<i>&nbsp;interest</i>&nbsp;%', 'M'],
-	'TR': ['Technical resistance', 'resist<i>ance</i>', 'F'],
-	'TS': ['Technical support', '<i>tech&nbsp;</i>support', 'F'],
-	'WD': ['Wedge down', 'wedge<i>&nbsp;down</i>', 'F'],
-	'WE': ['Wedge', 'wedge', 'F'],
-	'WU': ['Wedge up', 'wedge<i>&nbsp;up</i>', 'F']
+	'AS': ['Ascending triangle', '&#128200;&nbsp;asc<i>&nbsp;triangle</i>', 'F'],
+	'CD': ['Channel down', '&#128201;&nbsp;c<i>hannel&nbsp;</i>down', 'F'],
+	'CH': ['Channel', '&#128200;&nbsp;chan<i>nel</i>', 'F'],
+	'CU': ['Channel up', '&#128200;&nbsp;c<i>hannel&nbsp;</i>up', 'F'],
+	'D1': ['Barchart directional top 1%', '&#128200;&nbsp;<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
+	'DB': ['Double bottom', '&#128200;&nbsp;2x&nbsp;bot<i>tom</i>', 'F'],
+	'DE': ['Descending triangle', '&#128201;&nbsp;desc<i>&nbsp;triangle</i>', 'F'],
+	'DT': ['Double top', '&#128201;&nbsp;2x&nbsp;top', 'F'],
+	'HI': ['Inverse head and Ssoulders', '&#128200;&nbsp;inv<i>erse</i>&nbsp;h&amp;s', 'F'],
+	'HS': ['Head and shoulders', '&#128201;&nbsp;h&nbsp;&amp;&nbsp;s', 'F'],
+	'HZ': ['Horizontal S/R', '&#128200;&nbsp;s&nbsp;&amp;&nbsp;r', 'F'],
+	'LF': ['Low float', '&#128640;&nbsp;<i>low&nbsp;</i>float', 'F'],
+	'MB': ['Multiple bottoms', '&#128200;&nbsp;&gt;2x&nbsp;bot<i>tom</i>s', 'F'],
+	'MT': ['Multiple tops', '&#128201;&nbsp;&gt;2x&nbsp;tops', 'F'],
+	'S1': ['Barchart strength top 1%', '&#128200;&nbsp;<i>&nbsp;barchart&nbsp;</i>top&nbsp;1%', 'B'],
+	'SI': ['High short interest', '&#128640;&nbsp;short<i>&nbsp;interest</i>&nbsp;%', 'G'],
+	'TR': ['Technical resistance', '&#128201;&nbsp;resist<i>ance</i>', 'F'],
+	'TS': ['Technical support', '&#128200;&nbsp;<i>tech&nbsp;</i>support', 'F'],
+	'WD': ['Wedge down', '&#128201;&nbsp;wedge<i>&nbsp;down</i>', 'F'],
+	'WE': ['Wedge', '&#128200;&nbsp;wedge', 'F'],
+	'WU': ['Wedge up', '&#128200;&nbsp;wedge<i>&nbsp;up</i>', 'F']
 },
 _eventMap: {
 	   '#l_root': {
@@ -374,7 +374,7 @@ EVT: {
 	scroll: e => {
 		const scrolledDown=$E($ANI.ID) || (($W.pageYOffset||$D.documentElement.scrollTop) > $E('l_fixed').offsetHeight);
 		const percent=($D.documentElement.scrollTop||$D.body.scrollTop) / (($D.documentElement.scrollHeight||$D.body.scrollHeight) - $D.documentElement.clientHeight) * 100;
-		if(percent > 50 && $GUI.TABLE_SOFT_LIMIT > 0) {
+		if(percent > 80 && $GUI.TABLE_SOFT_LIMIT > 0) {
 			$GUI.TABLE_SOFT_LIMIT = -$GUI.TABLE_SOFT_LIMIT;
 			$GUI.contentTableUpdate();
 		}
@@ -978,7 +978,7 @@ GUI: {
 		if(row[$REL] && typeof row[$REL] == 'object')
 			$F('f_class_title_display', ['l_notify_popout l_related', 'Related movers', '&#128279;&nbsp;<i>related </i>movers']);
 		else if(row[$TAN] && typeof row[$TAN] == 'string' && _taMap[row[$TAN]])
-			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:$GUI.KEY_MAP_IDX_DEFAULT), `&#128200;&nbsp;${_taMap[row[$TAN]][1]}`]);
+			$F('f_class_title_keymap_display', ['l_notify_popout l_ta', _taMap[row[$TAN]][0], (_taMap[row[$TAN]][2]?_taMap[row[$TAN]][2]:$GUI.KEY_MAP_IDX_DEFAULT), _taMap[row[$TAN]][1]]);
 		else if(row[$ERN] && row[$NWS] && typeof row[$ERN] != 'object' && typeof row[$NWS] != 'object')
 			$F('f_class_title_display', ['l_notify_popout l_news', `News and earnings on ${$GUI.cell(row,$ERN)}`, `&#128197;&nbsp;${$GUI.cell(row,$ERN)}<i>&nbsp;+&nbsp;news</i>`]);
 		else if(row[$ERN] && typeof row[$ERN] != 'object')
