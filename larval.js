@@ -954,10 +954,11 @@ GUI: {
 		$GUI.contentTableUpdate();
 	},
 	setSpread: spreads => {
-		const items=(spreads?spreads.map(x => `<div style="border-image:linear-gradient(90deg, var(--l-color-3) ${x[1]-1}%, var(--l-color-6) ${x[1]}%, var(--l-color-5) ${x[1]+1}%) 1 1">${$H(x[0])}</div>`):[]);
+		const items=(spreads?spreads.map(x => `<div class="${x[2]?'l_spread_link':'l_spread_nolink'}" data-ref="${x[2]?x[2]:''}" style="border-image:linear-gradient(90deg, var(--l-color-3) ${x[1]-1}%, var(--l-color-6) ${x[1]}%, var(--l-color-5) ${x[1]+1}%) 1 1">${$H(x[0])}</div>`):[]);
 		$E('l_spread').style.opacity = items.length ? '1' : '0.25';
-		if(!items.length) return;
-		items.splice(Math.floor(items.length/2), 0, '<u></u>'); 
+		if(!items.length)
+			return;
+		items.splice(Math.floor(items.length/2), 0, '<div class="l_spread_separator"></div>'); 
 		_E.innerHTML = items.join('');
 	},
 	cellRollover: (row, primary, secondary, staticPrimary) => {

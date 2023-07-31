@@ -549,7 +549,7 @@ i { font-style: normal !important; }
 	opacity: 0;
 	min-width: 0;
 }
-#l_spread div {
+.l_spread_link, .l_spread_nolink {
 	flex: 1;
 	text-align: center;
 	height: 17px;
@@ -561,7 +561,7 @@ i { font-style: normal !important; }
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-#l_spread u {
+.l_spread_separator {
 	display: block;
 	width: 250px;
 }
@@ -1097,6 +1097,10 @@ input[type=checkbox]:checked:disabled + label:before {
 	.l_marquee_link:hover, .l_marquee_info:hover, .l_marquee_talk:hover {
 		cursor: pointer;
 		border-bottom-color: var(--l-color-1) !important;
+	}
+	.l_spread_link:hover {
+		cursor: pointer;
+		color: var(--l-color-0) !important;
 	}
 	.l_top_only .l_marquee_warning a:hover { border-bottom: 2px solid var(--l-color-0); }
 	.l_stage_only .l_marquee_warning span, .l_marquee_talk span { cursor: pointer; }
