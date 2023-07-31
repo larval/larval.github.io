@@ -528,6 +528,43 @@ i { font-style: normal !important; }
 	width: 60%;
 	transition: 0.5s;
 }
+#l_spread_container {
+	position: relative;
+	color: var(--l-color-1);
+	margin: auto;
+	user-select: none;
+	font-size: 10px;
+	font-weight: normal !important;
+	font-variant: small-caps;
+	text-align: center;
+}
+#l_spread {
+	display: flex;
+	margin: auto;
+	transition: 1s;
+	position: absolute;
+	width: 60%;
+	left: 50%;
+	transform: translateX(-50%);
+	opacity: 0;
+	min-width: 0;
+}
+#l_spread div {
+	flex: 1;
+	text-align: center;
+	height: 17px;
+	margin-left: 5px;
+	margin-right: 5px;
+	border-bottom-style: solid;
+	border-botton-width: 2px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+#l_spread u {
+	display: block;
+	width: 250px;
+}
 #l_control {
 	height: 0px;
 	width: 45%; 
@@ -687,7 +724,7 @@ i { font-style: normal !important; }
 	width: 100% !important;
 	margin: 0 !important;
 }
-.l_top_only #l_progress_cap_right, .l_top_only #l_progress_cap_left, .l_top_only #l_stage_about, .l_stage_only #l_top_about, .l_top_only  #l_logo_stage, .l_stage_only  #l_logo_top, .l_stage_only #l_control_table tr.l_top_row, .l_top_only #l_control_table tr.l_stage_row  {
+.l_top_only #l_progress_cap_right, .l_top_only #l_progress_cap_left, .l_top_only #l_stage_about, .l_stage_only #l_top_about, .l_top_only  #l_logo_stage, .l_stage_only  #l_logo_top, .l_stage_only #l_control_table tr.l_top_row, .l_top_only #l_control_table tr.l_stage_row, .l_top_only #l_spread_container {
 	display: none;
 }
 .l_top_only #l_content_table tr td:nth-child(3) .l_history_active, .l_top_only #l_content_table tr td:nth-child(2) .l_history_active {
@@ -1004,7 +1041,7 @@ input[type="checkbox"] {
 #l_nam * { transition: 0s !important; }
 .l_nam #l_logo * { animation-play-state: paused !important; }
 #l_nam #l_marquee_flash, #l_nam .l_content_tr_fade_in tr td { animation: l_fade_in 1s ease forwards !important; }
-#l_nam, #l_nam:after, #l_nam:before, #l_na tr, #l_na td, #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3, #l_nam #l_marquee_container, #l_nam #l_afterhours_left, #l_nam #l_afterhours_right, #l_nam #l_logo_worm_eyelid, #l_nam .l_logo_worm_body, #l_nam #l_logo_worm_eye, #l_nam .l_marquee_highlight i { animation: none !important; }
+#l_nam, #l_nam:after, #l_nam:before, #l_na tr, #l_na td, #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3, #l_nam #l_marquee_container, #l_nam #l_afterhours_left, #l_nam #l_afterhours_right, #l_nam #l_logo_worm_eyelid, #l_nam .l_logo_worm_body, #l_nam #l_logo_worm_eye, #l_nam .l_marquee_highlight i, #l_spread_container { animation: none !important; }
 #l_nam, #l_nam:after, #l_nam:before { background: #222 !important; }
 #l_nam #l_fixed_bg1, #l_nam #l_fixed_bg2, #l_nam #l_fixed_bg3 { background: none !important; }
 #l_nam #l_marquee_container { height: 125px !important; }
@@ -1044,7 +1081,7 @@ input[type=checkbox] + label:active:before {
 }
 input[type=checkbox]:checked + label:before {
 	background-color: var(--l-color-12);
-	border-color:var(--l-color-12);
+	border-color: var(--l-color-12);
 	color: #333;
 }
 input[type=checkbox]:disabled + label:before {
@@ -1110,12 +1147,8 @@ input[type=checkbox]:checked:disabled + label:before {
 		width: 200px;
 	}
 }
-@media only screen and (max-width: 1300px) {
-	.l_notify_popout i { display: none; }
-	.l_top_user i { width: 100px; }
-}
 @media only screen and (max-width: 1500px) {
-	#l_content, #l_marquee_container { width: 75%; }
+	#l_content, #l_marquee_container, #l_spread { width: 75%; }
 	#l_content_table tr td {
 		padding-left: 10px;
 		padding-right: 10px;
@@ -1126,12 +1159,17 @@ input[type=checkbox]:checked:disabled + label:before {
 	}
 	.l_tab_info { padding: 10px 15px 10px 15px !important; }
 }
+@media only screen and (max-width: 1300px) {
+	#l_spread_container { font-size: 9px; }
+	.l_notify_popout i { display: none; }
+	.l_top_user i { width: 100px; }
+}
 @media only screen and (max-width: 1000px) {
 	#l_marquee_flash {
 		padding-bottom: 16px;
 		font-size: 13px;
 	}
-	#l_content, #l_control, #l_marquee_container { width: 90%; }
+	#l_content, #l_control, #l_marquee_container, #l_spread { width: 90%; }
 	#l_content { font-size: 12px; }
 	#l_footer { font-size: 15px; }
 	#l_last_update { font-size: 12px; }
@@ -1152,6 +1190,7 @@ input[type=checkbox]:checked:disabled + label:before {
 		margin-bottom: 0 !important;
 		width: 100%;
 	}
+	#l_spread_container { display: none; }
 	#l_marquee_container { max-height: 175px !important; }
 	#l_marquee_flash { font-size: 12px; }
 	#l_settings_button {

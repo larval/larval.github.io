@@ -701,8 +701,9 @@ DAT: {
 	MODE: 'stage', DATA: null, SORT: 0, LAST: 0, ON_TOP: {}, FETCHING: null, TIMEOUT: null,
 
 	setup: () => void(0),
-	setStage: stageData => { 
+	setStage: stageData => {
 		$DAT.DATA = $DAT.vpmStage(stageData);
+		$GUI.setSpread(stageData ? stageData['spreads'] : null);
 		$GUI.TABLE_SOFT_LIMIT = Math.abs($GUI.TABLE_SOFT_LIMIT);
 		if($GUI.setTheme($GUI.getThemeMode()) !== false && $Q('meta[name="theme-color"]'))
 			_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
@@ -951,6 +952,13 @@ GUI: {
 		$DAT.DATA = $DAT.vpmStage($DAT.DATA);
 		$CFG.updateRange('l_range_volume');
 		$GUI.contentTableUpdate();
+	},
+	setSpread: spreads => {
+		const items=(spreads?spreads.map(x => `<div style="border-image:linear-gradient(90deg, var(--l-color-3) ${x[1]-1}%, var(--l-color-6) ${x[1]}%, var(--l-color-5) ${x[1]+1}%) 1 1">${$H(x[0])}</div>`):[]);
+		$E('l_spread').style.opacity = items.length ? '1' : '0.25';
+		if(!items.length) return;
+		items.splice(Math.floor(items.length/2), 0, '<u></u>'); 
+		_E.innerHTML = items.join('');
 	},
 	cellRollover: (row, primary, secondary, staticPrimary) => {
 		let cell='<div class="l_hover_container">', hasSecondary=(row[secondary]||staticPrimary);
