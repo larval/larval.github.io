@@ -541,7 +541,7 @@ i { font-style: normal !important; }
 #l_spread {
 	display: flex;
 	margin: auto;
-	transition: 1s;
+	transition: 0.5s;
 	position: absolute;
 	width: 60%;
 	left: 50%;
