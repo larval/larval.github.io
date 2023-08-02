@@ -1048,7 +1048,6 @@ GUI: {
 		html += '</tr>';
 		if(doNotify)
 			$NFY.clear();
-
 		while((indices.length > 0 && (i=r=indices.pop())) || ++i < $DAT.DATA['items'].length) {
 			const row=$DAT.DATA['items'][i], rowType=_assetTypes[$I(_assetTypes,`l_${row[$OPT]}`)>=0?_I:(row[$SYM][0]==_char['etf']?1:0)], isStock=(_I<0), notifyExcept=($I($NFY.EXCEPTIONS,row[$SYM])>=0), isOnTop=!!$DAT.ON_TOP[row[$SYM]];
 			let rowClass=rowType, notifyControl='', historyClass=($TOP.LOG?'':'l_history_toggle');
