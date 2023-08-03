@@ -908,6 +908,7 @@ GUI: {
 	setStage: set => {
 		$TOP.ON = (set=='top');
 		$GUI.MAP = $GUI.MAPS[$DAT.MODE=set];
+		$D.body.style.filter = 'grayscale(0%)';
 		_title = document.title = ($TOP.ON?'Larval - Top market players':'Larval - Live market volatility dashboard');
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^$TOP.ON?'remove':'add'](cn));
 	},
