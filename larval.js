@@ -702,6 +702,8 @@ DAT: {
 
 	setup: () => void(0),
 	setStage: stageData => {
+		if(!$DAT.DATA)
+			$D.body.style.filter = 'grayscale(0%)';
 		$DAT.DATA = $DAT.vpmStage(stageData);
 		$GUI.setSpread(stageData ? stageData['spreads'] : null);
 		$GUI.TABLE_SOFT_LIMIT = Math.abs($GUI.TABLE_SOFT_LIMIT);
@@ -908,7 +910,6 @@ GUI: {
 	setStage: set => {
 		$TOP.ON = (set=='top');
 		$GUI.MAP = $GUI.MAPS[$DAT.MODE=set];
-		$D.body.style.filter = 'grayscale(0%)';
 		_title = document.title = ($TOP.ON?'Larval - Top market players':'Larval - Live market volatility dashboard');
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^$TOP.ON?'remove':'add'](cn));
 	},
