@@ -1806,7 +1806,7 @@ updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' && !$
 removeFunction: (comp, func) => $W['$'+comp][func] = $L[comp][func] = () => void(0),
 hasSettings: () => localStorage && localStorage.getItem('larval'),
 isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
-isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
+isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || /iphone|android/i.test(navigator.userAgent)),
 isVisible: el => (el ? $W.getComputedStyle(el).visibility : $D.visibilityState) == 'visible',
 isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show'],
 isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
