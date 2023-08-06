@@ -1804,7 +1804,7 @@ createURL: (symbol, type) => _keyMap[_keyMap[$GUI.KEY_MAP_IDX]?$GUI.KEY_MAP_IDX:
 cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
 updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' && !$TOP.ON ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
 removeFunction: (comp, func) => $W['$'+comp][func] = $L[comp][func] = () => void(0),
-hasSettings: () => localStorage && localStorage.getItem('larval'),
+hasSettings: () => !$TOP.ON && localStorage && localStorage.getItem('larval'),
 isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
 isMobile: strict => 'ontouchstart' in $D.documentElement && (!strict || $D.body.clientHeight > $D.body.clientWidth),
 isVisible: el => (el ? $W.getComputedStyle(el).visibility : $D.visibilityState) == 'visible',
