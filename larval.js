@@ -703,7 +703,7 @@ DAT: {
 	setup: () => void(0),
 	setStage: stageData => {
 		if(!$DAT.DATA)
-			$D.body.style.filter = 'grayscale(0%)';
+			$E('l_fixed').style.filter = 'grayscale(0%)';
 		$DAT.DATA = $DAT.vpmStage(stageData);
 		$GUI.setSpread(stageData ? stageData['spreads'] : null);
 		$GUI.TABLE_SOFT_LIMIT = Math.abs($GUI.TABLE_SOFT_LIMIT);
