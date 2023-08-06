@@ -243,7 +243,7 @@ i { font-style: normal !important; }
 	height: 100%;
 	z-index: 2;
 	background-color: var(--l-color-7);
-	transition: 0.5s;
+	transition: 2s;
 	filter: grayscale(100%);
 	animation: l_fixed 0.5s ease 6s 1 normal forwards;
 	cursor: pointer;
