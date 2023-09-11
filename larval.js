@@ -1569,7 +1569,7 @@ NFY: {
 		if($HST.DATA.length < 2) return;
 		if(!$isVisible() && typeof Notification != 'undefined' && Notification.permission == 'granted') {
 			$NFY.NOTIFICATIONS.push(new Notification('Larval - Market volatility found!', {
-				icon: '/icon-192x192.png',
+				icon: `/${_theme=='default'?'icon':_theme}-192x192.png`,
 				body: notifyRows.length > 0 ? 'Volatile stock(s): ' + $U(notifyRows.map(a => (typeof a[$HLT]=='string'?_char['halt']:_char[a[$PCT5]<0?'down':'up'])+a[$SYM])).join(' ') : 'Larval - Market volatility found!'
 			}));
 		}
