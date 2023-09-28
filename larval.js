@@ -927,8 +927,11 @@ GUI: {
 			if(!_I ^ !$TOP.ON)
 				$DAT.toggleStage(true);
 		}
-		else
-			location.href = `//${sub=='www'?'':sub+'.'}${$M(/(stage\.)?[^.]+\.[A-Z0-9]+$/i,$D.domain)?_M[0]:'larval.com'}`;
+		else {
+			const url=`//${sub=='www'?'':sub+'.'}${$M(/(stage\.)?[^.]+\.[A-Z0-9]+$/i,$D.domain)?_M[0]:'larval.com'}`, win=$W.open(url,sub);
+			if(win) win.focus();
+			else location.href = url;
+		}
 	},
 	broadBehaviorToggle: topMode => {
 		if(!$ANI.COMPLETE)
