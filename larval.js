@@ -106,6 +106,7 @@ _clickMap: {
 	'l_tab':_                   => $CFG.tabSelect(_.el),
 	'l_warning_audio':_         => $NFY.playAudio(_audioTest, false, true),
 	'l_warning_never_notify':_  => $NFY.requestPermission(true),
+	'multi_default':_           => $GUI.openInline(_),
 	'shift_default':_           => _.raw ? $TOP.searchFromURL('/symbol/'+($M(/[A-Z0-9_]+$/ig,_.raw)?_M[0]:_.raw), true) : $DAT.editSymbolsOnTop(),
 	'alt_default':_             => _.raw ? $DAT.setSymbolsOnTop(_.raw, null, true) : $DAT.editSymbolsOnTop(),
 	'default':_                 => $W.open($createURL(_.sym, _.type), `l_${_.type}_${_.sym}`, _extURLOptions)
@@ -273,7 +274,9 @@ EVT: {
 			sym = $DAT.DATA['items'][idx] ? $DAT.DATA['items'][idx][$SYM] : idx;
 		}
 		const raw=sym;
-		if((e.ctrlKey || e.altKey || e.type=='contextmenu') && (el.dataset&&el.dataset.alt!='none'))
+		if(sym && (Number(e.ctrlKey)+Number(e.altKey)+Number(e.shiftKey)) > 1)
+			ref = 'multi_default';
+		else if((e.ctrlKey || e.altKey || e.type=='contextmenu') && (el.dataset&&el.dataset.alt!='none'))
 			ref = 'alt_default';
 		else if(e.shiftKey && sym)
 			ref = 'shift_default';
@@ -921,6 +924,12 @@ GUI: {
 		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
 		$GUI.setTheme('random');
 		$MRQ.flash(message, false, 20000);
+	},
+	openInline: args => {
+		for(let next=(args&&args.el?args.el:{}); !!next.parentElement; next=next.parentElement) {
+			if(next.tagName == 'TR')
+				return(next.innerHTML=`<td colspan="7"><iframe src="${$createURLWithKey(args.sym,args.type,'S')}" referrerpolicy="no-referrer" /></td>`);
+		}
 	},
 	menuClick: sub => {
 		if($I(['www','top'],!$TOP.LOG&&$DAT.MODE!='bid'?sub:null) >= 0) {
@@ -1816,7 +1825,8 @@ scrollToTop: smooth => ($W.scrollY ? $W.scrollTo({top: 0, behavior: smooth?'smoo
 keyModeReset: () => $GUI.KEY_ROW ? $EVT.keydown(false) : null,
 epochNow: () => Math.floor(Date.now() / 1000),
 epochToDate: epoch => new Date(epoch * 1000).toLocaleTimeString('en-US', {weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),
-createURL: (symbol, type) => _keyMap[_keyMap[$GUI.KEY_MAP_IDX]?$GUI.KEY_MAP_IDX:$GUI.KEY_MAP_IDX_DEFAULT][type].replace('@',symbol),
+createURLWithKey: (symbol, type, key) => _keyMap[_keyMap[key]?key:$GUI.KEY_MAP_IDX_DEFAULT][type].replace('@',symbol),
+createURL: (symbol, type) => $createURLWithKey(symbol, type, $GUI.KEY_MAP_IDX),
 cloneObject: obj => typeof structuredClone=='function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)),
 updateTitleWithPrefix: setPrefix => $D.title = (typeof setPrefix=='string' && !$TOP.ON ? (_titlePrefix=setPrefix) : _titlePrefix) + _title,
 removeFunction: (comp, func) => $W['$'+comp][func] = $L[comp][func] = () => void(0),
