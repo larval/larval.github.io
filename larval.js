@@ -1447,7 +1447,7 @@ NET: {
 	nextURL: updateNow => $NET.URLS.push($NET.URL=$NET.URLS.shift()) && (!updateNow||!$POL.forceNextStage()),
 	get: (jsonFile, callback, args) => {
 		$E('l_logo').classList.add('l_net_loading');
-		fetch($DAT.FETCHING=($NET.URL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')))
+		fetch($DAT.FETCHING=($NET.URL+jsonFile+'?ts='+new Date().getTime()+(args&&args.search?`&search=${encodeURIComponent(args.search)}`:'')), {signal:typeof AbortSignal!='undefined'&&AbortSignal.timeout?AbortSignal.timeout($DAT.DATA?30000:8000):null})
 		.then(resp => resp.json())
 		.then(json => $NET.getCallback(callback, json, args))
 		.catch(err => $NET.getCallback(callback, null, args));
