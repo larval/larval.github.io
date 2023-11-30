@@ -918,7 +918,7 @@ GUI: {
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^$TOP.ON?'remove':'add'](cn));
 	},
 	forceRedraw: el => el && (el.style.transform='translateZ(0)') && void el.offsetHeight,
-	setTheme: name => (_theme!=name && _themes[name] && !_themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color)) && $A('link') && !_A.forEach(l => l.rel=='icon' ? l.href=l.href.replace(/icon|afterhours|top|bid/, name=='default'?'icon':name) : null)),
+	setTheme: name => (_theme!=name && _themes[name] && !_themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color)) && $A('link') && !_A.forEach(l => l.rel=='icon' ? l.href=l.href.replace(/(icon|afterhours|top|bid)([^/]+)$/, `${name=='default'?'icon':name}$2`) : null)),
 	getThemeMode: prefix => $DAT.DATA ? ((prefix?prefix:'') + (['afterhours','bloodbath','top'].find(key => $DAT.DATA[key]) || 'default')) : null,
 	setThemeRandom: message => {
 		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
