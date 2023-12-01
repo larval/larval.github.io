@@ -1014,17 +1014,16 @@ input[type="checkbox"] {
 	font-size: 30px;
 	color: var(--l-color-0); 
 }
-#l_more svg {
+#l_loading {
 	display: block;
 	width: 75px;
 	height: 75px;
 	margin: auto;
 	padding-top: 25px;
+	cursor: pointer;
 }
-#l_more path:nth-child(-n+5) {
-	fill: var(--l-color-1) !important;
-}
-#l_na #l_more svg { display: none !important;; }
+#l_loading path:nth-child(-n+5) { fill: var(--l-color-1) !important; }
+#l_na #l_loading { display: none !important;; }
 #l_na #l_more span { display: block !important; }
 .l_more { display: block !important; }
 .l_no_more { display: none !important; }
@@ -1291,6 +1290,18 @@ input[type=checkbox]:checked:disabled + label:before {
 	#l_stocks_ah span { font-size: 5px !important; }
 	.l_tab { font-size: 9px !important; }
 	.l_tab_info { padding: 10px 3px 10px 3px !important; }
+}
+@media only screen and (min-height: 640px) {
+	#l_root:not(.l_animations_complete) #l_loading {
+		position: fixed;
+		z-index: 4000;
+		left: 50vw;
+		bottom: 5vh;
+		transform: translateX(-50%);
+		transition: 1s;
+		opacity: 0.75;
+	}
+	#l_root.l_has_net:not(.l_animations_complete) #l_loading { opacity: 0; }
 }
 @media only screen and (max-height: 500px) {
 	#l_logo {

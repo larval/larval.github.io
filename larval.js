@@ -92,6 +92,7 @@ _clickMap: {
 	'l_history_toggle':_        => $HST.dropDownToggle(_.idx),
 	'l_hotkey_help':_           => $MRQ.hotKeyHelp(),
 	'l_last_update':_           => $POL.forceNextStage(),
+	'l_loading':_               => $GUI.broadBehaviorToggle($TOP.ON),
 	'l_marquee_flash':_         => $HST.gotoStageData(0),
 	'l_marquee_info':_          => $DAT.setURLFormat(_.sym, false),
 	'l_marquee_talk':_          => $TOP.searchFromURL(_.raw, true),
@@ -708,8 +709,10 @@ DAT: {
 
 	setup: () => void(0),
 	setStage: stageData => {
-		if(!$DAT.DATA)
+		if(!$DAT.DATA) {
+			$E('l_root').classList.add('l_has_net');
 			$E('l_fixed').style.filter = 'grayscale(0%)';
+		}
 		$DAT.DATA = $DAT.vpmStage(stageData);
 		$GUI.setSpread(stageData ? stageData['spreads'] : null);
 		$GUI.TABLE_SOFT_LIMIT = Math.abs($GUI.TABLE_SOFT_LIMIT);
