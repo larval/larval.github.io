@@ -487,10 +487,12 @@ ANI: {
 		$ANI.updateFlash();
 	},
 	updateFlash: nextPollMS => {
-		if(!$ANI.COMPLETE || !$T('path')) return;
-		for(let t=0,i=0; t < _T.length; t++) {
-			const path=_T[t], animate=path.lastElementChild, flashable=path.classList.contains('l_logo_worm_flashable');
-			if(animate.getAttribute('begin')) {
+		if(!$ANI.COMPLETE || !$A('#l_logo path')) return;
+		for(let a=0,i=0; a < _A.length; a++) {
+			const path=_A[a], animate=path.lastElementChild, flashable=path.classList.contains('l_logo_worm_flashable');
+			if(!animate)
+				continue;
+			else if(animate.getAttribute('begin')) {
 				animate.setAttribute('begin', '');
 				animate.beginElement();
 				continue;

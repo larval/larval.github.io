@@ -817,7 +817,7 @@ i { font-style: normal !important; }
 	font-family: Larval,Futura,Trebuchet MS,Arial,sans-serif;
 	font-weight: normal !important;
 	text-align: center;
-	font-size: 25px;
+	font-size: 4vmin !important;
 	padding: 60px 30px 60px 30px !important;
 	color: var(--l-color-1) !important;
 	text-decoration: none !important;
@@ -1008,11 +1008,24 @@ input[type="checkbox"] {
 	background-color: transparent;
 	animation: l_notify_halt 1s ease alternate infinite;
 }
-#l_more {
+#l_more span {
+	display: none;
 	text-align: center;
 	font-size: 30px;
 	color: var(--l-color-0); 
 }
+#l_more svg {
+	display: block;
+	width: 75px;
+	height: 75px;
+	margin: auto;
+	padding-top: 25px;
+}
+#l_more path:nth-child(-n+5) {
+	fill: var(--l-color-1) !important;
+}
+#l_na #l_more svg { display: none !important;; }
+#l_na #l_more span { display: block !important; }
 .l_more { display: block !important; }
 .l_no_more { display: none !important; }
 .l_hr {
