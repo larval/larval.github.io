@@ -379,9 +379,9 @@ EVT: {
 	scroll: e => {
 		const scrolledDown=$E($ANI.ID) || (($W.pageYOffset||$D.documentElement.scrollTop) > $E('l_fixed').offsetHeight);
 		const percent=($D.documentElement.scrollTop||$D.body.scrollTop) / (($D.documentElement.scrollHeight||$D.body.scrollHeight) - $D.documentElement.clientHeight) * 100;
-		if(percent > 80 && $GUI.TABLE_SOFT_LIMIT > 0) {
+		if(percent > 95 && $GUI.TABLE_SOFT_LIMIT > 0) {
 			$GUI.TABLE_SOFT_LIMIT = -$GUI.TABLE_SOFT_LIMIT;
-			$GUI.contentTableUpdate();
+			setTimeout($GUI.contentTableUpdate, 1000);
 		}
 		$E('l_fixed').className = scrolledDown ? 'l_scrolled' : 'l_not_scrolled';
 	},

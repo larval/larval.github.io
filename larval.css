@@ -1008,11 +1008,11 @@ input[type="checkbox"] {
 	background-color: transparent;
 	animation: l_notify_halt 1s ease alternate infinite;
 }
-#l_more span {
+#l_loading_na {
 	display: none;
 	text-align: center;
 	font-size: 30px;
-	color: var(--l-color-0); 
+	color: var(--l-color-0);
 }
 #l_loading {
 	display: block;
@@ -1024,7 +1024,7 @@ input[type="checkbox"] {
 }
 #l_loading path:nth-child(-n+5) { fill: var(--l-color-1) !important; }
 #l_na #l_loading { display: none !important;; }
-#l_na #l_more span { display: block !important; }
+#l_na #l_loading_na { display: block !important; }
 .l_more { display: block !important; }
 .l_no_more { display: none !important; }
 .l_hr {
