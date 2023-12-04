@@ -15,11 +15,12 @@ _symbolsStatic: ['^VIX', '^DJI', '^GSPC', '^IXIC', '^RUT', '^TNX', '^TYX'],
 _assetTypes: ['l_stocks', 'l_etfs', 'l_crypto', 'l_futures', 'l_currency'],
 _char: { 'up':"\u25b2 ", 'down':"\u25bc ", 'updown':"\u21c5 ", 'warning':"\u26a0 ", 'halt':"\u25a0 ", 'etf':"~", 'crypto':"*", 'futures':'^', 'currency':"$", 'user':"@" },
 _themes: {
-	'default':    ['#A6FDA4','#E1FDE4','#88CF86','#7DFF7A','#A6FDA4','#FF4444','#2A302A','#303630','#363C36','#825900','#FFDE96','#FAEED4','#A6FDA4','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDE8C','#FAF4E6'],
-	'afterhours': ['#95ABFC','#CDDFFF','#8BA4FF','#7492FF','#D274FF','#FF4444','#2A2A30','#303034','#36363C','#660303','#FF73BB','#D4DCFA','#A0FACA','#00AAAA','#85FFD6','#FF0080','#FDA4CF','#A6B7F7','#E6EAFA'],
-	'bloodbath':  ['#FC656F','#FAB6B6','#F77272','#FF4747','#FFAE74','#FFCC54','#361010','#4B1818','#602121','#825900','#FFEC73','#F2D088','#D4F0A3','#91AD03','#FAB143','#FF0000','#FF7070','#FC868E','#FAF4E6'],
-	'top':        ['#A6FFFF','#E1FDFF','#88CFD1','#A6FFFF','#75bcff','#9175ff','#2A3030','#303636','#363C3C','#825900','#FFDE96','#FCF0D2','#A6FFFF','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDEDE','#FAF4E6']
-}, _theme: '', _themeBGColorIndex: 7,
+	'none':       ['#D9D9D9','#F1F1F1','#B1B1B1','#C9C9C9','#D9D9D9','#7C7C7C','#2D2D2D','#333333','#393939','#5B5B5B','#DFDFDF','#EEEEEE','#D9D9D9','#646464','#CECECE','#4C4C4C','#BEBEBE','#BDBDBD','#F4F4F4','#FFFFFF'],
+	'default':    ['#A6FDA4','#E1FDE4','#88CF86','#7DFF7A','#A6FDA4','#FF4444','#2A302A','#303630','#363C36','#825900','#FFDE96','#FAEED4','#A6FDA4','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDE8C','#FAF4E6','#33FF33'],
+	'afterhours': ['#95ABFC','#CDDFFF','#8BA4FF','#7492FF','#D274FF','#FF4444','#2A2A30','#303034','#36363C','#660303','#FF73BB','#D4DCFA','#A0FACA','#00AAAA','#85FFD6','#FF0080','#FDA4CF','#A6B7F7','#E6EAFA','#3366FF'],
+	'bloodbath':  ['#FC656F','#FAB6B6','#F77272','#FF4747','#FFAE74','#FFCC54','#361010','#4B1818','#602121','#825900','#FFEC73','#F2D088','#D4F0A3','#91AD03','#FAB143','#FF0000','#FF7070','#FC868E','#FAF4E6','#FF3333'],
+	'top':        ['#A6FFFF','#E1FDFF','#88CFD1','#A6FFFF','#75bcff','#9175ff','#2A3030','#303636','#363C3C','#825900','#FFDE96','#FCF0D2','#A6FFFF','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDEDE','#FAF4E6','#33FFFF']
+}, _theme: '', _themeBGColorIndex: 7, _themeIconColorIndex: 19,
 _keyMap: {
 	'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@-USD'],
 	'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/crypto/coins/@'],
@@ -716,7 +717,8 @@ DAT: {
 		$DAT.DATA = $DAT.vpmStage(stageData);
 		$GUI.setSpread(stageData ? stageData['spreads'] : null);
 		$GUI.TABLE_SOFT_LIMIT = Math.abs($GUI.TABLE_SOFT_LIMIT);
-		if($GUI.setTheme($GUI.getThemeMode()) !== false && $Q('meta[name="theme-color"]'))
+		$GUI.setTheme($GUI.getThemeMode());
+		if($Q('meta[name="theme-color"]'))
 			_Q.setAttribute('content', _themes[_theme][_themeBGColorIndex]);
 		if(!$TOP.ON && location.pathname.length > 1 && $W.history && $W.history.replaceState)
 			$W.history.replaceState({}, null, '/');
@@ -915,6 +917,7 @@ GUI: {
 					_keyMap[key][type] = _keyMap[$GUI.KEY_MAP_IDX_DEFAULT][type];
 			}
 		}
+		$GUI.setTheme('none');
 	},
 	setStage: set => {
 		$TOP.ON = (set=='top');
@@ -923,7 +926,7 @@ GUI: {
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^$TOP.ON?'remove':'add'](cn));
 	},
 	forceRedraw: el => el && (el.style.transform='translateZ(0)') && void el.offsetHeight,
-	setTheme: name => (_theme!=name && _themes[name] && !_themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color)) && $A('link') && !_A.forEach(l => l.rel=='icon' ? l.href=l.href.replace(/(icon|afterhours|top|bid)([^/]+)$/, `${name=='default'?'icon':name}$2`) : null)),
+	setTheme: name => setTimeout(() => _theme!=name && _themes[name] && !_themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color)) && $A('link') && !_A.forEach(l => l.rel=='icon' ? (l.href=$M('svg',l.type)?'data:image/svg+xml;charset=utf-8,'+escape($E('l_icon').outerHTML.replace(/<\/?animate[^>]*>/ig,'').replace(/\#FFFFFF/ig,_themes[_theme][_themeIconColorIndex])):l.href.replace(/(none|default|afterhours|top|bid)-/,name+'-')) : null), 100),	
 	getThemeMode: prefix => $DAT.DATA ? ((prefix?prefix:'') + (['afterhours','bloodbath','top'].find(key => $DAT.DATA[key]) || 'default')) : null,
 	setThemeRandom: message => {
 		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
@@ -1180,7 +1183,7 @@ GUI: {
 				html += onTop[key];
 			html += htmlPriority + htmlNormal;
 		}
-		$E('l_more').className = $GUI.TABLE_SOFT_LIMIT > 0 ? 'l_more' : 'l_no_more';
+		$E('l_loading').className = $GUI.TABLE_SOFT_LIMIT > 0 ? 'l_loading' : 'l_no_loading';
 		$E('l_content_table').className = $E('l_awaiting_data') ? '' : 'l_content_tr_fade_in';
 		if(doNotify && !$isSafari())
 			$E('l_content_table').classList.add('l_content_table_notify_'+Math.abs($DAT.SORT));
@@ -1599,7 +1602,7 @@ NFY: {
 		if($HST.DATA.length < 2) return;
 		if(!$isVisible() && typeof Notification != 'undefined' && Notification.permission == 'granted') {
 			$NFY.NOTIFICATIONS.push(new Notification('Larval - Market volatility found!', {
-				icon: `/${_theme=='default'?'icon':_theme}-192x192.png`,
+				icon: $A('link') && Array.from(_A).find(l => l.rel==($isSafari()?'apple-touch-icon':'icon')).href,
 				body: notifyRows.length > 0 ? 'Volatile stock(s): ' + $U(notifyRows.map(a => (typeof a[$HLT]=='string'?_char['halt']:_char[a[$PCT5]<0?'down':'up'])+a[$SYM])).join(' ') : 'Larval - Market volatility found!'
 			}));
 		}
