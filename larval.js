@@ -20,7 +20,7 @@ _themes: {
 	'afterhours': ['#95ABFC','#CDDFFF','#8BA4FF','#7492FF','#D274FF','#FF4444','#2A2A30','#303034','#36363C','#660303','#FF73BB','#D4DCFA','#A0FACA','#00AAAA','#85FFD6','#FF0080','#FDA4CF','#A6B7F7','#E6EAFA','#3366FF'],
 	'bloodbath':  ['#FC656F','#FAB6B6','#F77272','#FF4747','#FFAE74','#FFCC54','#361010','#4B1818','#602121','#825900','#FFEC73','#F2D088','#D4F0A3','#91AD03','#FAB143','#FF0000','#FF7070','#FC868E','#FAF4E6','#FF3333'],
 	'top':        ['#A6FFFF','#E1FDFF','#88CFD1','#A6FFFF','#75bcff','#9175ff','#2A3030','#303636','#363C3C','#825900','#FFDE96','#FCF0D2','#A6FFFF','#00AA00','#85FF92','#FF0000','#FDA4A4','#8FDEDE','#FAF4E6','#33FFFF']
-}, _theme: '', _themeBGColorIndex: 7, _themeIconColorIndex: 19,
+}, _theme: '', _themeIcon: '', _themeBGColorIndex: 7, _themeIconColorIndex: 19,
 _keyMap: {
 	'A': ['https://www.seekingalpha.com/symbol/@', 'https://www.seekingalpha.com/symbol/@-USD'],
 	'B': ['https://www.barchart.com/stocks/quotes/@', 'https://www.barchart.com/crypto/coins/@'],
@@ -926,7 +926,8 @@ GUI: {
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^$TOP.ON?'remove':'add'](cn));
 	},
 	forceRedraw: el => el && (el.style.transform='translateZ(0)') && void el.offsetHeight,
-	setTheme: name => setTimeout(() => _theme!=name && _themes[name] && !_themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color)) && $A('link') && !_A.forEach(l => l.rel=='icon' ? (l.href=$M('svg',l.type)?'data:image/svg+xml;charset=utf-8,'+escape($E('l_icon').outerHTML.replace(/<\/?animate[^>]*>/ig,'').replace(/\#FFFFFF/ig,_themes[_theme][_themeIconColorIndex])):l.href.replace(/(none|default|afterhours|top|bid)-/,name+'-')) : null), 100),	
+	setIcon: name => _themes[_themeIcon=name] && $A('link') && !_A.forEach(l => l.rel=='icon' ? (l.href=$M('svg',l.type)?'data:image/svg+xml;charset=utf-8,'+escape($E('l_icon').outerHTML.replace(/<\/?animate[^>]*>/ig,'').replace(/\#FFFFFF/ig,_themes[name][_themeIconColorIndex])):l.href.replace(/(none|default|afterhours|top|bid)-/,name+'-')) : null),
+	setTheme: name => setTimeout(() => _theme!=name && _themes[name] && !_themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color)) && $GUI.setIcon(name), 100),	
 	getThemeMode: prefix => $DAT.DATA ? ((prefix?prefix:'') + (['afterhours','bloodbath','top'].find(key => $DAT.DATA[key]) || 'default')) : null,
 	setThemeRandom: message => {
 		_theme = '', _themes['random'] = _themes['default'].map(() => '#'+(2**32+Math.floor(Math.random()*2**32)).toString(16).substr(-6));
@@ -1610,6 +1611,7 @@ NFY: {
 			$NFY.requestPermission();
 		notifyRows.push([]);
 		$NFY.INTERVAL = setInterval(() => {
+			$GUI.setIcon(_themeIcon=='none' ? _theme : 'none');
 			if(!$D.hidden || !$NFY.INTERVAL)
 				$NFY.clear();
 			else if(!notifyRows[0] || !notifyRows[0][0])
@@ -1625,6 +1627,7 @@ NFY: {
 	},
 	clear: () => {
 		if($NFY.INTERVAL) {
+			$GUI.setIcon(_theme);
 			clearInterval($NFY.INTERVAL);
 			$NFY.INTERVAL = null;
 		}
