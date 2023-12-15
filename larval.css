@@ -1291,6 +1291,9 @@ input[type=checkbox]:checked:disabled + label:before {
 	.l_tab { font-size: 9px !important; }
 	.l_tab_info { padding: 10px 3px 10px 3px !important; }
 }
+@media only screen and (max-width: 400px) {
+	#l_footer a span { display: none; }
+}
 @media only screen and (min-height: 640px) {
 	#l_root:not(.l_animations_complete) #l_icon {
 		position: fixed;

@@ -384,6 +384,9 @@ EVT: {
 			$GUI.TABLE_SOFT_LIMIT = -$GUI.TABLE_SOFT_LIMIT;
 			setTimeout($GUI.contentTableUpdate, 1000);
 		}
+		if($GUI.TIMEOUT)
+			clearTimeout($GUI.TIMEOUT);
+		$GUI.TIMEOUT = setTimeout($GUI.scrollTopIfClose, 1000);
 		$E('l_fixed').className = scrolledDown ? 'l_scrolled' : 'l_not_scrolled';
 	},
 	contextmenu: e => {
@@ -889,7 +892,7 @@ GUI: {
 	MAPS: {'top':[],'stage':[]}, MAP: null,
 	KEY_MAP_IDX_DEFAULT: 'Y', KEY_MAP_IDX: null, KEY_ROW: 0,
 	TABLE_SOFT_LIMIT: 100, TABLE_ROWS_IN_VIEW: 10,
-	FRAMES: null, SWIPE_START: null,
+	FRAMES: null, SWIPE_START: null, TIMEOUT: null,
 
 	setup: () => {
 		Object.keys(_enumMap).forEach(enumGroup => { 
@@ -925,6 +928,14 @@ GUI: {
 		_title = document.title = ($TOP.ON?'Larval - Top market players':'Larval - Live market volatility dashboard');
 		['l_stage_only','l_top_only'].forEach((cn,i) => $E('l_root').classList[i^$TOP.ON?'remove':'add'](cn));
 	},
+	scroll: speed => {
+		const t=($D.documentElement.scrollTop||$D.body.scrollTop);
+		if (typeof requestAnimationFrame != 'undefined' && t > 0) {
+			$W.requestAnimationFrame($GUI.scroll);
+			$W.scrollTo(0, Math.floor(t-t/speed));
+		}
+	},
+	scrollTopIfClose: () => ($D.documentElement.scrollTop && $E('l_marquee_container').offsetHeight > $D.documentElement.scrollTop + $E('l_menu').offsetHeight) ? $GUI.scroll(32) : null,
 	forceRedraw: el => el && (el.style.transform='translateZ(0)') && void el.offsetHeight,
 	setIcon: name => _themes[_themeIcon=name] && $A('link') && !_A.forEach(l => l.rel=='icon' ? (l.href=$M('svg',l.type)?'data:image/svg+xml;charset=utf-8,'+escape($E('l_icon').outerHTML.replace(/<\/?animate[^>]*>/ig,'').replace(/\#FFFFFF/ig,_themes[name][_themeIconColorIndex])):l.href.replace(/(none|default|afterhours|top|bid)-/,name+'-')) : null),
 	setTheme: name => setTimeout(() => _theme!=name && _themes[name] && !_themes[_theme=name].forEach((color,i) => $D.body.style.setProperty(`--l-color-${i}`,color)) && $GUI.setIcon(name), 100),	
