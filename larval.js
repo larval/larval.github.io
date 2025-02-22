@@ -235,9 +235,12 @@ LOAD: e => {
 /*************************************************************************************************\
 \*******  GLOBAL EVENTS (automatically hooked)  *****************************  [ $EVT.* ]  *******/
 EVT: {
+	DOCUMENT: [ 'click', 'keydown', 'keyup', 'keypress', 'touchstart', 'touchmove', 'touchend', 'visibilitychange' ],
+	WINDOW: [ 'contextmenu', 'resize', 'popstate' ],
+
 	setup: () => {
-		for(let k of Object.keys($EVT))
-			(typeof window['on'+k]=='undefined'?$D:$W).addEventListener(k, $EVT[k]);
+		$EVT.DOCUMENT.forEach(k => $D.addEventListener(k, $EVT[k]));
+		$EVT.WINDOW.forEach(k => $W.addEventListener(k, $EVT[k]));
 		for(let query of Object.keys(_eventMap)) {
 			if(!$A(query)) continue;
 			for(let a=0; a < _A.length; a++) {
