@@ -235,7 +235,7 @@ LOAD: e => {
 /*************************************************************************************************\
 \*******  GLOBAL EVENTS (automatically hooked)  *****************************  [ $EVT.* ]  *******/
 EVT: {
-	DOCUMENT: [ 'click', 'keydown', 'keyup', 'keypress', 'touchstart', 'touchmove', 'touchend', 'visibilitychange' ],
+	DOCUMENT: [ 'click', 'keydown', 'keyup', 'keypress', 'scroll', 'touchstart', 'touchmove', 'touchend', 'visibilitychange' ],
 	WINDOW: [ 'contextmenu', 'resize', 'popstate' ],
 
 	setup: () => {
