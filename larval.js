@@ -248,6 +248,11 @@ EVT: {
 					_A[a].addEventListener(e, _eventMap[query][e]);
 			}
 		}
+		const nav = performance.getEntriesByType("navigation")[0];
+		if (nav && nav.type === "reload") {
+			setTimeout(() => $GUI.broadBehaviorToggle(true), 1000);
+			setTimeout(() => $DAT.toggleStage($TOP.ON), 2000);
+		}
 	},
 	click: e => {
 		let idx=0, msgIdx=-1, sym='', type=$KSTK, dataRef=null, ref='', refList=Object.keys(_clickMap), el=(e&&e.target?e.target:e);
@@ -420,6 +425,10 @@ EVT: {
 		else if(movementPercent[2] > 25 && movementWeighting <= 1 && $GUI.SWIPE_START[2] > 0)
 			$POL.forceNextStage();
 		$GUI.SWIPE_START = null;
+	},
+	beforeunload: e => {
+		e.preventDefault();
+		e.returnValue = '';
 	},
 	popstate: e => {
 		$CFG.buttonToggle(false);
@@ -1863,3 +1872,4 @@ isShowing: type => typeof _settings[type] == 'object' && _settings[type]['l_show
 isWeekend: dateObj => $I([0,6], (dateObj?dateObj:new Date()).getDay()) >= 0,
 isHaltRow: row => row && row[$HLT] && typeof row[$HLT] == 'string'
 } /* EOF */
+
