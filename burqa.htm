@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+ <title>Burqa - Live market chatter</title>
+ <meta charset="UTF-8" /> 
+ <meta name="description" content="Me and my bot chasing symbols" />
+ <meta name="keywords" content="live,stock,market,volatility,vega,implied,iv,stocktwits" />
+ <meta name="referrer" content="origin" /> 
+ <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, width=device-width" />
+ <meta name="theme-color" content="#303630" />
+ <meta property="og:type" content="website" />
+ <meta property="og:title" content="Burqa - Live market chatter" />
+ <meta property="og:description" content="A tool to help traders find live volatility in the stock market as it happens, alerting you to the biggest movements in the last 5 minutes." />
+ <meta property="og:url" content="https://burqa.com" />
+ <meta property="og:image:width" content="1200" />
+ <meta property="og:image:height" content="630" />
+ <meta http-equiv="refresh" content="60">
+ <link rel="canonical" href="https://burqa.com" />
+ <link rel="stylesheet" type="text/css" href="burqa.css" />
+ <script src="burqa.js"></script>
+ <noscript><style>#l_logo { visibility: visible !important; }</style></noscript>
+</head>
+<body onload="$L.LOAD()">
+<div id="l_root" class="l_stage_only">
+ <div id="l_fixed">
+  <div id="l_fixed_bg0"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div id="l_fixed_bg1"></div>
+  <div id="l_fixed_bg2"></div>
+  <div id="l_fixed_bg3"></div>
+  <div id="l_fixed_highlight"></div>
+  <div id="l_menu">
+   <div id="l_afterhours_left"><span>after<br />hours</span><i>blood<br />!&nbsp;bath&nbsp;!</i><u>top<br />shots</u></div>
+   <div id="l_afterhours_right"><span>after<br />hours</span><i>blood<br />!&nbsp;bath&nbsp;!</i><u>top<br />shots</u></div>
+   <div id="l_menu_left"></div>
+   <div id="l_menu_right"></div>
+<svg id="l_logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1200" height="628" viewBox="-30 -22 1200 628" xml:space="preserve">
+	<g transform="matrix(0.13 0 0 -0.13 735.32 239.64)">
+		<path class="l_logo_worm_flashable" id="l_logo_worm_eye" fill="#E1FDE4" stroke="#E1FDE4" style="stroke: rgb(225,253,228); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(225,253,228); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-4045.06, -1754.71)" d="M 4022 1837 C 3997 1810 3980 1761 3980 1713 C 3980 1622 4029 1630 4089 1730 C 4110 1764 4116 1813 4104 1844 C 4095 1868 4047 1864 4022 1837 z" stroke-linecap="round">
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0.8" dur="0.5s" begin="4.2s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.13 0 0 -0.13 729.62 216.59)">
+		<path class="l_logo_worm_flashable" id="l_logo_worm_eyelid" fill="#E1FDE4" stroke="#E1FDE4" style="stroke: rgb(225,253,228); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(225,253,228); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-4000.15, -1935.41)" d="M 3949 2047 C 3879 2000 3859 1943 3876 1838 C 3884 1790 3896 1790 3915 1837 C 3947 1913 4001 1950 4080 1950 C 4119 1950 4130 1953 4130 1966 C 4130 1993 4089 2041 4054 2056 C 4008 2075 3988 2074 3949 2047 z" stroke-linecap="round">
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0.3" dur="0.5s" begin="4.1s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.13 0 0 -0.13 689.14 223.82)">
+		<path class="l_logo_worm_flashable l_logo_worm_body" fill="#E1FDE4" stroke="#E1FDE4" style="stroke: rgb(225,253,228); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(225,253,228); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-3682.5, -1879.38)" d="M 3630 2207 C 3584 2192 3521 2128 3490 2065 C 3469 2022 3466 2000 3465 1910 C 3465 1815 3468 1800 3493 1749 C 3521 1690 3570 1638 3653 1576 C 3692 1546 3708 1540 3750 1540 C 3778 1540 3800 1544 3800 1548 C 3800 1568 3843 1600 3870 1600 C 3887 1600 3900 1605 3900 1610 C 3900 1616 3896 1620 3892 1620 C 3878 1620 3818 1728 3799 1790 C 3761 1914 3784 2028 3863 2097 C 3884 2115 3900 2133 3900 2137 C 3899 2149 3829 2196 3791 2208 C 3750 2223 3677 2222 3630 2207 z" stroke-linecap="round">
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0.9" dur="0.5s" begin="4s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.13 0 0 -0.13 634.4 217.44)">
+		<path class="l_logo_worm_flashable l_logo_worm_body" fill="#E1FDE4" stroke="#E1FDE4"style="stroke: rgb(225,253,228); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(225,253,228); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-3253.16, -1929.53)" d="M 3205 2308 C 3056 2254 2972 2085 3001 1896 C 3017 1791 3060 1711 3147 1619 L 3223 1540 L 3278 1540 C 3325 1540 3338 1544 3370 1573 C 3391 1590 3418 1612 3430 1620 L 3452 1636 L 3431 1670 C 3335 1827 3355 2076 3476 2210 L 3511 2248 L 3481 2269 C 3428 2307 3383 2320 3308 2319 C 3268 2319 3222 2314 3205 2308 z" stroke-linecap="round">
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0.75" dur="0.5s" begin="3.9s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.13 0 0 -0.13 571.52 214.3)">
+		<path class="l_logo_worm_flashable l_logo_worm_body" fill="#E1FDE4" stroke="#E1FDE4" style="stroke: rgb(225,253,228); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(225,253,228); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-2760.14, -1954.22)" d="M 2717 2356 C 2581 2306 2499 2180 2484 2000 C 2470 1837 2534 1710 2680 1610 C 2711 1589 2742 1565 2749 1556 C 2758 1545 2779 1540 2817 1540 C 2874 1540 2867 1536 2977 1625 L 3001 1645 L 2976 1691 C 2872 1877 2882 2112 3001 2269 C 3023 2298 3040 2323 3038 2325 C 3036 2326 3019 2336 3000 2346 C 2953 2370 2773 2377 2717 2356 z" stroke-linecap="round">
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0.6" dur="0.5s" begin="3.8s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+
+	<g transform="matrix(0.13 0 0 -0.13 511.6 217.38)">
+		<path class="l_logo_worm_flashable l_logo_worm_body" fill="#E1FDE4" stroke="#E1FDE4" style="stroke: rgb(225,253,228); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(225,253,228); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-2290.5, -1930)" d="M 2242 2289 C 2138 2237 2083 2143 2073 1999 C 2063 1855 2108 1744 2229 1618 L 2303 1540 L 2357 1540 C 2405 1540 2417 1544 2453 1575 C 2475 1594 2497 1610 2502 1610 C 2517 1610 2510 1630 2472 1689 C 2413 1779 2395 1846 2395 1970 C 2395 2090 2418 2182 2470 2263 C 2486 2289 2500 2313 2500 2315 C 2500 2318 2456 2320 2402 2320 C 2312 2320 2298 2317 2242 2289 z" stroke-linecap="round">
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0.45" dur="0.5s" begin="3.7s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.13 0 0 -0.13 458.68 227.15)">
+		<path class="l_logo_worm_flashable l_logo_worm_body" fill="#E1FDE4" stroke="#E1FDE4" style="stroke: rgb(225,253,228); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(225,253,228); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-1875.6, -1853.23)" d="M 1815 2163 C 1804 2160 1782 2148 1765 2137 C 1683 2081 1656 2010 1662 1872 C 1670 1716 1694 1666 1808 1568 C 1835 1545 1850 1540 1896 1540 C 1941 1540 1955 1544 1975 1564 C 1988 1577 2019 1596 2044 1605 C 2069 1615 2090 1625 2090 1628 C 2090 1631 2076 1655 2060 1682 C 2043 1709 2018 1766 2004 1808 C 1981 1877 1978 1895 1983 1985 C 1986 2040 1992 2097 1995 2112 C 2001 2133 1997 2141 1981 2149 C 1957 2162 1845 2172 1815 2163 z" stroke-linecap="round">
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0.3" dur="0.5s" begin="3.6s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.13 0 0 -0.13 410.91 239.84)">
+		<path class="l_logo_worm_flashable l_logo_worm_body" fill="#E1FDE4" stroke="#E1FDE4" style="stroke: rgb(225,253,228); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(225,253,228); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-1501.31, -1753.27)" d="M 1500 1909 C 1408 1854 1356 1779 1356 1699 C 1355 1638 1363 1625 1420 1594 C 1447 1580 1477 1576 1547 1576 C 1598 1576 1643 1579 1646 1583 C 1649 1586 1642 1605 1630 1625 C 1599 1676 1570 1791 1570 1867 C 1570 1939 1560 1945 1500 1909 z" stroke-linecap="round">
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0.15" dur="0.5s" begin="3.5s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.05 0 0 -0.05 339.79 311.08)">
+		<path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4"  style="stroke: rgb(166,253,164); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(166,253,164); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-2123.22, -2866.01)" d="M 837 4563 C 826 4553 829 2561 840 2402 C 860 2105 935 1877 1078 1674 C 1257 1420 1575 1229 1908 1174 C 2027 1154 2286 1160 2400 1185 C 2740 1259 3025 1456 3218 1749 C 3469 2130 3483 2681 3253 3077 C 3057 3412 2735 3643 2376 3705 C 2285 3720 2024 3726 1936 3714 L 1890 3707 L 1890 3194 C 1890 2793 1893 2681 1903 2677 C 1909 2675 1932 2684 1952 2696 C 1997 2725 2100 2760 2138 2760 C 2185 2760 2272 2730 2317 2697 C 2366 2663 2422 2584 2440 2526 C 2447 2503 2451 2454 2448 2406 C 2445 2341 2438 2315 2415 2272 C 2355 2161 2246 2096 2120 2096 C 1949 2095 1860 2168 1801 2355 C 1788 2399 1785 2542 1783 3488 L 1779 4570 L 1311 4570 C 1054 4570 840 4567 837 4563 z" stroke-linecap="round">
+			<animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="stroke-width" values="40;0" dur="0.5s" begin="1s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="1s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.05 0 0 -0.05 466.39 338.59)">
+		<path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4"  style="stroke: rgb(166,253,164); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(166,253,164); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-4669.42, -2385.11)" d="M 3570 2903 C 3570 2119 3573 2065 3620 1892 C 3718 1534 3997 1258 4355 1164 C 4477 1132 4718 1120 4852 1140 C 5253 1198 5608 1517 5724 1922 C 5768 2076 5771 2131 5768 2905 L 5765 3635 L 5298 3638 L 4831 3640 L 4828 2913 C 4825 2208 4824 2184 4805 2146 C 4777 2091 4741 2067 4678 2063 C 4611 2058 4564 2082 4536 2136 C 4516 2174 4515 2193 4510 2905 L 4505 3635 L 4038 3638 L 3570 3640 L 3570 2903 z" stroke-linecap="round">
+			<animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="stroke-width" values="40;0" dur="0.5s" begin="1.5s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="1.5s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.05 0 0 -0.05 569.24 334.06)">
+		<path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4"  style="stroke: rgb(166,253,164); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(166,253,164); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-6735.64, -2472.02)" d="M 6976 3719 C 6799 3700 6605 3626 6474 3526 C 6290 3388 6154 3173 6095 2927 C 6054 2760 6049 2626 6052 1895 L 6055 1215 L 6525 1215 L 6995 1215 L 7000 1870 C 7006 2578 7006 2574 7061 2654 C 7119 2739 7225 2763 7340 2717 C 7375 2702 7407 2693 7412 2696 C 7416 2699 7420 2926 7420 3200 L 7420 3698 L 7393 3704 C 7342 3714 7159 3730 7106 3729 C 7078 3728 7019 3724 6976 3719 z" stroke-linecap="round">
+			<animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="stroke-width" values="20;0" dur="0.5s" begin="2s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="2s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.05 0 0 -0.05 668 355.41)">
+		<path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4"  style="stroke: rgb(166,253,164); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(166,253,164); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-8831.57, -2014.38)" d="M 8595 3704 C 8088 3613 7670 3213 7571 2725 C 7511 2427 7545 2137 7669 1885 C 7742 1739 7828 1623 7952 1504 C 8240 1230 8550 1129 8993 1166 L 9070 1173 L 9070 1687 C 9070 2112 9068 2202 9056 2206 C 9049 2209 9023 2198 8999 2182 C 8864 2091 8708 2110 8596 2230 C 8528 2303 8506 2357 8505 2455 C 8505 2553 8534 2625 8602 2691 C 8671 2758 8738 2785 8840 2785 C 8954 2785 9004 2765 9069 2694 C 9127 2631 9156 2556 9170 2429 C 9176 2380 9180 1918 9180 1328 L 9180 310 L 9650 310 L 10121 310 L 10117 1463 C 10114 2604 10114 2616 10092 2710 C 10029 2985 9923 3187 9753 3356 C 9580 3529 9320 3662 9073 3705 C 8964 3724 8704 3723 8595 3704 z" stroke-linecap="round">
+			<animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="stroke-width" values="20;0" dur="0.5s" begin="2.5s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="2.5s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+	<g transform="matrix(0.05 0 0 -0.05 800.42 335.64)">
+		<path class="l_logo_letter" fill="#A6FDA4" stroke="#A6FDA4" style="stroke: rgb(166,253,164); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(166,253,164); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" transform=" translate(-11509.91, -2439.47)" d="M 11261 3705 C 10893 3640 10547 3385 10361 3040 C 10205 2749 10176 2320 10292 1992 C 10357 1807 10439 1679 10589 1529 C 10787 1330 11007 1217 11283 1174 C 11386 1157 11684 1158 11723 1175 C 11739 1182 11740 1214 11740 1660 C 11740 1990 11737 2141 11729 2145 C 11723 2149 11692 2140 11659 2125 C 11456 2034 11246 2128 11194 2332 C 11140 2540 11299 2752 11510 2754 C 11599 2755 11662 2735 11716 2687 C 11769 2641 11799 2596 11826 2525 C 11843 2478 11845 2431 11850 1845 L 11855 1215 L 12325 1215 L 12795 1215 L 12798 1810 C 12801 2457 12794 2633 12756 2800 C 12649 3271 12333 3583 11855 3691 C 11734 3719 11387 3726 11261 3705 z" stroke-linecap="round">
+			<animate attributeName="stroke-width" values="0;20" dur="1s" begin="0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;0" begin="0.0s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="stroke-width" values="20;0" dur="0.5s" begin="3s" repeatCount="1" fill="freeze"/>
+			<animate attributeName="fill-opacity" values="0;1" dur="0.5s" begin="3s" repeatCount="1" fill="freeze"/>
+		</path>
+	</g>
+</svg>
+   <div id="l_logo_tag">stock market <span id="l_logo_stage">volatility</span><span id="l_logo_top">accountability</span>  in its <i id="l_logo_tag_type"><i>b</i><i>u</i><i>r</i><i>q</i><i>a</i></i> stage</div>
+  </div>
+  <div id="l_progress">
+   <div id="l_progress_display">
+    <div id="l_progress_cap_left"></div>
+    <div id="l_progress_cap_right"></div>
+   </div>
+  </div>
+ </div>
+ <div id="l_marquee_container" tabindex="0">
+  <div id="l_marquee">
+   <div id="l_marquee_content">
+    <h1 id="l_marquee_about">
+     <div id="l_stage_about"><i>&#8226;</i>Burqa is a sidecar blog to larval.com, since they tried to silence me, you can see unfettered posts here!</div>
+    </h1>
+   </div>
+   <div id="l_marquee_content_clone"></div>
+  </div>
+  <div id="l_marquee_flash"></div>
+ </div>
+ <div id="l_spread_container"><div id="l_spread"></div></div>
+ <div id="l_control">
+  <table id="l_control_table">
+   <tr class="l_stage_row"><th colspan="6">~5 minute % change threshold to alert (<i>0.0% to disable</i>)</th></tr>
+   <tr class="l_stage_row">
+    <td class="l_tab" id="l_stocks"><i>&#10003;</i>Stocks<span>&nbsp;(AH)</span></td>
+    <td class="l_tab" id="l_etfs"><i>&#10003;</i>ETFs</td>
+    <td class="l_tab" id="l_crypto"><i>&#10003;</i>Crypto</td>
+    <td class="l_tab" id="l_futures"><i>&#10003;</i>Futures</td>
+    <td class="l_tab" id="l_currency"><i>&#10003;</i>Currency</td>
+    <td class="l_tab_info">&nbsp;&nbsp;<input type="checkbox" class="l_checkbox" id="l_show" name="l_show" /><label for="l_show">Show</label>&nbsp;&nbsp;</td>
+   </tr>
+   <tr class="l_stage_row"><td colspan="5"><input type="range" min="0" max="200" value="0" class="l_range" id="l_range_up" /></td><td class="l_tab_info">&gt;<i id="l_range_up_display">0.0</i>%</td></tr>
+   <tr class="l_stage_row"><td colspan="5"><input type="range" min="0" max="200" value="0" class="l_range" id="l_range_down" /></td><td class="l_tab_info">&lt;<i id="l_range_down_display">0.0</i>%</td></tr>
+   <tr class="l_stage_row"><td colspan="5"><input type="range" min="0" max="999" value="0" class="l_range" id="l_range_volume" /></td><td class="l_tab_info">&gt;<i id="l_range_volume_display">0</i>&nbsp;<i id="l_range_volume_type" title="Toggle volume per minute (VPM)">vol?</i></td></tr>
+   <tr class="l_stage_row"><td colspan="6"><input type="checkbox" class="l_checkbox" id="l_audible" name="l_audible" />&nbsp;<label for="l_audible">Audible notifications</label> <input type="checkbox" class="l_checkbox" id="l_options_only" name="l_options_only" />&nbsp;<label for="l_options_only">Only notify if a stock has options</label> <input type="checkbox" class="l_checkbox" id="l_notify_halts" name="l_notify_halts" />&nbsp;<label for="l_notify_halts">Notify when halted</label></td></tr>
+   <tr class="l_top_row"><th colspan="6">Enter a $symbol, @username, or #message to search for:</th></tr>
+   <tr class="l_top_row"><td colspan="6"><input type="text" id="l_top_search" placeholder="[ type and hit enter to search ]" autocorrect="off" autocomplete="off" /></td></tr>
+  </table>
+ </div>
+ <div id="l_content">
+  <iframe src="https://www.burqa.com">
+ </div>
+ <div id="l_loading">
+  <svg id="l_icon" version="1.0" xmlns="http://www.w3.org/2000/svg" width="75px" height="75px" viewBox="0 0 372.000000 372.000000" preserveAspectRatio="xMidYMid meet">
+   <g transform="translate(0.000000,372.000000) scale(0.100000,-0.100000)" stroke="none">
+    <path fill="#FFFFFF" fill-opacity="1" d="M1445 2641 c-44 -20 -70 -60 -70 -112 0 -42 5 -53 33 -81 28 -28 39 -33 82 -33 149 0 158 211 9 230 -19 3 -43 1 -54 -4z" />
+    <path fill="#FFFFFF" fill-opacity="1" d="M2215 2641 c-45 -20 -70 -60 -70 -112 0 -42 5 -53 33 -81 28 -28 39 -33 82 -33 43 0 54 5 82 33 28 28 33 39 33 82 0 42 -5 54 -31 81 -33 33 -92 46 -129 30z" />
+    <path fill="#FFFFFF" fill-opacity="0.8" d="M1740 3330 c-222 -29 -415 -125 -589 -294 -152 -147 -220 -264 -266 -456 -22 -90 -33 -404 -15 -425 33 -40 171 -132 265 -176 127 -60 247 -101 380 -129 142 -31 523 -40 677 -16 273 43 511 143 647 270 l53 51 -5 180 c-5 176 -11 212 -56 362 -21 71 -83 182 -144 259 -188 237 -452 366 -772 378 -60 3 -139 1 -175 -4z m-178 -662 c48 -24 85 -79 100 -151 11 -53 11 -58 -18 -114 -51 -99 -141 -142 -228 -109 -78 30 -155 127 -156 196 0 42 45 126 84 155 74 56 139 63 218 23z m771 18 c59 -22 107 -64 133 -120 29 -61 30 -88 5 -142 -39 -86 -142 -153 -216 -141 -59 10 -116 56 -149 120 -29 56 -29 61 -18 114 20 97 71 153 157 174 42 10 46 10 88 -5z">
+     <animate attributeName="fill-opacity" values="0.6;1;0.6;0.6;0.6;0.6;0.6" dur="1s" repeatCount="indefinite" />
+    </path>
+    <path fill="#FFFFFF" fill-opacity="0.6" d="M870 1795 c-10 -12 -11 -44 -7 -128 l6 -112 53 -48 c182 -165 433 -305 633 -354 182 -44 403 -55 557 -28 248 43 510 175 697 351 l81 76 0 112 c0 74 -4 116 -12 124 -22 22 -61 12 -167 -42 -142 -72 -224 -103 -361 -138 -247 -62 -510 -71 -774 -27 -194 33 -500 141 -596 209 -33 24 -92 26 -110 5z">
+     <animate attributeName="fill-opacity" values="0.4;0.4;0.4;0.8;0.4;0.4;0.4" dur="1s" repeatCount="indefinite" />
+    </path>
+    <path fill="#FFFFFF" fill-opacity="0.4" d="M880 1185 c-39 -47 51 -254 170 -392 166 -195 357 -314 578 -363 135 -30 378 -28 520 4 237 54 383 136 548 307 90 95 155 187 199 283 74 162 22 230 -100 131 -178 -144 -435 -250 -706 -290 -135 -19 -202 -19 -359 1 -254 33 -518 135 -693 268 -89 69 -131 82 -157 51z">
+     <animate attributeName="fill-opacity" values="0.2;0.2;0.2;0.2;0.2;0.6;0.2" dur="1s" repeatCount="indefinite" />
+    </path>
+    <path fill="#222222" fill-opacity="0.8" d="M1750 3614 c-237 -30 -434 -102 -620 -227 -96 -64 -273 -241 -337 -337 -103 -153 -173 -323 -210 -505 -16 -81 -18 -150 -18 -685 0 -535 2 -604 18 -685 55 -274 171 -491 366 -686 192 -191 398 -304 664 -361 144 -30 370 -30 514 0 266 57 472 170 664 361 195 195 311 412 366 686 16 81 18 150 18 685 0 535 -2 604 -18 685 -55 274 -171 491 -366 686 -192 192 -403 306 -664 360 -98 20 -302 32 -377 23z m220 -335 c240 -29 439 -121 593 -272 182 -178 277 -424 277 -715 l0 -106 -49 -45 c-51 -48 -198 -134 -291 -169 -72 -27 -175 -56 -280 -78 -107 -23 -492 -27 -610 -6 -247 44 -489 143 -649 265 l-54 42 7 146 c9 202 46 338 127 476 52 86 190 226 290 293 179 119 289 156 539 179 9 0 54 -4 100 -10z m-1019 -1540 c38 -27 178 -92 254 -118 229 -79 393 -110 625 -118 353 -12 674 57 936 203 33 19 64 34 67 34 4 0 7 -33 7 -74 l0 -73 -83 -80 c-156 -150 -358 -258 -592 -319 -259 -67 -557 -29 -830 106 -150 74 -253 141 -343 225 l-71 66 -3 84 c-2 47 -1 85 0 85 2 0 17 -9 33 -21z m150 -722 c201 -128 536 -217 814 -217 253 0 530 71 734 187 68 39 204 133 219 151 23 30 12 -7 -27 -90 -103 -217 -303 -408 -521 -500 -250 -105 -571 -116 -800 -28 -92 36 -229 120 -312 191 -87 76 -184 202 -233 304 -69 143 -69 147 6 88 35 -28 89 -66 120 -86z" />
+    <path fill="#222222" fill-opacity="0.8" d="M1365 2727 c-212 -101 -203 -384 14 -480 158 -70 341 55 341 233 0 74 -15 121 -53 172 -69 91 -201 124 -302 75z m180 -142 c74 -73 -26 -179 -109 -114 -55 43 -18 139 54 139 19 0 40 -9 55 -25z" />
+    <path fill="#222222" fill-opacity="0.8" d="M2198 2736 c-108 -39 -167 -127 -167 -251 -1 -182 180 -309 340 -238 172 76 223 276 105 410 -72 82 -182 113 -278 79z m117 -151 c35 -34 34 -86 -1 -114 -57 -45 -134 -12 -134 58 0 74 83 109 135 56z" />
+   </g>
+  </svg>
+  <div id="l_loading_na">...</div>
+ </div>
+ <div id="l_footer">
+  <a href="https://grub.larval.com/atom.xml" target="_blank">atom</a> &#8226; <a href="https://grub.larval.com/rss.xml" target="_blank">rss</a> &#8226; <a href="mailto:contact@larval.com?subject=Larval%20inquiry" tabindex="-1">contact<span>@larval . com</span></a> &#8226; <a class="l_last_update" title="Force update now" tabindex="-1">last update: <i id="l_last_update">NEVER</i></a>
+ </div>
+ <div id="l_fragments">
+  <table id="f_no_results_row"><tr><td class="l_none" colspan="7">@</td></tr></table>
+  <div id="f_marquee_blink_wide"><i class="l_marquee_blink_wide">&#8226;</i></div>
+  <div id="f_marquee_blink"><i class="l_marquee_blink">&#8226;</i></div>
+  <div id="f_empty_cell"><div class="l_none">&#8226;</div></div>
+  <div id="f_class_title_display"><div class="@" title="@">@</div></div>
+  <div id="f_class_title_keymap_display"><div class="@" title="@" data-keymap="@">@</div></div>
+  <div id="f_l_up">%<i class="l_up">&#9650;</i></div>
+  <div id="f_l_down">%<i class="l_down">&#9660;</i></div>
+  <div id="f_blank_line"><div class="l_hr"></div></div>
+ </div>
+</div>
+</body></html>
