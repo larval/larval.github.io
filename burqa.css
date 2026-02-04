@@ -174,8 +174,14 @@ svg {
 	margin: auto;
 }
 iframe {
-	height: 100vh;
+	postition: fixed;
+	top: 0;
+	left: 0;
 	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	border: 0;
 }
 i { font-style: normal !important; }
 #l_root {
@@ -1320,3 +1326,4 @@ input[type=checkbox]:checked:disabled + label:before {
 		height: 121px !important;
 	}
 }
+
