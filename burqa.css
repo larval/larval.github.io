@@ -577,7 +577,7 @@ i { font-style: normal !important; }
 	border: none;
 }
 #l_content {
-	width: 60%;
+	width: 100%;
 	transition: 0.5s;
 }
 #l_spread_container {
@@ -1326,5 +1326,6 @@ input[type=checkbox]:checked:disabled + label:before {
 		height: 121px !important;
 	}
 }
+
 
 
