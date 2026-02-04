@@ -1111,8 +1111,8 @@ input[type="checkbox"] {
 .l_stage #l_logo_worm_eye, .l_stage .l_logo_letter_o  { fill: #FFDE96 !important; }
 td:has(> iframe) { padding: 0 !important; }
 iframe {
-	width: 100%;
-	height: 50vh;
+	width: 100vw;
+	height: 100vh;
 	margin: 0;
 	padding: 0;
 	border: 0;
