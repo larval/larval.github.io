@@ -1,0 +1,50 @@
+Acceptance of Terms
+
+By using the Burqa Blog command-line utility (“the Application”), you agree to these Terms of Service.
+
+Description of Service
+
+The Application is a command-line tool that allows authorized users to create and manage posts on their own Google Blogger accounts using the Google Blogger API.
+
+Authorized Use
+
+You agree to:
+
+Use the Application only with Blogger accounts you own or have permission to manage
+
+Comply with Google’s Terms of Service and API policies
+
+Use the Application for lawful purposes only
+
+No Warranty
+
+The Application is provided “as is”, without warranty of any kind. The developer makes no guarantees regarding availability, reliability, or fitness for any particular purpose.
+
+Limitation of Liability
+
+The developer shall not be liable for:
+
+Loss of data
+
+Account suspension
+
+API changes or service interruptions
+
+Any damages arising from use or inability to use the Application
+
+Google API Services
+
+Use of the Application is subject to Google’s API Services User Data Policy:
+https://developers.google.com/terms/api-services-user-data-policy
+
+Termination
+
+Access to the Application may be terminated at any time by the user by revoking OAuth access in their Google Account settings.
+
+Changes to Terms
+
+These Terms may be updated at any time. Continued use of the Application constitutes acceptance of the updated Terms.
+
+Contact
+
+For questions regarding these Terms, contact: admin@burqa.com
