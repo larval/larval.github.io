@@ -1,0 +1,62 @@
+Overview
+
+Burqa Blog (“the Application”) is a personal command-line utility used to publish content to Google Blogger accounts authorized by the user. This application is intended for personal or internal use only.
+
+Information We Collect
+
+The Application does not collect, store, or transmit personal data beyond what is required to authenticate with Google APIs.
+
+Specifically:
+
+OAuth access tokens and refresh tokens are stored locally by the user on their own system.
+
+No user data is stored on external servers.
+
+No data is shared with third parties.
+
+Use of Google User Data
+
+The Application accesses Google user data strictly for the purpose of:
+
+Authenticating the user via OAuth
+
+Creating and managing blog posts on the user’s own Blogger account
+
+The Application only requests the following scope:
+
+https://www.googleapis.com/auth/blogger
+
+
+Google user data is:
+
+Used only while the application is running
+
+Never logged, analyzed, or sold
+
+Never transferred to any third-party service
+
+Data Storage
+
+All authentication tokens are stored locally in a file (token.json) on the user’s machine. The user is fully responsible for securing this file.
+
+Data Retention and Deletion
+
+The Application does not retain user data on any server. Users may revoke access at any time by:
+
+Deleting the local token file
+
+Revoking the application in their Google Account security settings
+
+Third-Party Services
+
+The Application uses Google APIs. Use of Google services is governed by Google’s Privacy Policy:
+https://policies.google.com/privacy
+
+Changes to This Policy
+
+This Privacy Policy may be updated from time to time. Any changes will be reflected on this page.
+
+Contact
+
+For questions about this Privacy Policy, contact:
+[your email address]
